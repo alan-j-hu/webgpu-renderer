@@ -2,15 +2,17 @@
 #define MODEL_H
 
 #include "pipeline.h"
+#include "glm/mat4x4.hpp"
 
-class ModelBinding
+class Model
 {
 public:
-    ModelBinding(WGPUDevice device, Pipeline pipeline);
+    Model(WGPUDevice device, Pipeline& pipeline);
+    virtual ~Model();
 
     void copy_to_gpu(WGPUDevice device);
 
-    Model m_model;
+    ModelData m_model;
     WGPUBindGroup m_bind_group;
     WGPUBuffer m_buffer;
 };

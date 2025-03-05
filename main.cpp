@@ -4,6 +4,7 @@
 #include "pipeline.h"
 
 #include <array>
+#include <iostream>
 #include <webgpu/webgpu.h>
 
 class Main : public Application
@@ -79,12 +80,12 @@ public:
 
     virtual ~Main()
     {
-        //wgpuBufferRelease(m_vertex_buffer);
+        wgpuBufferRelease(m_vertex_buffer);
     }
 private:
     Pipeline m_pipeline;
-    CameraBinding m_camera;
-    ModelBinding m_model;
+    Camera m_camera;
+    Model m_model;
     WGPUBuffer m_vertex_buffer;
 };
 

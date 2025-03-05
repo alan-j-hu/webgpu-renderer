@@ -3,14 +3,15 @@
 
 #include "pipeline.h"
 
-class CameraBinding
+class Camera
 {
 public:
-    CameraBinding(WGPUDevice device, Pipeline pipeline);
+    Camera(WGPUDevice device, Pipeline& pipeline);
+    virtual ~Camera();
 
     void copy_to_gpu(WGPUDevice device);
 
-    Camera m_camera;
+    CameraData m_camera;
     WGPUBindGroup m_bind_group;
     WGPUBuffer m_buffer;
 };

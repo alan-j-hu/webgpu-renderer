@@ -1,6 +1,7 @@
 #ifndef PIPELINE_H
 #define PIPELINE_H
 
+#include <glm/mat4x4.hpp>
 #include <webgpu/webgpu.h>
 
 struct Vertex
@@ -10,20 +11,22 @@ struct Vertex
     float r, g, b, a;
 };
 
-struct Camera
+struct CameraData
 {
-    float viewproj[4][4];
+    glm::mat4 viewproj;
 };
 
-struct Model
+struct ModelData
 {
-    float transform[4][4];
+    glm::mat4 transform;
 };
 
 class Pipeline
 {
 public:
     Pipeline(WGPUDevice device);
+    Pipeline(const Pipeline&) = delete;
+    Pipeline& operator=(const Pipeline&) = delete;
 
     ~Pipeline();
 

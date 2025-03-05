@@ -73,7 +73,7 @@ fn fs_main(input: FragmentInput) -> @location(0) vec4f {
     layout0_entries[0].binding = 0;
     layout0_entries[0].visibility = WGPUShaderStage_Vertex;
     layout0_entries[0].buffer.type = WGPUBufferBindingType_Uniform;
-    layout0_entries[0].buffer.minBindingSize = sizeof(Camera);
+    layout0_entries[0].buffer.minBindingSize = sizeof(CameraData);
 
     WGPUBindGroupLayoutDescriptor layout0_desc = { 0 };
     layout0_desc.label = {"CameraLayout", WGPU_STRLEN};
@@ -86,7 +86,7 @@ fn fs_main(input: FragmentInput) -> @location(0) vec4f {
     layout1_entries[0].binding = 0;
     layout1_entries[0].visibility = WGPUShaderStage_Vertex;
     layout1_entries[0].buffer.type = WGPUBufferBindingType_Uniform;
-    layout1_entries[0].buffer.minBindingSize = sizeof(Model);
+    layout1_entries[0].buffer.minBindingSize = sizeof(ModelData);
 
     WGPUBindGroupLayoutDescriptor layout1_desc = { 0 };
     layout1_desc.label = {"ModelLayout", WGPU_STRLEN};
@@ -153,9 +153,9 @@ fn fs_main(input: FragmentInput) -> @location(0) vec4f {
 
 Pipeline::~Pipeline()
 {
-    //wgpuBindGroupLayoutRelease(m_layout1);
-    //wgpuBindGroupLayoutRelease(m_layout0);
-    //wgpuRenderPipelineRelease(m_pipeline);
+    wgpuBindGroupLayoutRelease(m_layout1);
+    wgpuBindGroupLayoutRelease(m_layout0);
+    wgpuRenderPipelineRelease(m_pipeline);
 }
 
 WGPUBindGroup Pipeline::create_camera_group(WGPUBuffer buffer)
@@ -163,7 +163,7 @@ WGPUBindGroup Pipeline::create_camera_group(WGPUBuffer buffer)
     WGPUBindGroupEntry entries[1] = { 0 };
     entries[0].binding = 0;
     entries[0].buffer = buffer;
-    entries[0].size = sizeof(Camera);
+    entries[0].size = sizeof(CameraData);
 
     WGPUBindGroupDescriptor bind_group_desc = { 0 };
     bind_group_desc.label = {"CameraBindGroup", WGPU_STRLEN};
@@ -179,7 +179,7 @@ WGPUBindGroup Pipeline::create_model_group(WGPUBuffer buffer)
     WGPUBindGroupEntry entries[1] = { 0 };
     entries[0].binding = 0;
     entries[0].buffer = buffer;
-    entries[0].size = sizeof(Model);
+    entries[0].size = sizeof(ModelData);
 
     WGPUBindGroupDescriptor bind_group_desc = { 0 };
     bind_group_desc.label = {"ModelBindGroup", WGPU_STRLEN};
