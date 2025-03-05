@@ -77,6 +77,8 @@ WGPUDevice request_device(WGPUInstance instance, WGPUAdapter adapter)
 
     WGPUDeviceDescriptor desc = { 0 };
     desc.nextInChain = NULL;
+    desc.label.data = "device";
+    desc.label.length = WGPU_STRLEN;
     desc.deviceLostCallbackInfo.mode = WGPUCallbackMode_AllowSpontaneous;
     desc.deviceLostCallbackInfo.callback = device_lost_callback;
     desc.uncapturedErrorCallbackInfo.callback = uncaptured_error_callback;
