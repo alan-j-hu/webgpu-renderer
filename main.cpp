@@ -69,6 +69,7 @@ public:
     void tick()
     {
         WGPUQueue queue = wgpuDeviceGetQueue(m_device);
+        pre_render(queue);
 
         WGPUCommandEncoderDescriptor encoder_desc = { 0 };
         WGPUCommandEncoder encoder =
@@ -211,7 +212,7 @@ struct FragmentInput {
 @vertex
 fn vs_main(vertex: Vertex) -> FragmentInput {
   var out: FragmentInput;
-  out.pos = vec4(vertex.pos, 1);
+  out.pos = camera.viewproj * model.transform * vec4(vertex.pos, 1);
   out.color = vertex.color;
   return out;
 }
@@ -395,8 +396,8 @@ public:
     CameraBinding(WGPUDevice device, Pipeline pipeline)
     {
         std::memset(m_camera.viewproj, 0, sizeof(float[4][4]));
-        m_camera.viewproj[0][0] = 1;
-        m_camera.viewproj[1][1] = 1;
+        m_camera.viewproj[0][0] = 2;
+        m_camera.viewproj[1][1] = 0.5;
         m_camera.viewproj[2][2] = 1;
         m_camera.viewproj[3][3] = 1;
 
@@ -430,8 +431,8 @@ public:
     ModelBinding(WGPUDevice device, Pipeline pipeline)
     {
         std::memset(m_model.transform, 0, sizeof(float[4][4]));
-        m_model.transform[0][0] = 1;
-        m_model.transform[1][1] = 1;
+        m_model.transform[0][0] = 0.5;
+        m_model.transform[1][1] = 0.5;
         m_model.transform[2][2] = 1;
         m_model.transform[3][3] = 1;
 
