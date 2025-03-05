@@ -4,7 +4,7 @@ project(Demo)
 set(DAWN_FETCH_DEPENDENCIES ON)
 add_subdirectory(third_party/dawn EXCLUDE_FROM_ALL)
 
-set(sources main.cpp init_wgpu.c)
+set(sources main.cpp application.cpp init_wgpu.c)
 
 add_executable(demo ${sources})
 
