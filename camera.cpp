@@ -42,9 +42,6 @@ void Camera::update_matrix()
         4.0f / 3.0f,
         0.1f,
         100.f);
-    glm::mat4 view = glm::lookAtLH(
-        m_position,
-        m_target,
-        m_up);
+    glm::mat4 view = glm::lookAtLH(m_position, m_target, m_up);
     m_camera.viewproj = proj * view;
 }

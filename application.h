@@ -18,18 +18,14 @@ public:
 
     void tick();
 
+    virtual void render(WGPUTextureView view) = 0;
+
 protected:
     GLFWwindow* window() { return m_window; }
 
     WGPUDevice device() { return m_device; }
 
-    WGPUSurface surface()
-    {
-        return m_surface;
-    }
-    virtual void pre_render(WGPUQueue queue) = 0;
-
-    virtual void render(WGPURenderPassEncoder) = 0;
+    WGPUSurface surface() { return m_surface; }
 
 private:
     int m_width;

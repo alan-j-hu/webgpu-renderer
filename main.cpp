@@ -1,10 +1,11 @@
 #include "application.h"
 #include "camera.h"
+#include "mesh.h"
 #include "model.h"
 #include "pipeline.h"
+#include "renderer.h"
 
 #include <array>
-#include <iostream>
 #include <webgpu/webgpu.h>
 
 class Main : public Application
@@ -12,9 +13,7 @@ class Main : public Application
 public:
     Main(int width, int height)
         : Application(width, height),
-          m_pipeline(device()),
-          m_camera(device(), m_pipeline),
-          m_model(device(), m_pipeline)
+          m_renderer(device(), width, height)
     {
         std::array<Vertex, 3> vertices;
         vertices[0].x = 0;
@@ -43,50 +42,17 @@ public:
         vertices[2].g = 0;
         vertices[2].b = 1;
         vertices[2].a = 1;
-        create_vertices(vertices.data(), 3);
+        auto& mesh = m_renderer.add_mesh(vertices.data(), 3);
+        m_renderer.add_model(mesh);
     }
 
-    void create_vertices(Vertex* vertices, std::size_t count)
+    virtual void render(WGPUTextureView view) override
     {
-        WGPUBufferDescriptor buffer_desc = { 0 };
-        buffer_desc.nextInChain = nullptr;
-        buffer_desc.usage = WGPUBufferUsage_CopyDst | WGPUBufferUsage_Vertex,
-        buffer_desc.size = count * sizeof(Vertex);
-        buffer_desc.mappedAtCreation = false;
-
-        m_vertex_buffer =
-            wgpuDeviceCreateBuffer(device(), &buffer_desc);
-
-        WGPUQueue queue = wgpuDeviceGetQueue(device());
-        wgpuQueueWriteBuffer(
-            queue, m_vertex_buffer, 0, vertices, sizeof(Vertex) * count);
+        m_renderer.render(view);
     }
 
-
-    virtual void pre_render(WGPUQueue queue)
-    {
-        m_camera.copy_to_gpu(device());
-        m_model.copy_to_gpu(device());
-    }
-
-    virtual void render(WGPURenderPassEncoder encoder) override
-    {
-        wgpuRenderPassEncoderSetBindGroup(encoder, 0, m_camera.m_bind_group, 0, nullptr);
-        wgpuRenderPassEncoderSetBindGroup(encoder, 1, m_model.m_bind_group, 0, nullptr);
-        wgpuRenderPassEncoderSetPipeline(encoder, m_pipeline.pipeline());
-        wgpuRenderPassEncoderSetVertexBuffer(encoder, 0, m_vertex_buffer, 0, sizeof(Vertex) * 3);
-        wgpuRenderPassEncoderDraw(encoder, 3, 1, 0, 0);
-    }
-
-    virtual ~Main()
-    {
-        wgpuBufferRelease(m_vertex_buffer);
-    }
 private:
-    Pipeline m_pipeline;
-    Camera m_camera;
-    Model m_model;
-    WGPUBuffer m_vertex_buffer;
+    Renderer m_renderer;
 };
 
 int main()

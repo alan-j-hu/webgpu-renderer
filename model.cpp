@@ -1,8 +1,10 @@
 #include "model.h"
+#include "mesh.h"
 #include <cstring>
 #include <glm/ext/matrix_transform.hpp>
 
-Model::Model(WGPUDevice device, Pipeline& pipeline)
+Model::Model(WGPUDevice device, Pipeline& pipeline, const Mesh& mesh)
+    : m_mesh(mesh)
 {
     m_model.transform = glm::identity<glm::mat4>();
 

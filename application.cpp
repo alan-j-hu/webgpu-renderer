@@ -58,45 +58,13 @@ int Application::run()
 
 void Application::tick()
 {
-    WGPUQueue queue = wgpuDeviceGetQueue(m_device);
-    pre_render(queue);
-
-    WGPUCommandEncoderDescriptor encoder_desc = { 0 };
-    WGPUCommandEncoder encoder =
-        wgpuDeviceCreateCommandEncoder(m_device, &encoder_desc);
-
     WGPUSurfaceTexture surface_texture;
     wgpuSurfaceGetCurrentTexture(m_surface, &surface_texture);
-
-    WGPURenderPassColorAttachment color_attachments = { 0 };
-    color_attachments.depthSlice = WGPU_DEPTH_SLICE_UNDEFINED;
-    color_attachments.loadOp = WGPULoadOp_Clear;
-    color_attachments.storeOp = WGPUStoreOp_Store;
-    color_attachments.clearValue = { 1, 1, 0, 1 };
-    color_attachments.view = wgpuTextureCreateView(
+    WGPUTextureView view = wgpuTextureCreateView(
         surface_texture.texture, nullptr);
-
-    WGPURenderPassDescriptor render_pass_desc = {};
-    render_pass_desc.colorAttachmentCount = 1;
-    render_pass_desc.colorAttachments = &color_attachments;
-    render_pass_desc.depthStencilAttachment = nullptr;
-
-    WGPURenderPassEncoder pass = wgpuCommandEncoderBeginRenderPass(
-        encoder, &render_pass_desc);
-    render(pass);
-    wgpuRenderPassEncoderEnd(pass);
-
-    WGPUCommandBufferDescriptor buffer_desc = { 0 };
-    WGPUCommandBuffer command_buffer =
-        wgpuCommandEncoderFinish(encoder, &buffer_desc);
-    wgpuQueueSubmit(queue, 1, &command_buffer);
-
+    render(view);
     wgpuSurfacePresent(m_surface);
-
-    wgpuTextureViewRelease(color_attachments.view);
-    wgpuRenderPassEncoderRelease(pass);
-    wgpuCommandEncoderRelease(encoder);
-    wgpuCommandBufferRelease(command_buffer);
+    wgpuTextureViewRelease(view);
 }
 
 void Application::resize(int width, int height)
