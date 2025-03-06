@@ -5,7 +5,7 @@
 
 Camera::Camera(WGPUDevice device, Pipeline& pipeline)
 {
-    m_position = glm::vec3(0.0f, 0.0f, 1.0f);
+    m_position = glm::vec3(0.0f, 0.0f, -1.0f);
     m_target = glm::vec3(0.0f, 0.0f, 0.0f);
     m_up = glm::vec3(0.0f, 1.0f, 0.0f);
 
@@ -27,6 +27,16 @@ Camera::~Camera()
     wgpuBufferRelease(m_buffer);
 }
 
+void Camera::set_position(const glm::vec3& position)
+{
+    m_position = position;
+}
+
+void Camera::set_target(const glm::vec3& target)
+{
+    m_target = target;
+}
+
 void Camera::copy_to_gpu(WGPUDevice device)
 {
     update_matrix();
@@ -37,7 +47,7 @@ void Camera::copy_to_gpu(WGPUDevice device)
 
 void Camera::update_matrix()
 {
-    glm::mat4 proj = glm::perspective(
+    glm::mat4 proj = glm::perspectiveLH_ZO(
         glm::pi<float>() * 0.5f,
         4.0f / 3.0f,
         0.1f,

@@ -13,6 +13,8 @@ class Renderer
 public:
     Renderer(WGPUDevice device, int width, int height);
 
+    Camera& camera() { return m_camera; }
+
     void render(WGPUTextureView view);
 
     Mesh& add_mesh(Vertex* vertices, std::size_t count);

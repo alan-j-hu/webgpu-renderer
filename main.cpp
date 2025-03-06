@@ -6,7 +6,32 @@
 #include "renderer.h"
 
 #include <array>
+#include <glm/ext/scalar_constants.hpp>
 #include <webgpu/webgpu.h>
+
+Vertex make_vertex(
+    float x, float y, float z, float r, float g, float b, float a)
+{
+    Vertex v = { 0 };
+    v.x = x;
+    v.y = y;
+    v.z = z;
+    v.r = r;
+    v.g = g;
+    v.b = b;
+    v.a = a;
+    return v;
+}
+
+void make_quad(Vertex* out, Vertex a, Vertex b, Vertex c, Vertex d)
+{
+    out[0] = a;
+    out[1] = b;
+    out[2] = c;
+    out[3] = a;
+    out[4] = c;
+    out[5] = d;
+}
 
 class Main : public Application
 {
@@ -15,44 +40,57 @@ public:
         : Application(width, height),
           m_renderer(device(), width, height)
     {
-        std::array<Vertex, 3> vertices;
-        vertices[0].x = 0;
-        vertices[0].y = 0;
-        vertices[0].z = 50;
-        vertices[0]._padding = 0;
-        vertices[0].r = 1;
-        vertices[0].g = 0;
-        vertices[0].b = 0;
-        vertices[0].a = 1;
+        std::array<Vertex, 24> vertices;
+        // front
+        make_quad(
+            vertices.data(),
+            make_vertex(-20, 20, -20, 1, 0, 0, 1),
+            make_vertex(-20, -20, -20, 0, 1, 0, 1),
+            make_vertex(20, -20, -20, 0, 0, 1, 1),
+            make_vertex(20, 20, -20, 1, 0, 0, 1));
+        // right
+        make_quad(
+            vertices.data() + 6,
+            make_vertex(20, 20, -20, 1, 0, 0, 1),
+            make_vertex(20, -20, -20, 0, 1, 0, 1),
+            make_vertex(20, -20, 20, 0, 0, 1, 1),
+            make_vertex(20, 20, 20, 1, 0, 0, 1));
+        // back
+        make_quad(
+            vertices.data() + 12,
+            make_vertex(20, 20, 20, 1, 0, 0, 1),
+            make_vertex(20, -20, 20, 0, 1, 0, 1),
+            make_vertex(-20, -20, 20, 0, 0, 1, 1),
+            make_vertex(-20, 20, 20, 1, 0, 0, 1));
+        // left
+        make_quad(
+            vertices.data() + 18,
+            make_vertex(-20, 20, 20, 1, 0, 0, 1),
+            make_vertex(-20, -20, 20, 0, 1, 0, 1),
+            make_vertex(-20, -20, -20, 0, 0, 1, 1),
+            make_vertex(-20, 20, -20, 1, 0, 0, 1));
 
-        vertices[1].x = 20;
-        vertices[1].y = 20;
-        vertices[1].z = 50;
-        vertices[1]._padding = 0;
-        vertices[1].r = 0;
-        vertices[1].g = 1;
-        vertices[1].b = 0;
-        vertices[1].a = 1;
+        m_yaw = glm::pi<float>() * 0.25f;
+        auto& mesh = m_renderer.add_mesh(vertices.data(), 24);
+        m_model = &m_renderer.add_model(mesh);
+        m_model->set_translation(glm::vec3(0.0f, 0.0f, 50.0f));
 
-        vertices[2].x = 0;
-        vertices[2].y = 20;
-        vertices[2].z = 50;
-        vertices[2]._padding = 0;
-        vertices[2].r = 0;
-        vertices[2].g = 0;
-        vertices[2].b = 1;
-        vertices[2].a = 1;
-        auto& mesh = m_renderer.add_mesh(vertices.data(), 3);
-        m_renderer.add_model(mesh);
+        auto& camera = m_renderer.camera();
+        camera.set_position(glm::vec3(0.0f, 0.0f, -25.0f));
+        camera.set_target(glm::vec3(0.0f, 0.0f, 0.0f));
     }
 
     virtual void render(WGPUTextureView view) override
     {
+        m_yaw += 0.01;
+        m_model->set_yaw(m_yaw);
         m_renderer.render(view);
     }
 
 private:
     Renderer m_renderer;
+    Model* m_model;
+    float m_yaw;
 };
 
 int main()

@@ -4,11 +4,15 @@
 #include "pipeline.h"
 #include <glm/vec3.hpp>
 
+/* The camera uses a left-handed coordinate system with Y-up. */
 class Camera
 {
 public:
     Camera(WGPUDevice device, Pipeline& pipeline);
     virtual ~Camera();
+
+    void set_position(const glm::vec3& position);
+    void set_target(const glm::vec3& target);
 
     void copy_to_gpu(WGPUDevice device);
 

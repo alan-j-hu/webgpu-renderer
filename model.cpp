@@ -16,6 +16,9 @@ Model::Model(WGPUDevice device, Pipeline& pipeline, const Mesh& mesh)
     m_buffer = wgpuDeviceCreateBuffer(device, &buffer_desc);
 
     m_bind_group = pipeline.create_model_group(m_buffer);
+
+    m_translation = glm::vec3(0.0f, 0.0f, 0.0f);
+    m_scale = 1;
 }
 
 Model::~Model()
@@ -24,9 +27,36 @@ Model::~Model()
     wgpuBufferRelease(m_buffer);
 }
 
+void Model::set_translation(const glm::vec3& translation)
+{
+    m_translation = translation;
+}
+
+void Model::set_yaw(float yaw)
+{
+    m_yaw = yaw;
+}
+
+void Model::set_scale(float scale)
+{
+    m_scale = scale;
+}
+
 void Model::copy_to_gpu(WGPUDevice device)
 {
+    update_matrix();
     WGPUQueue queue = wgpuDeviceGetQueue(device);
     wgpuQueueWriteBuffer(
         queue, m_buffer, 0, &m_model.transform, sizeof(float[4][4]));
+}
+
+void Model::update_matrix()
+{
+    glm::mat4 transform = glm::mat4(1);
+    // Unintuitively, the matrix argument is the *left* mtrix (i.e. the
+    // the *next* step in the transformation. Therefore, the code is
+    // written in the opposite order than the transformations.
+    transform = glm::translate(transform, m_translation);
+    transform = glm::rotate(transform, m_yaw, glm::vec3(0, 1, 0));
+    m_model.transform = transform;
 }
