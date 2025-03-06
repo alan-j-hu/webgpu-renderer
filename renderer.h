@@ -17,16 +17,24 @@ public:
 
     void render(WGPUTextureView view);
 
+    void resize(int width, int height);
+
     Mesh& add_mesh(Vertex* vertices, std::size_t count);
 
     Model& add_model(const Mesh& mesh);
 private:
+    int m_width;
+    int m_height;
+    WGPUTexture m_depth_texture;
+    WGPUTextureView m_depth_texture_view;
+
     WGPUDevice m_device;
     Pipeline m_pipeline;
     Camera m_camera;
     std::vector<std::unique_ptr<Mesh>> m_meshes;
     std::vector<std::unique_ptr<Model>> m_models;
 
+    void create_depth_buffer(int width, int height);
     void do_render(WGPURenderPassEncoder encoder);
 };
 

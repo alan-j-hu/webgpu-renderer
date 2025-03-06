@@ -87,6 +87,12 @@ public:
         m_renderer.render(view);
     }
 
+    virtual void resize(int width, int height)
+    {
+        Application::resize(width, height);
+        m_renderer.resize(width, height);
+    }
+
 private:
     Renderer m_renderer;
     Model* m_model;

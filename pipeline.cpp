@@ -104,6 +104,11 @@ fn fs_main(input: FragmentInput) -> @location(0) vec4f {
     WGPUPipelineLayout pipeline_layout =
         wgpuDeviceCreatePipelineLayout(device, &pipeline_layout_desc);
 
+    WGPUDepthStencilState depth_stencil = { 0 };
+    depth_stencil.format = WGPUTextureFormat_Depth24Plus;
+    depth_stencil.depthWriteEnabled = WGPUOptionalBool_True;
+    depth_stencil.depthCompare = WGPUCompareFunction_Less;
+
     WGPUBlendState blend = {
         .color= {
             .operation = WGPUBlendOperation_Add,
@@ -139,6 +144,7 @@ fn fs_main(input: FragmentInput) -> @location(0) vec4f {
     pipeline_desc.primitive.topology = WGPUPrimitiveTopology_TriangleList;
     pipeline_desc.primitive.frontFace = WGPUFrontFace_CCW;
     pipeline_desc.primitive.cullMode = WGPUCullMode_None;
+    pipeline_desc.depthStencil = &depth_stencil;
     pipeline_desc.multisample.count = 1;
     pipeline_desc.multisample.count = 1;
     pipeline_desc.multisample.mask = ~0u;

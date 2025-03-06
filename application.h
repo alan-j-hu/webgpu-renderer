@@ -27,6 +27,8 @@ protected:
 
     WGPUSurface surface() { return m_surface; }
 
+    virtual void resize(int width, int height);
+
 private:
     int m_width;
     int m_height;
@@ -35,8 +37,6 @@ private:
     WGPUAdapter m_adapter;
     WGPUDevice m_device;
     WGPUSurface m_surface;
-
-    void resize(int width, int height);
 
     static void resize_callback(GLFWwindow* window, int width, int height);
 };
