@@ -11,6 +11,12 @@ Renderer::Renderer(WGPUDevice device, int width, int height)
     create_depth_buffer(width, height);
 }
 
+Renderer::~Renderer()
+{
+    wgpuTextureViewRelease(m_depth_texture_view);
+    wgpuTextureRelease(m_depth_texture);
+}
+
 void Renderer::resize(int width, int height)
 {
     wgpuTextureViewRelease(m_depth_texture_view);

@@ -13,6 +13,8 @@ class Renderer
 public:
     Renderer(WGPUDevice device, int width, int height);
 
+    virtual ~Renderer();
+
     Camera& camera() { return m_camera; }
 
     void render(WGPUTextureView view);
