@@ -16,7 +16,7 @@ add_subdirectory(third_party/dawn EXCLUDE_FROM_ALL)
 set(sources main.cpp
   application.cpp
   camera.cpp
-  init_wgpu.c
+  init_wgpu.cpp
   mesh.cpp
   model.cpp
   pipeline.cpp

@@ -1,5 +1,19 @@
-#include <stdio.h>
+#include <iostream>
+#include <string_view>
 #include <webgpu/webgpu.h>
+
+std::string_view convert_stringview(WGPUStringView view)
+{
+    if (view.length == 0) {
+        return std::string_view();
+    } else if (view.data == nullptr) {
+        return std::string_view();
+    } else if (view.length == WGPU_STRLEN) {
+        return std::string_view(view.data);
+    } else {
+        return std::string_view(view.data, view.length);
+    }
+}
 
 void request_adapter_callback(
     WGPURequestAdapterStatus status,
@@ -28,7 +42,7 @@ void device_lost_callback(
     void* userdata1,
     void* userdata2)
 {
-    fprintf(stderr, "Device lost.");
+    std::cerr << "Device lost.\n";
 }
 
 void uncaptured_error_callback(
@@ -38,7 +52,7 @@ void uncaptured_error_callback(
     void* userdata1,
     void* userdata2)
 {
-    fprintf(stderr, "Error: %s\n", message.data);
+    std::cerr << "Error: " << convert_stringview(message) << std::endl;
 }
 
 WGPUAdapter request_adapter(WGPUInstance instance, WGPUSurface surface)
