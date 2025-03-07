@@ -24,7 +24,10 @@ public:
     Mesh& add_mesh(Vertex* vertices, std::size_t count);
 
     Model& add_model(const Mesh& mesh);
+
+    void set_clear_color(WGPUColor);
 private:
+    WGPUColor m_clear_color;
     int m_width;
     int m_height;
     WGPUTexture m_depth_texture;

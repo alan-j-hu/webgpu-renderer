@@ -2,7 +2,8 @@
 #include <utility>
 
 Renderer::Renderer(WGPUDevice device, int width, int height)
-    : m_device(device),
+    : m_clear_color {0, 0, 0, 1},
+      m_device(device),
       m_width(width),
       m_height(height),
       m_pipeline(device),
@@ -41,7 +42,7 @@ void Renderer::render(WGPUTextureView view)
     color_attachment.depthSlice = WGPU_DEPTH_SLICE_UNDEFINED;
     color_attachment.loadOp = WGPULoadOp_Clear;
     color_attachment.storeOp = WGPUStoreOp_Store;
-    color_attachment.clearValue = { 1, 1, 0, 1 };
+    color_attachment.clearValue = m_clear_color;
     color_attachment.view = view;
 
     WGPURenderPassDepthStencilAttachment depth_stencil_attachment = { 0 };
@@ -87,6 +88,11 @@ Model& Renderer::add_model(const Mesh& mesh)
     m_models.push_back(
         std::make_unique<Model>(m_device, m_pipeline, mesh));
     return *m_models[m_models.size() - 1];
+}
+
+void Renderer::set_clear_color(WGPUColor color)
+{
+    m_clear_color = color;
 }
 
 void Renderer::create_depth_buffer(int width, int height)

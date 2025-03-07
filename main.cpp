@@ -40,6 +40,8 @@ public:
         : Application(width, height),
           m_renderer(device(), width, height)
     {
+        m_renderer.set_clear_color({0.5, 0.5, 0.5, 1});
+
         std::array<Vertex, 24> vertices;
         // front
         make_quad(
