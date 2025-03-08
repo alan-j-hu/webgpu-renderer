@@ -129,14 +129,14 @@ void Renderer::do_render(WGPURenderPassEncoder encoder)
     wgpuRenderPassEncoderSetPipeline(
         encoder, m_pipeline.pipeline());
     wgpuRenderPassEncoderSetBindGroup(
-        encoder, 0, m_camera.m_bind_group, 0, nullptr);
+        encoder, 0, m_camera.bind_group(), 0, nullptr);
     for (auto& model : m_models) {
-        std::size_t count = 3 * model->m_mesh.tri_count;
+        std::size_t count = 3 * model->mesh().tri_count;
 
         wgpuRenderPassEncoderSetBindGroup(
-            encoder, 1, model->m_bind_group, 0, nullptr);
+            encoder, 1, model->bind_group(), 0, nullptr);
         wgpuRenderPassEncoderSetVertexBuffer(
-            encoder, 0, model->m_mesh.vertex_buffer, 0,
+            encoder, 0, model->mesh().vertex_buffer, 0,
             sizeof(Vertex) * count);
         wgpuRenderPassEncoderDraw(encoder, count, 1, 0, 0);
     }
