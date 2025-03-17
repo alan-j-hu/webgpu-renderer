@@ -17,10 +17,13 @@ set(sources main.cpp
   application.cpp
   camera.cpp
   init_wgpu.cpp
+  material.cpp
   mesh.cpp
   model.cpp
   pipeline.cpp
-  renderer.cpp)
+  renderer.cpp
+  stb_image.c
+  texture.cpp)
 
 add_executable(demo ${sources})
 

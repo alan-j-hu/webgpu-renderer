@@ -11,29 +11,33 @@ struct Model {
   transform: mat4x4<f32>,
 };
 @group(0) @binding(0) var<uniform> camera: Camera;
-@group(1) @binding(0) var<uniform> model: Model;
+
+@group(1) @binding(0) var the_texture: texture_2d<f32>;
+@group(1) @binding(1) var the_sampler: sampler;
+
+@group(2) @binding(0) var<uniform> model: Model;
 
 struct Vertex {
   @location(0) pos: vec3f,
-  @location(1) color: vec4f,
+  @location(1) tex_coords: vec2f,
 }
 
 struct FragmentInput {
   @builtin(position) pos: vec4f,
-  @location(0) color: vec4f,
+  @location(0) tex_coords: vec2f,
 };
 
 @vertex
 fn vs_main(vertex: Vertex) -> FragmentInput {
   var out: FragmentInput;
   out.pos = camera.viewproj * model.transform * vec4(vertex.pos, 1);
-  out.color = vertex.color;
+  out.tex_coords = vertex.tex_coords;
   return out;
 }
 
 @fragment
 fn fs_main(input: FragmentInput) -> @location(0) vec4f {
-  return input.color;
+  return textureSample(the_texture, the_sampler, input.tex_coords);
 }
 )";
 
@@ -60,8 +64,8 @@ fn fs_main(input: FragmentInput) -> @location(0) vec4f {
     vertex_attrs[0].format = WGPUVertexFormat_Float32x3;
     vertex_attrs[0].offset = 0;
     vertex_attrs[1].shaderLocation = 1;
-    vertex_attrs[1].format = WGPUVertexFormat_Float32x3;
-    vertex_attrs[1].offset = offsetof(Vertex, r);
+    vertex_attrs[1].format = WGPUVertexFormat_Float32x2;
+    vertex_attrs[1].offset = offsetof(Vertex, u);
 
     WGPUVertexBufferLayout vertex_layout = { 0 };
     vertex_layout.stepMode = WGPUVertexStepMode_Vertex;
@@ -69,36 +73,66 @@ fn fs_main(input: FragmentInput) -> @location(0) vec4f {
     vertex_layout.attributeCount = 2;
     vertex_layout.attributes = vertex_attrs;
 
-    WGPUBindGroupLayoutEntry layout0_entries[1] = { 0 };
-    layout0_entries[0].binding = 0;
-    layout0_entries[0].visibility = WGPUShaderStage_Vertex;
-    layout0_entries[0].buffer.type = WGPUBufferBindingType_Uniform;
-    layout0_entries[0].buffer.minBindingSize = sizeof(CameraData);
+    WGPUBindGroupLayoutEntry camera_layout_entries[1] = { 0 };
+    camera_layout_entries[0].binding = 0;
+    camera_layout_entries[0].visibility = WGPUShaderStage_Vertex;
+    camera_layout_entries[0].buffer.type = WGPUBufferBindingType_Uniform;
+    camera_layout_entries[0].buffer.minBindingSize = sizeof(CameraData);
 
-    WGPUBindGroupLayoutDescriptor layout0_desc = { 0 };
-    layout0_desc.label = {"CameraLayout", WGPU_STRLEN};
-    layout0_desc.entryCount = 1;
-    layout0_desc.entries = layout0_entries;
+    WGPUBindGroupLayoutDescriptor camera_layout_desc = { 0 };
+    camera_layout_desc.label = {"CameraLayout", WGPU_STRLEN};
+    camera_layout_desc.entryCount = 1;
+    camera_layout_desc.entries = camera_layout_entries;
 
-    m_layout0 = wgpuDeviceCreateBindGroupLayout(device, &layout0_desc);
+    m_camera_layout =
+        wgpuDeviceCreateBindGroupLayout(device, &camera_layout_desc);
 
-    WGPUBindGroupLayoutEntry layout1_entries[1] = { 0 };
-    layout1_entries[0].binding = 0;
-    layout1_entries[0].visibility = WGPUShaderStage_Vertex;
-    layout1_entries[0].buffer.type = WGPUBufferBindingType_Uniform;
-    layout1_entries[0].buffer.minBindingSize = sizeof(ModelData);
+    WGPUTextureBindingLayout texture_layout = { 0 };
+    texture_layout.sampleType = WGPUTextureSampleType_Float;
+    texture_layout.viewDimension = WGPUTextureViewDimension_2D;
+    texture_layout.multisampled = 0;
 
-    WGPUBindGroupLayoutDescriptor layout1_desc = { 0 };
-    layout1_desc.label = {"ModelLayout", WGPU_STRLEN};
-    layout1_desc.entryCount = 1;
-    layout1_desc.entries = layout0_entries;
+    WGPUSamplerBindingLayout sampler_layout = { 0 };
+    sampler_layout.type = WGPUSamplerBindingType_Filtering;
 
-    m_layout1 = wgpuDeviceCreateBindGroupLayout(device, &layout1_desc);
+    WGPUBindGroupLayoutEntry material_layout_entries[2] = { 0 };
+    material_layout_entries[0].binding = 0;
+    material_layout_entries[0].visibility = WGPUShaderStage_Fragment;
+    material_layout_entries[0].texture = texture_layout;
+    material_layout_entries[1].binding = 1;
+    material_layout_entries[1].visibility = WGPUShaderStage_Fragment;
+    material_layout_entries[1].sampler = sampler_layout;
 
-    WGPUBindGroupLayout layouts[2] = { m_layout0, m_layout1 };
+    WGPUBindGroupLayoutDescriptor material_layout_desc = { 0 };
+    material_layout_desc.label = {"MaterialLayout", WGPU_STRLEN};
+    material_layout_desc.entryCount = 2;
+    material_layout_desc.entries = material_layout_entries;
+
+    m_material_layout =
+        wgpuDeviceCreateBindGroupLayout(device, &material_layout_desc);
+
+    WGPUBindGroupLayoutEntry model_layout_entries[1] = { 0 };
+    model_layout_entries[0].binding = 0;
+    model_layout_entries[0].visibility = WGPUShaderStage_Vertex;
+    model_layout_entries[0].buffer.type = WGPUBufferBindingType_Uniform;
+    model_layout_entries[0].buffer.minBindingSize = sizeof(ModelData);
+
+    WGPUBindGroupLayoutDescriptor model_layout_desc = { 0 };
+    model_layout_desc.label = {"ModelLayout", WGPU_STRLEN};
+    model_layout_desc.entryCount = 1;
+    model_layout_desc.entries = model_layout_entries;
+
+    m_model_layout =
+        wgpuDeviceCreateBindGroupLayout(device, &model_layout_desc);
+
+    WGPUBindGroupLayout layouts[3] = {
+        m_camera_layout,
+        m_material_layout,
+        m_model_layout
+    };
 
     WGPUPipelineLayoutDescriptor pipeline_layout_desc = { 0 };
-    pipeline_layout_desc.bindGroupLayoutCount = 2;
+    pipeline_layout_desc.bindGroupLayoutCount = 3;
     pipeline_layout_desc.bindGroupLayouts = layouts;
 
     WGPUPipelineLayout pipeline_layout =
@@ -159,12 +193,12 @@ fn fs_main(input: FragmentInput) -> @location(0) vec4f {
 
 Pipeline::~Pipeline()
 {
-    wgpuBindGroupLayoutRelease(m_layout1);
-    wgpuBindGroupLayoutRelease(m_layout0);
+    wgpuBindGroupLayoutRelease(m_model_layout);
+    wgpuBindGroupLayoutRelease(m_camera_layout);
     wgpuRenderPipelineRelease(m_pipeline);
 }
 
-WGPUBindGroup Pipeline::create_camera_group(WGPUBuffer buffer)
+WGPUBindGroup Pipeline::create_camera_group(WGPUBuffer buffer) const
 {
     WGPUBindGroupEntry entries[1] = { 0 };
     entries[0].binding = 0;
@@ -173,14 +207,32 @@ WGPUBindGroup Pipeline::create_camera_group(WGPUBuffer buffer)
 
     WGPUBindGroupDescriptor bind_group_desc = { 0 };
     bind_group_desc.label = {"CameraBindGroup", WGPU_STRLEN};
-    bind_group_desc.layout = m_layout0;
+    bind_group_desc.layout = m_camera_layout;
     bind_group_desc.entryCount = 1;
     bind_group_desc.entries = entries;
 
     return wgpuDeviceCreateBindGroup(m_device, &bind_group_desc);
 }
 
-WGPUBindGroup Pipeline::create_model_group(WGPUBuffer buffer)
+WGPUBindGroup Pipeline::create_material_group(
+    WGPUTextureView texture, WGPUSampler sampler) const
+{
+    WGPUBindGroupEntry entries[2] = { 0 };
+    entries[0].binding = 0;
+    entries[0].textureView = texture;
+    entries[1].binding = 1;
+    entries[1].sampler = sampler;
+
+    WGPUBindGroupDescriptor bind_group_desc = { 0 };
+    bind_group_desc.label = {"MaterialBindGroup", WGPU_STRLEN};
+    bind_group_desc.layout = m_material_layout;
+    bind_group_desc.entryCount = 2;
+    bind_group_desc.entries = entries;
+
+    return wgpuDeviceCreateBindGroup(m_device, &bind_group_desc);
+}
+
+WGPUBindGroup Pipeline::create_model_group(WGPUBuffer buffer) const
 {
     WGPUBindGroupEntry entries[1] = { 0 };
     entries[0].binding = 0;
@@ -189,7 +241,7 @@ WGPUBindGroup Pipeline::create_model_group(WGPUBuffer buffer)
 
     WGPUBindGroupDescriptor bind_group_desc = { 0 };
     bind_group_desc.label = {"ModelBindGroup", WGPU_STRLEN};
-    bind_group_desc.layout = m_layout1;
+    bind_group_desc.layout = m_model_layout;
     bind_group_desc.entryCount = 1;
     bind_group_desc.entries = entries;
 

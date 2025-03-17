@@ -10,10 +10,24 @@ Renderer::Renderer(WGPUDevice device, int width, int height)
       m_camera(device, m_pipeline)
 {
     create_depth_buffer(width, height);
+
+    WGPUSamplerDescriptor sampler_desc = { 0 };
+    sampler_desc.addressModeU = WGPUAddressMode_ClampToEdge;
+    sampler_desc.addressModeV = WGPUAddressMode_ClampToEdge;
+    sampler_desc.addressModeW = WGPUAddressMode_ClampToEdge;
+    sampler_desc.magFilter = WGPUFilterMode_Nearest;
+    sampler_desc.minFilter = WGPUFilterMode_Nearest;
+    sampler_desc.mipmapFilter = WGPUMipmapFilterMode_Nearest;
+    sampler_desc.lodMinClamp = 0;
+    sampler_desc.lodMaxClamp = 1;
+    sampler_desc.compare = WGPUCompareFunction_Undefined;
+    sampler_desc.maxAnisotropy = 1;
+    m_sampler = wgpuDeviceCreateSampler(m_device, &sampler_desc);
 }
 
 Renderer::~Renderer()
 {
+    wgpuSamplerRelease(m_sampler);
     wgpuTextureViewRelease(m_depth_texture_view);
     wgpuTextureRelease(m_depth_texture);
 }
@@ -76,10 +90,21 @@ void Renderer::render(WGPUTextureView view)
     wgpuCommandBufferRelease(command_buffer);
 }
 
-Mesh& Renderer::add_mesh(Vertex* vertices, std::size_t count)
+Texture& Renderer::add_texture(const std::filesystem::path& path)
 {
-    m_meshes.push_back(
-        std::make_unique<Mesh>(m_device, vertices, count));
+    m_textures.push_back(std::make_unique<Texture>(m_device, path));
+    return *m_textures[m_textures.size() - 1];
+}
+
+Material& Renderer::add_material(const Texture& texture)
+{
+    m_materials.push_back(std::make_unique<Material>(m_pipeline, texture, m_sampler));
+    return *m_materials[m_materials.size() - 1];
+}
+
+Mesh& Renderer::add_mesh(Vertex* vertices, std::size_t count, Material& mat)
+{
+    m_meshes.push_back(std::make_unique<Mesh>(m_device, vertices, count, mat));
     return *m_meshes[m_meshes.size() - 1];
 }
 
@@ -134,7 +159,9 @@ void Renderer::do_render(WGPURenderPassEncoder encoder)
         std::size_t count = 3 * model->mesh().tri_count;
 
         wgpuRenderPassEncoderSetBindGroup(
-            encoder, 1, model->bind_group(), 0, nullptr);
+            encoder, 1, model->mesh().material->bind_group(), 0, nullptr);
+        wgpuRenderPassEncoderSetBindGroup(
+            encoder, 2, model->bind_group(), 0, nullptr);
         wgpuRenderPassEncoderSetVertexBuffer(
             encoder, 0, model->mesh().vertex_buffer, 0,
             sizeof(Vertex) * count);
