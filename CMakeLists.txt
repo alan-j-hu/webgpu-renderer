@@ -13,20 +13,22 @@ FetchContent_MakeAvailable(glm)
 set(DAWN_FETCH_DEPENDENCIES ON)
 add_subdirectory(third_party/dawn EXCLUDE_FROM_ALL)
 
-set(sources main.cpp
-  application.cpp
-  camera.cpp
-  init_wgpu.cpp
-  material.cpp
-  mesh.cpp
-  model.cpp
-  pipeline.cpp
-  renderer.cpp
-  stb_image.c
-  texture.cpp)
+add_library(renderer3d
+  src/application.cpp
+  src/camera.cpp
+  src/init_wgpu.cpp
+  src/material.cpp
+  src/mesh.cpp
+  src/model.cpp
+  src/pipeline.cpp
+  src/renderer.cpp
+  src/stb_image.c
+  src/texture.cpp)
+target_link_libraries(renderer3d dawn::webgpu_dawn glm::glm glfw webgpu_glfw)
 
-add_executable(demo ${sources})
+add_executable(demo main.cpp)
 
 set_property(TARGET demo PROPERTY CXX_STANDARD 23)
 set_property(TARGET demo PROPERTY C_STANDARD 23)
-target_link_libraries(demo dawn::webgpu_dawn glm::glm glfw webgpu_glfw)
+target_link_libraries(demo
+  renderer3d)

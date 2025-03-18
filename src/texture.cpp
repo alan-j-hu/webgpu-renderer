@@ -1,6 +1,6 @@
 #include "texture.h"
 #include <utility>
-#include "third_party/stb/stb_image.h"
+#include "../third_party/stb/stb_image.h"
 
 namespace fs = std::filesystem;
 

@@ -1,9 +1,9 @@
-#include "application.h"
-#include "camera.h"
-#include "mesh.h"
-#include "model.h"
-#include "pipeline.h"
-#include "renderer.h"
+#include "src/application.h"
+#include "src/camera.h"
+#include "src/mesh.h"
+#include "src/model.h"
+#include "src/pipeline.h"
+#include "src/renderer.h"
 
 #include <array>
 #include <glm/ext/scalar_constants.hpp>
