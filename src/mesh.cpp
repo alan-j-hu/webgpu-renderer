@@ -6,7 +6,7 @@ Mesh::Mesh(WGPUDevice device,
 {
     WGPUBufferDescriptor buffer_desc = { 0 };
     buffer_desc.nextInChain = nullptr;
-    buffer_desc.usage = WGPUBufferUsage_CopyDst | WGPUBufferUsage_Vertex;
+    buffer_desc.usage = WGPUBufferUsage_CopyDst | WGPUBufferUsage_Storage;
     buffer_desc.size = count * sizeof(Vertex);
     buffer_desc.mappedAtCreation = false;
 

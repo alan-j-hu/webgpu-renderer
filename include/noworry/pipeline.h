@@ -7,7 +7,6 @@
 struct Vertex
 {
     float x, y, z;
-    float _padding;
     float u, v;
 };
 
@@ -40,7 +39,8 @@ public:
 
     WGPUBindGroup create_material_group(WGPUTextureView, WGPUSampler) const;
 
-    WGPUBindGroup create_model_group(WGPUBuffer buffer) const;
+    WGPUBindGroup create_model_group(
+        WGPUBuffer transform, WGPUBuffer vertices, int tri_count) const;
 
 private:
     WGPUDevice m_device;

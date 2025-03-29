@@ -15,7 +15,8 @@ Model::Model(WGPUDevice device, Pipeline& pipeline, const Mesh& mesh)
     buffer_desc.mappedAtCreation = false;
     m_buffer = wgpuDeviceCreateBuffer(device, &buffer_desc);
 
-    m_bind_group = pipeline.create_model_group(m_buffer);
+    m_bind_group = pipeline.create_model_group(
+        m_buffer, mesh.vertex_buffer, mesh.tri_count);
 
     m_translation = glm::vec3(0.0f, 0.0f, 0.0f);
     m_scale = 1;

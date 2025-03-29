@@ -162,9 +162,9 @@ void Renderer::do_render(WGPURenderPassEncoder encoder)
             encoder, 1, model->mesh().material->bind_group(), 0, nullptr);
         wgpuRenderPassEncoderSetBindGroup(
             encoder, 2, model->bind_group(), 0, nullptr);
-        wgpuRenderPassEncoderSetVertexBuffer(
-            encoder, 0, model->mesh().vertex_buffer, 0,
-            sizeof(Vertex) * count);
+        //wgpuRenderPassEncoderSetVertexBuffer(
+        //    encoder, 0, model->mesh().vertex_buffer, 0,
+        //    sizeof(Vertex) * count);
         wgpuRenderPassEncoderDraw(encoder, count, 1, 0, 0);
     }
 }

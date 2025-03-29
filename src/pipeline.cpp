@@ -7,19 +7,29 @@ Pipeline::Pipeline(WGPUDevice device)
 struct Camera {
   viewproj: mat4x4<f32>,
 };
+
 struct Model {
   transform: mat4x4<f32>,
 };
+
+struct Vertex {
+  x: f32,
+  y: f32,
+  z: f32,
+  u: f32,
+  v: f32,
+};
+
 @group(0) @binding(0) var<uniform> camera: Camera;
 
 @group(1) @binding(0) var the_texture: texture_2d<f32>;
 @group(1) @binding(1) var the_sampler: sampler;
 
 @group(2) @binding(0) var<uniform> model: Model;
+@group(2) @binding(1) var<storage, read> vertices: array<Vertex>;
 
-struct Vertex {
-  @location(0) pos: vec3f,
-  @location(1) tex_coords: vec2f,
+struct VertexInput {
+  @builtin(vertex_index) vertexID : u32,
 }
 
 struct FragmentInput {
@@ -28,10 +38,12 @@ struct FragmentInput {
 };
 
 @vertex
-fn vs_main(vertex: Vertex) -> FragmentInput {
+fn vs_main(vertex: VertexInput) -> FragmentInput {
+  var v = vertices[vertex.vertexID];
+
   var out: FragmentInput;
-  out.pos = camera.viewproj * model.transform * vec4(vertex.pos, 1);
-  out.tex_coords = vertex.tex_coords;
+  out.pos = camera.viewproj * model.transform * vec4(v.x, v.y, v.z, 1);
+  out.tex_coords = vec2(v.u, v.v);
   return out;
 }
 
@@ -58,20 +70,6 @@ fn fs_main(input: FragmentInput) -> @location(0) vec4f {
     frag_desc.nextInChain = &frag_wgsl_desc.chain;
     WGPUShaderModule fragment_shader =
         wgpuDeviceCreateShaderModule(device, &frag_desc);
-
-    WGPUVertexAttribute vertex_attrs[2];
-    vertex_attrs[0].shaderLocation = 0;
-    vertex_attrs[0].format = WGPUVertexFormat_Float32x3;
-    vertex_attrs[0].offset = 0;
-    vertex_attrs[1].shaderLocation = 1;
-    vertex_attrs[1].format = WGPUVertexFormat_Float32x2;
-    vertex_attrs[1].offset = offsetof(Vertex, u);
-
-    WGPUVertexBufferLayout vertex_layout = { 0 };
-    vertex_layout.stepMode = WGPUVertexStepMode_Vertex;
-    vertex_layout.arrayStride = sizeof(Vertex);
-    vertex_layout.attributeCount = 2;
-    vertex_layout.attributes = vertex_attrs;
 
     WGPUBindGroupLayoutEntry camera_layout_entries[1] = { 0 };
     camera_layout_entries[0].binding = 0;
@@ -111,15 +109,20 @@ fn fs_main(input: FragmentInput) -> @location(0) vec4f {
     m_material_layout =
         wgpuDeviceCreateBindGroupLayout(device, &material_layout_desc);
 
-    WGPUBindGroupLayoutEntry model_layout_entries[1] = { 0 };
+    WGPUBindGroupLayoutEntry model_layout_entries[2] = { 0 };
     model_layout_entries[0].binding = 0;
     model_layout_entries[0].visibility = WGPUShaderStage_Vertex;
     model_layout_entries[0].buffer.type = WGPUBufferBindingType_Uniform;
     model_layout_entries[0].buffer.minBindingSize = sizeof(ModelData);
+    model_layout_entries[1].binding = 1;
+    model_layout_entries[1].visibility = WGPUShaderStage_Vertex;
+    model_layout_entries[1].buffer.type =
+        WGPUBufferBindingType_ReadOnlyStorage;
+    model_layout_entries[1].buffer.minBindingSize = 0;
 
     WGPUBindGroupLayoutDescriptor model_layout_desc = { 0 };
     model_layout_desc.label = {"ModelLayout", WGPU_STRLEN};
-    model_layout_desc.entryCount = 1;
+    model_layout_desc.entryCount = 2;
     model_layout_desc.entries = model_layout_entries;
 
     m_model_layout =
@@ -173,8 +176,8 @@ fn fs_main(input: FragmentInput) -> @location(0) vec4f {
     pipeline_desc.layout = pipeline_layout;
     pipeline_desc.vertex.module = vertex_shader;
     pipeline_desc.vertex.entryPoint = {"vs_main", WGPU_STRLEN};
-    pipeline_desc.vertex.bufferCount = 1;
-    pipeline_desc.vertex.buffers = &vertex_layout;
+    pipeline_desc.vertex.bufferCount = 0;
+    pipeline_desc.vertex.buffers = nullptr;
     pipeline_desc.primitive.topology = WGPUPrimitiveTopology_TriangleList;
     pipeline_desc.primitive.frontFace = WGPUFrontFace_CCW;
     pipeline_desc.primitive.cullMode = WGPUCullMode_None;
@@ -232,17 +235,21 @@ WGPUBindGroup Pipeline::create_material_group(
     return wgpuDeviceCreateBindGroup(m_device, &bind_group_desc);
 }
 
-WGPUBindGroup Pipeline::create_model_group(WGPUBuffer buffer) const
+WGPUBindGroup Pipeline::create_model_group(
+    WGPUBuffer transform, WGPUBuffer vertices, int tri_count) const
 {
-    WGPUBindGroupEntry entries[1] = { 0 };
+    WGPUBindGroupEntry entries[2] = { 0 };
     entries[0].binding = 0;
-    entries[0].buffer = buffer;
+    entries[0].buffer = transform;
     entries[0].size = sizeof(ModelData);
+    entries[1].binding = 1;
+    entries[1].buffer = vertices;
+    entries[1].size = 3 * tri_count * sizeof(Vertex);
 
     WGPUBindGroupDescriptor bind_group_desc = { 0 };
     bind_group_desc.label = {"ModelBindGroup", WGPU_STRLEN};
     bind_group_desc.layout = m_model_layout;
-    bind_group_desc.entryCount = 1;
+    bind_group_desc.entryCount = 2;
     bind_group_desc.entries = entries;
 
     return wgpuDeviceCreateBindGroup(m_device, &bind_group_desc);
