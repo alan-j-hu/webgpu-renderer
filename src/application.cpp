@@ -1,5 +1,5 @@
-#include "application.h"
-#include "init_wgpu.h"
+#include "noworry/application.h"
+#include "noworry/init_wgpu.h"
 #include <webgpu/webgpu_glfw.h>
 
 Application::Application(int width, int height)

@@ -1,4 +1,4 @@
-#include "mesh.h"
+#include "noworry/mesh.h"
 
 Mesh::Mesh(WGPUDevice device,
            Vertex* vertices, std::size_t count, Material& mat)

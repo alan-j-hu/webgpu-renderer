@@ -1,3 +1,4 @@
+#include "noworry/init_wgpu.h"
 #include <iostream>
 #include <string_view>
 #include <webgpu/webgpu.h>

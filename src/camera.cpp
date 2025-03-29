@@ -1,4 +1,4 @@
-#include "camera.h"
+#include "noworry/camera.h"
 #include <cstring>
 #include <glm/ext/matrix_clip_space.hpp>
 #include <glm/ext/matrix_transform.hpp>

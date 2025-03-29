@@ -1,4 +1,4 @@
-#include "material.h"
+#include "noworry/material.h"
 
 Material::Material(const Pipeline& pipeline,
                    const Texture& texture,

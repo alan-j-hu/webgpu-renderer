@@ -1,5 +1,5 @@
-#include "model.h"
-#include "mesh.h"
+#include "noworry/model.h"
+#include "noworry/mesh.h"
 #include <cstring>
 #include <glm/ext/matrix_transform.hpp>
 
