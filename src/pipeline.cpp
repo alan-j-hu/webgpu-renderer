@@ -1,4 +1,5 @@
 #include "noworry/pipeline.h"
+#include "noworry/mesh.h"
 
 Pipeline::Pipeline(WGPUDevice device, Effect& effect)
     : m_device(device), m_effect(effect)
@@ -55,4 +56,23 @@ Pipeline::Pipeline(WGPUDevice device, Effect& effect)
 Pipeline::~Pipeline()
 {
     wgpuRenderPipelineRelease(m_pipeline);
+}
+
+void Pipeline::draw(
+    WGPURenderPassEncoder encoder,
+    Camera& camera,
+    std::vector<std::unique_ptr<Model>>& models)
+{
+    wgpuRenderPassEncoderSetPipeline(encoder, m_pipeline);
+    wgpuRenderPassEncoderSetBindGroup(
+        encoder, 0, camera.bind_group(), 0, nullptr);
+    for (auto& model : models) {
+        std::size_t count = 3 * model->mesh().tri_count;
+
+        wgpuRenderPassEncoderSetBindGroup(
+            encoder, 1, model->mesh().material->bind_group(), 0, nullptr);
+        wgpuRenderPassEncoderSetBindGroup(
+            encoder, 2, model->bind_group(), 0, nullptr);
+        wgpuRenderPassEncoderDraw(encoder, count, 1, 0, 0);
+    }
 }

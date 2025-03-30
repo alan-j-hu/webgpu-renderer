@@ -153,17 +153,5 @@ void Renderer::create_depth_buffer(int width, int height)
 
 void Renderer::do_render(WGPURenderPassEncoder encoder)
 {
-    wgpuRenderPassEncoderSetPipeline(
-        encoder, m_pipeline.pipeline());
-    wgpuRenderPassEncoderSetBindGroup(
-        encoder, 0, m_camera.bind_group(), 0, nullptr);
-    for (auto& model : m_models) {
-        std::size_t count = 3 * model->mesh().tri_count;
-
-        wgpuRenderPassEncoderSetBindGroup(
-            encoder, 1, model->mesh().material->bind_group(), 0, nullptr);
-        wgpuRenderPassEncoderSetBindGroup(
-            encoder, 2, model->bind_group(), 0, nullptr);
-        wgpuRenderPassEncoderDraw(encoder, count, 1, 0, 0);
-    }
+    m_pipeline.draw(encoder, m_camera, m_models);
 }

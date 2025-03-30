@@ -1,7 +1,11 @@
 #ifndef PIPELINE_H
 #define PIPELINE_H
 
+#include "noworry/camera.h"
 #include "noworry/effect.h"
+#include "noworry/model.h"
+#include <memory>
+#include <vector>
 #include <glm/mat4x4.hpp>
 #include <webgpu/webgpu.h>
 
@@ -14,8 +18,9 @@ public:
 
     ~Pipeline();
 
-    WGPURenderPipeline pipeline() { return m_pipeline; }
-
+    void draw(WGPURenderPassEncoder encoder,
+              Camera& camera,
+              std::vector<std::unique_ptr<Model>>& models);
 private:
     WGPUDevice m_device;
     Effect& m_effect;
