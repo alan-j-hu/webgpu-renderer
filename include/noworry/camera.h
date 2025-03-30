@@ -1,14 +1,14 @@
 #ifndef CAMERA_H
 #define CAMERA_H
 
-#include "pipeline.h"
+#include "effect.h"
 #include <glm/vec3.hpp>
 
 /* The camera uses a left-handed coordinate system with Y-up. */
 class Camera
 {
 public:
-    Camera(WGPUDevice device, Pipeline& pipeline);
+    Camera(WGPUDevice device, Effect& effect);
     virtual ~Camera();
 
     WGPUBindGroup bind_group() { return m_bind_group; }

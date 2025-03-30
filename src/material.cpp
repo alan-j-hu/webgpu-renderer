@@ -1,11 +1,11 @@
 #include "noworry/material.h"
 
-Material::Material(const Pipeline& pipeline,
+Material::Material(WGPUDevice device, const Effect& effect,
                    const Texture& texture,
                    WGPUSampler sampler)
 {
     m_texture = &texture;
     m_bind_group =
-        pipeline.create_material_group(texture.view(), sampler);
+        effect.create_material_group(device, texture.view(), sampler);
 }
 

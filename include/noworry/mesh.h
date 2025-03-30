@@ -2,7 +2,7 @@
 #define MESH_H
 
 #include "material.h"
-#include "pipeline.h"
+#include "effect.h"
 #include <cstddef>
 #include <webgpu/webgpu.h>
 

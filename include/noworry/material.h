@@ -1,14 +1,14 @@
 #ifndef MATERIAL_H
 #define MATERIAL_H
 
-#include "pipeline.h"
+#include "effect.h"
 #include "texture.h"
 #include <webgpu/webgpu.h>
 
 class Material
 {
 public:
-    Material(const Pipeline&, const Texture&, WGPUSampler sampler);
+    Material(WGPUDevice device, const Effect&, const Texture&, WGPUSampler sampler);
 
     WGPUBindGroup bind_group() { return m_bind_group; }
 private:

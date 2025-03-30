@@ -3,7 +3,7 @@
 #include <glm/ext/matrix_clip_space.hpp>
 #include <glm/ext/matrix_transform.hpp>
 
-Camera::Camera(WGPUDevice device, Pipeline& pipeline)
+Camera::Camera(WGPUDevice device, Effect& effect)
 {
     m_position = glm::vec3(0.0f, 0.0f, -1.0f);
     m_target = glm::vec3(0.0f, 0.0f, 0.0f);
@@ -18,7 +18,7 @@ Camera::Camera(WGPUDevice device, Pipeline& pipeline)
     buffer_desc.mappedAtCreation = false;
     m_buffer = wgpuDeviceCreateBuffer(device, &buffer_desc);
 
-    m_bind_group = pipeline.create_camera_group(m_buffer);
+    m_bind_group = effect.create_camera_group(device, m_buffer);
 }
 
 Camera::~Camera()

@@ -2,6 +2,7 @@
 #define RENDERER_H
 
 #include "camera.h"
+#include "effect.h"
 #include "material.h"
 #include "mesh.h"
 #include "model.h"
@@ -41,6 +42,7 @@ private:
 
     WGPUDevice m_device;
     WGPUSampler m_sampler;
+    Effect m_effect;
     Pipeline m_pipeline;
     Camera m_camera;
     std::vector<std::unique_ptr<Texture>> m_textures;

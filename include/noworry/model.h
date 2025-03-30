@@ -1,7 +1,7 @@
 #ifndef MODEL_H
 #define MODEL_H
 
-#include "pipeline.h"
+#include "effect.h"
 #include <glm/mat4x4.hpp>
 #include <glm/vec3.hpp>
 
@@ -10,7 +10,7 @@ struct Mesh;
 class Model
 {
 public:
-    Model(WGPUDevice device, Pipeline& pipeline, const Mesh& mesh);
+    Model(WGPUDevice device, Effect& effect, const Mesh& mesh);
     virtual ~Model();
 
     const Mesh& mesh() const { return m_mesh; }

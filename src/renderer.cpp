@@ -6,8 +6,9 @@ Renderer::Renderer(WGPUDevice device, int width, int height)
       m_device(device),
       m_width(width),
       m_height(height),
-      m_pipeline(device),
-      m_camera(device, m_pipeline)
+      m_effect(device),
+      m_pipeline(device, m_effect),
+      m_camera(device, m_effect)
 {
     create_depth_buffer(width, height);
 
@@ -98,7 +99,8 @@ Texture& Renderer::add_texture(const std::filesystem::path& path)
 
 Material& Renderer::add_material(const Texture& texture)
 {
-    m_materials.push_back(std::make_unique<Material>(m_pipeline, texture, m_sampler));
+    m_materials.push_back(
+        std::make_unique<Material>(m_device, m_effect, texture, m_sampler));
     return *m_materials[m_materials.size() - 1];
 }
 
@@ -111,7 +113,7 @@ Mesh& Renderer::add_mesh(Vertex* vertices, std::size_t count, Material& mat)
 Model& Renderer::add_model(const Mesh& mesh)
 {
     m_models.push_back(
-        std::make_unique<Model>(m_device, m_pipeline, mesh));
+        std::make_unique<Model>(m_device, m_effect, mesh));
     return *m_models[m_models.size() - 1];
 }
 
@@ -162,9 +164,6 @@ void Renderer::do_render(WGPURenderPassEncoder encoder)
             encoder, 1, model->mesh().material->bind_group(), 0, nullptr);
         wgpuRenderPassEncoderSetBindGroup(
             encoder, 2, model->bind_group(), 0, nullptr);
-        //wgpuRenderPassEncoderSetVertexBuffer(
-        //    encoder, 0, model->mesh().vertex_buffer, 0,
-        //    sizeof(Vertex) * count);
         wgpuRenderPassEncoderDraw(encoder, count, 1, 0, 0);
     }
 }

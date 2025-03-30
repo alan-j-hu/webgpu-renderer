@@ -1,6 +1,7 @@
 add_library(noworry
   application.cpp
   camera.cpp
+  effect.cpp
   init_wgpu.cpp
   material.cpp
   mesh.cpp
