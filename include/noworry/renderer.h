@@ -28,9 +28,9 @@ public:
 
     Material& add_material(const Texture&);
 
-    Mesh& add_mesh(Vertex* vertices, std::size_t count, Material& material);
+    Mesh& add_mesh(Vertex* vertices, std::size_t count);
 
-    Model& add_model(const Mesh& mesh);
+    Model& add_model(const Mesh& mesh, Material& material);
 
     void set_clear_color(WGPUColor);
 private:
@@ -45,6 +45,9 @@ private:
     Effect m_effect;
     Pipeline m_pipeline;
     Camera m_camera;
+
+    int m_mat_id;
+
     std::vector<std::unique_ptr<Texture>> m_textures;
     std::vector<std::unique_ptr<Material>> m_materials;
     std::vector<std::unique_ptr<Mesh>> m_meshes;

@@ -100,20 +100,21 @@ Texture& Renderer::add_texture(const std::filesystem::path& path)
 Material& Renderer::add_material(const Texture& texture)
 {
     m_materials.push_back(
-        std::make_unique<Material>(m_device, m_effect, texture, m_sampler));
+        std::make_unique<Material>(
+            m_mat_id++, m_device, m_pipeline, texture, m_sampler));
     return *m_materials[m_materials.size() - 1];
 }
 
-Mesh& Renderer::add_mesh(Vertex* vertices, std::size_t count, Material& mat)
+Mesh& Renderer::add_mesh(Vertex* vertices, std::size_t count)
 {
-    m_meshes.push_back(std::make_unique<Mesh>(m_device, vertices, count, mat));
+    m_meshes.push_back(std::make_unique<Mesh>(m_device, vertices, count));
     return *m_meshes[m_meshes.size() - 1];
 }
 
-Model& Renderer::add_model(const Mesh& mesh)
+Model& Renderer::add_model(const Mesh& mesh, Material& mat)
 {
     m_models.push_back(
-        std::make_unique<Model>(m_device, m_effect, mesh));
+        std::make_unique<Model>(m_device, m_effect, mesh, mat));
     return *m_models[m_models.size() - 1];
 }
 
@@ -153,5 +154,10 @@ void Renderer::create_depth_buffer(int width, int height)
 
 void Renderer::do_render(WGPURenderPassEncoder encoder)
 {
-    m_pipeline.draw(encoder, m_camera, m_models);
+    for (auto& model : m_models) {
+        model->material().pipeline().enqueue(*model);
+    }
+    wgpuRenderPassEncoderSetBindGroup(
+        encoder, 0, m_camera.bind_group(), 0, nullptr);
+    m_pipeline.draw(encoder, m_camera);
 }

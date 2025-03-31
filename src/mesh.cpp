@@ -1,7 +1,6 @@
 #include "noworry/mesh.h"
 
-Mesh::Mesh(WGPUDevice device,
-           Vertex* vertices, std::size_t count, Material& mat)
+Mesh::Mesh(WGPUDevice device, Vertex* vertices, std::size_t count)
     : tri_count(count / 3)
 {
     WGPUBufferDescriptor buffer_desc = { 0 };
@@ -15,8 +14,6 @@ Mesh::Mesh(WGPUDevice device,
     WGPUQueue queue = wgpuDeviceGetQueue(device);
     wgpuQueueWriteBuffer(
         queue, vertex_buffer, 0, vertices, sizeof(Vertex) * count);
-
-    material = &mat;
 }
 
 Mesh::~Mesh()

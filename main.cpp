@@ -74,8 +74,8 @@ public:
         auto& material = m_renderer.add_material(texture);
 
         m_yaw = glm::pi<float>() * 0.25f;
-        auto& mesh = m_renderer.add_mesh(vertices.data(), 24, material);
-        m_model = &m_renderer.add_model(mesh);
+        auto& mesh = m_renderer.add_mesh(vertices.data(), 24);
+        m_model = &m_renderer.add_model(mesh, material);
         m_model->set_translation(glm::vec3(0.0f, 0.0f, 50.0f));
 
         auto& camera = m_renderer.camera();

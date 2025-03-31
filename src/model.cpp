@@ -1,9 +1,11 @@
 #include "noworry/model.h"
+#include "noworry/material.h"
 #include "noworry/mesh.h"
 #include <cstring>
 #include <glm/ext/matrix_transform.hpp>
 
-Model::Model(WGPUDevice device, Effect& effect, const Mesh& mesh)
+Model::Model(
+    WGPUDevice device, Effect& effect, const Mesh& mesh, Material& mat)
     : m_mesh(mesh)
 {
     m_model.transform = glm::identity<glm::mat4>();
@@ -17,6 +19,8 @@ Model::Model(WGPUDevice device, Effect& effect, const Mesh& mesh)
 
     m_bind_group = effect.create_model_group(device,
         m_buffer, mesh.vertex_buffer, mesh.tri_count);
+
+    m_material = &mat;
 
     m_translation = glm::vec3(0.0f, 0.0f, 0.0f);
     m_scale = 1;

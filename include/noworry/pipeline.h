@@ -18,13 +18,17 @@ public:
 
     ~Pipeline();
 
-    void draw(WGPURenderPassEncoder encoder,
-              Camera& camera,
-              std::vector<std::unique_ptr<Model>>& models);
+    Effect& effect() { return m_effect; }
+
+    void enqueue(Model& model);
+
+    void draw(WGPURenderPassEncoder encoder, Camera& camera);
 private:
     WGPUDevice m_device;
     Effect& m_effect;
     WGPURenderPipeline m_pipeline;
+
+    std::vector<Model*> m_queue;
 };
 
 #endif
