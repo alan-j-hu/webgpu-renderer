@@ -8,6 +8,7 @@ add_library(noworry
   model.cpp
   pipeline.cpp
   renderer.cpp
+  resourcetable.cpp
   stb_image.c
   texture.cpp)
 target_include_directories(noworry PRIVATE ../include)

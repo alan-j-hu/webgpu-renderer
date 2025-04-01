@@ -91,33 +91,6 @@ void Renderer::render(WGPUTextureView view)
     wgpuCommandBufferRelease(command_buffer);
 }
 
-Texture& Renderer::add_texture(const std::filesystem::path& path)
-{
-    m_textures.push_back(std::make_unique<Texture>(m_device, path));
-    return *m_textures[m_textures.size() - 1];
-}
-
-Material& Renderer::add_material(const Texture& texture)
-{
-    m_materials.push_back(
-        std::make_unique<Material>(
-            m_mat_id++, m_device, m_pipeline, texture, m_sampler));
-    return *m_materials[m_materials.size() - 1];
-}
-
-Mesh& Renderer::add_mesh(Vertex* vertices, std::size_t count)
-{
-    m_meshes.push_back(std::make_unique<Mesh>(m_device, vertices, count));
-    return *m_meshes[m_meshes.size() - 1];
-}
-
-Model& Renderer::add_model(const Mesh& mesh, Material& mat)
-{
-    m_models.push_back(
-        std::make_unique<Model>(m_device, m_effect, mesh, mat));
-    return *m_models[m_models.size() - 1];
-}
-
 void Renderer::set_clear_color(WGPUColor color)
 {
     m_clear_color = color;

@@ -4,6 +4,7 @@
 #include "noworry/model.h"
 #include "noworry/pipeline.h"
 #include "noworry/renderer.h"
+#include "noworry/resourcetable.h"
 
 #include <array>
 #include <glm/ext/scalar_constants.hpp>
@@ -36,7 +37,8 @@ class Main : public Application
 public:
     Main(int width, int height)
         : Application(width, height),
-          m_renderer(device(), width, height)
+          m_renderer(device(), width, height),
+          m_resources(m_renderer)
     {
         m_renderer.set_clear_color({0.5, 0.5, 0.5, 1});
 
@@ -70,12 +72,12 @@ public:
             make_vertex(-20, -20, -20, 1, 1),
             make_vertex(-20, 20, -20, 0, 1));
 
-        auto& texture = m_renderer.add_texture("../assets/cat.png");
-        auto& material = m_renderer.add_material(texture);
+        auto& texture = m_resources.add_texture("../assets/cat.png");
+        auto& material = m_resources.add_material(texture);
 
         m_yaw = glm::pi<float>() * 0.25f;
-        auto& mesh = m_renderer.add_mesh(vertices.data(), 24);
-        m_model = &m_renderer.add_model(mesh, material);
+        auto& mesh = m_resources.add_mesh(vertices.data(), 24);
+        m_model = &m_resources.add_model(mesh, material);
         m_model->set_translation(glm::vec3(0.0f, 0.0f, 50.0f));
 
         auto& camera = m_renderer.camera();
@@ -98,6 +100,7 @@ public:
 
 private:
     Renderer m_renderer;
+    ResourceTable m_resources;
     Model* m_model;
     float m_yaw;
 };

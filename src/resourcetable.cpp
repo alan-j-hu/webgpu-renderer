@@ -1,0 +1,44 @@
+#include "noworry/resourcetable.h"
+
+ResourceTable::ResourceTable(Renderer& renderer)
+    : m_renderer(renderer)
+{
+}
+
+Texture& ResourceTable::add_texture(const std::filesystem::path& path)
+{
+    m_textures.push_back(std::make_unique<Texture>(m_renderer.device(), path));
+    return *m_textures[m_textures.size() - 1];
+}
+
+Material& ResourceTable::add_material(
+    const Texture& texture)
+{
+    m_materials.push_back(
+        std::make_unique<Material>(
+            m_mat_id++,
+            m_renderer.device(),
+            m_renderer.texture_mesh_pipeline(),
+            texture,
+            m_renderer.default_sampler()));
+    return *m_materials[m_materials.size() - 1];
+}
+
+Mesh& ResourceTable::add_mesh(Vertex* vertices, std::size_t count)
+{
+    m_meshes.push_back(std::make_unique<Mesh>(
+        m_renderer.device(), vertices, count));
+    return *m_meshes[m_meshes.size() - 1];
+}
+
+Model& ResourceTable::add_model(const Mesh& mesh, Material& mat)
+{
+    m_models.push_back(
+        std::make_unique<Model>(
+            m_renderer.device(),
+            m_renderer.texture_mesh_effect(),
+            mesh,
+            mat));
+    m_renderer.add_model(*m_models[m_models.size() - 1]);
+    return *m_models[m_models.size() - 1];
+}

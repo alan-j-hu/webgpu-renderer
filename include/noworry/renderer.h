@@ -18,21 +18,26 @@ public:
 
     virtual ~Renderer();
 
+    WGPUDevice device() { return m_device; }
+
+    Effect& texture_mesh_effect() { return m_effect; }
+
+    Pipeline& texture_mesh_pipeline() { return m_pipeline; }
+
+    WGPUSampler default_sampler() { return m_sampler; }
+
     Camera& camera() { return m_camera; }
 
     void render(WGPUTextureView view);
 
     void resize(int width, int height);
 
-    Texture& add_texture(const std::filesystem::path& path);
-
-    Material& add_material(const Texture&);
-
-    Mesh& add_mesh(Vertex* vertices, std::size_t count);
-
-    Model& add_model(const Mesh& mesh, Material& material);
-
     void set_clear_color(WGPUColor);
+
+    void add_model(Model& model)
+    {
+        m_models.push_back(&model);
+    }
 private:
     WGPUColor m_clear_color;
     int m_width;
@@ -46,12 +51,7 @@ private:
     Pipeline m_pipeline;
     Camera m_camera;
 
-    int m_mat_id;
-
-    std::vector<std::unique_ptr<Texture>> m_textures;
-    std::vector<std::unique_ptr<Material>> m_materials;
-    std::vector<std::unique_ptr<Mesh>> m_meshes;
-    std::vector<std::unique_ptr<Model>> m_models;
+    std::vector<Model*> m_models;
 
     void create_depth_buffer(int width, int height);
     void do_render(WGPURenderPassEncoder encoder);
