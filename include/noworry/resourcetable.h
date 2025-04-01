@@ -18,7 +18,11 @@ public:
 
     Material& add_material(const Texture&);
 
-    Mesh& add_mesh(Vertex* vertices, std::size_t count);
+    Mesh& add_mesh(
+        Vertex* vertices,
+        std::size_t vertex_count,
+        std::uint16_t* indices,
+        std::size_t tri_count);
 
     Model& add_model(const Mesh& mesh, Material& material);
 private:

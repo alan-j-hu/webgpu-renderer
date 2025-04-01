@@ -24,10 +24,14 @@ Material& ResourceTable::add_material(
     return *m_materials[m_materials.size() - 1];
 }
 
-Mesh& ResourceTable::add_mesh(Vertex* vertices, std::size_t count)
+Mesh& ResourceTable::add_mesh(
+    Vertex* vertices,
+    std::size_t vertex_count,
+    std::uint16_t* indices,
+    std::size_t tri_count)
 {
     m_meshes.push_back(std::make_unique<Mesh>(
-        m_renderer.device(), vertices, count));
+        m_renderer.device(), vertices, vertex_count, indices, tri_count));
     return *m_meshes[m_meshes.size() - 1];
 }
 

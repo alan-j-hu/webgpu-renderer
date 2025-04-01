@@ -72,7 +72,15 @@ void Pipeline::draw(WGPURenderPassEncoder encoder, Camera& camera)
             encoder, 1, model->material().bind_group(), 0, nullptr);
         wgpuRenderPassEncoderSetBindGroup(
             encoder, 2, model->bind_group(), 0, nullptr);
-        wgpuRenderPassEncoderDraw(encoder, count, 1, 0, 0);
+
+        wgpuRenderPassEncoderSetIndexBuffer(
+            encoder,
+            model->mesh().index_buffer,
+            WGPUIndexFormat_Uint16,
+            0,
+            count * sizeof(std::uint16_t));
+
+        wgpuRenderPassEncoderDrawIndexed(encoder, count, 1, 0, 0, 0);
     }
     m_queue.clear();
 }

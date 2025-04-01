@@ -193,7 +193,7 @@ WGPUBindGroup Effect::create_model_group(
     WGPUDevice device,
     WGPUBuffer transform,
     WGPUBuffer vertices,
-    int tri_count) const
+    int vertex_count) const
 {
     WGPUBindGroupEntry entries[2] = { 0 };
     entries[0].binding = 0;
@@ -201,7 +201,7 @@ WGPUBindGroup Effect::create_model_group(
     entries[0].size = sizeof(ModelData);
     entries[1].binding = 1;
     entries[1].buffer = vertices;
-    entries[1].size = 3 * tri_count * sizeof(Vertex);
+    entries[1].size = vertex_count * sizeof(Vertex);
 
     WGPUBindGroupDescriptor bind_group_desc = { 0 };
     bind_group_desc.label = {"ModelBindGroup", WGPU_STRLEN};
