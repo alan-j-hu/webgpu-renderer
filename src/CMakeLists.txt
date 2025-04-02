@@ -6,6 +6,7 @@ add_library(noworry
   flatmeshpipeline.cpp
   init_wgpu.cpp
   mesh.cpp
+  meshbuilder.cpp
   mesheffect.cpp
   model.cpp
   renderer.cpp
