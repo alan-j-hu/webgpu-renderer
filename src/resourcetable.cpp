@@ -11,6 +11,18 @@ Texture& ResourceTable::add_texture(const std::filesystem::path& path)
     return *m_textures[m_textures.size() - 1];
 }
 
+FlatMaterial& ResourceTable::add_flat_material(float r, float g, float b)
+{
+    auto ptr = std::make_unique<FlatMaterial>(
+        m_mat_id++,
+        m_renderer.device(),
+        m_renderer.flat_mesh_pipeline(),
+        r, g, b);
+    FlatMaterial& mat = *ptr;
+    m_materials.emplace_back(std::move(ptr));
+    return mat;
+}
+
 TextureMaterial& ResourceTable::add_texture_material(
     const Texture& texture)
 {

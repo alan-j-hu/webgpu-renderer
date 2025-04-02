@@ -97,10 +97,12 @@ public:
         auto& texture = m_resources.add_texture("../assets/cat.png");
         auto& material = m_resources.add_texture_material(texture);
 
+        auto& material2 = m_resources.add_flat_material(1, 0, 0);
+
         m_yaw = glm::pi<float>() * 0.25f;
         auto& mesh = m_resources.add_mesh(
             vertices.data(), 16, indices.data(), 8);
-        m_model = &m_resources.add_model(mesh, material);
+        m_model = &m_resources.add_model(mesh, material2);
         m_model->set_translation(glm::vec3(0.0f, 0.0f, 50.0f));
 
         auto& camera = m_renderer.camera();

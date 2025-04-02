@@ -6,6 +6,8 @@ Renderer::Renderer(WGPUDevice device, int width, int height)
       m_device(device),
       m_width(width),
       m_height(height),
+      m_flat_effect(device),
+      m_flat_pipeline(device, m_flat_effect),
       m_effect(device),
       m_pipeline(device, m_effect),
       m_camera(device, m_effect)
@@ -133,4 +135,5 @@ void Renderer::do_render(WGPURenderPassEncoder encoder)
     wgpuRenderPassEncoderSetBindGroup(
         encoder, 0, m_camera.bind_group(), 0, nullptr);
     m_pipeline.draw(encoder, m_camera);
+    m_flat_pipeline.draw(encoder, m_camera);
 }

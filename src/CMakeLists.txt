@@ -1,6 +1,9 @@
 add_library(noworry
   application.cpp
   camera.cpp
+  flatmaterial.cpp
+  flatmesheffect.cpp
+  flatmeshpipeline.cpp
   init_wgpu.cpp
   mesh.cpp
   mesheffect.cpp

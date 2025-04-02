@@ -2,6 +2,8 @@
 #define RENDERER_H
 
 #include "camera.h"
+#include "flatmesheffect.h"
+#include "flatmeshpipeline.h"
 #include "mesheffect.h"
 #include "material.h"
 #include "mesh.h"
@@ -20,6 +22,10 @@ public:
     virtual ~Renderer();
 
     WGPUDevice device() { return m_device; }
+
+    FlatMeshEffect& flat_mesh_effect() { return m_flat_effect; }
+
+    FlatMeshPipeline& flat_mesh_pipeline() { return m_flat_pipeline; }
 
     TextureMeshEffect& texture_mesh_effect() { return m_effect; }
 
@@ -48,6 +54,8 @@ private:
 
     WGPUDevice m_device;
     WGPUSampler m_sampler;
+    FlatMeshEffect m_flat_effect;
+    FlatMeshPipeline m_flat_pipeline;
     TextureMeshEffect m_effect;
     TextureMeshPipeline m_pipeline;
     Camera m_camera;

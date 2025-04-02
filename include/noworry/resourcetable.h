@@ -4,6 +4,7 @@
 #include "material.h"
 #include "mesh.h"
 #include "model.h"
+#include "flatmaterial.h"
 #include "texture.h"
 #include "texturematerial.h"
 #include "renderer.h"
@@ -16,6 +17,8 @@ public:
     ResourceTable(Renderer&);
 
     Texture& add_texture(const std::filesystem::path& path);
+
+    FlatMaterial& add_flat_material(float, float, float);
 
     TextureMaterial& add_texture_material(const Texture&);
 
