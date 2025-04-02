@@ -2,12 +2,13 @@
 #define RENDERER_H
 
 #include "camera.h"
-#include "effect.h"
+#include "mesheffect.h"
 #include "material.h"
 #include "mesh.h"
 #include "model.h"
-#include "pipeline.h"
 #include "texture.h"
+#include "texturemesheffect.h"
+#include "texturemeshpipeline.h"
 #include <memory>
 #include <vector>
 
@@ -20,9 +21,9 @@ public:
 
     WGPUDevice device() { return m_device; }
 
-    Effect& texture_mesh_effect() { return m_effect; }
+    TextureMeshEffect& texture_mesh_effect() { return m_effect; }
 
-    Pipeline& texture_mesh_pipeline() { return m_pipeline; }
+    TextureMeshPipeline& texture_mesh_pipeline() { return m_pipeline; }
 
     WGPUSampler default_sampler() { return m_sampler; }
 
@@ -47,8 +48,8 @@ private:
 
     WGPUDevice m_device;
     WGPUSampler m_sampler;
-    Effect m_effect;
-    Pipeline m_pipeline;
+    TextureMeshEffect m_effect;
+    TextureMeshPipeline m_pipeline;
     Camera m_camera;
 
     std::vector<Model*> m_models;

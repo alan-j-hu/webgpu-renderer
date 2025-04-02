@@ -11,17 +11,18 @@ Texture& ResourceTable::add_texture(const std::filesystem::path& path)
     return *m_textures[m_textures.size() - 1];
 }
 
-Material& ResourceTable::add_material(
+TextureMaterial& ResourceTable::add_texture_material(
     const Texture& texture)
 {
-    m_materials.push_back(
-        std::make_unique<Material>(
-            m_mat_id++,
-            m_renderer.device(),
-            m_renderer.texture_mesh_pipeline(),
-            texture,
-            m_renderer.default_sampler()));
-    return *m_materials[m_materials.size() - 1];
+    auto ptr = std::make_unique<TextureMaterial>(
+        m_mat_id++,
+        m_renderer.device(),
+        m_renderer.texture_mesh_pipeline(),
+        texture,
+        m_renderer.default_sampler());
+    TextureMaterial& mat = *ptr;
+    m_materials.emplace_back(std::move(ptr));
+    return mat;
 }
 
 Mesh& ResourceTable::add_mesh(

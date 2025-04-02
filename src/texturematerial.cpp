@@ -1,9 +1,9 @@
-#include "noworry/material.h"
+#include "noworry/texturematerial.h"
 
-Material::Material(
+TextureMaterial::TextureMaterial(
     int id,
     WGPUDevice device,
-    Pipeline& pipeline,
+    TextureMeshPipeline& pipeline,
     const Texture& texture,
     WGPUSampler sampler)
 {

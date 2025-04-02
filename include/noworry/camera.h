@@ -1,14 +1,14 @@
 #ifndef CAMERA_H
 #define CAMERA_H
 
-#include "effect.h"
+#include "mesheffect.h"
 #include <glm/vec3.hpp>
 
 /* The camera uses a left-handed coordinate system with Y-up. */
 class Camera
 {
 public:
-    Camera(WGPUDevice device, Effect& effect);
+    Camera(WGPUDevice device, MeshEffect& effect);
     virtual ~Camera();
 
     WGPUBindGroup bind_group() { return m_bind_group; }

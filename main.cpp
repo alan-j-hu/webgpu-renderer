@@ -2,7 +2,6 @@
 #include "noworry/camera.h"
 #include "noworry/mesh.h"
 #include "noworry/model.h"
-#include "noworry/pipeline.h"
 #include "noworry/renderer.h"
 #include "noworry/resourcetable.h"
 
@@ -96,7 +95,7 @@ public:
             make_vertex(-20, 20, -20, 0, 1));
 
         auto& texture = m_resources.add_texture("../assets/cat.png");
-        auto& material = m_resources.add_material(texture);
+        auto& material = m_resources.add_texture_material(texture);
 
         m_yaw = glm::pi<float>() * 0.25f;
         auto& mesh = m_resources.add_mesh(

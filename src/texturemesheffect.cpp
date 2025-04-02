@@ -1,6 +1,7 @@
-#include "noworry/effect.h"
+#include "noworry/texturemesheffect.h"
 
-Effect::Effect(WGPUDevice device)
+TextureMeshEffect::TextureMeshEffect(WGPUDevice device)
+    : MeshEffect(device)
 {
     const char* code = R"(
 struct Camera {
@@ -70,20 +71,6 @@ fn fs_main(input: FragmentInput) -> @location(0) vec4f {
     m_fragment_shader =
         wgpuDeviceCreateShaderModule(device, &frag_desc);
 
-    WGPUBindGroupLayoutEntry camera_layout_entries[1] = { 0 };
-    camera_layout_entries[0].binding = 0;
-    camera_layout_entries[0].visibility = WGPUShaderStage_Vertex;
-    camera_layout_entries[0].buffer.type = WGPUBufferBindingType_Uniform;
-    camera_layout_entries[0].buffer.minBindingSize = sizeof(CameraData);
-
-    WGPUBindGroupLayoutDescriptor camera_layout_desc = { 0 };
-    camera_layout_desc.label = {"CameraLayout", WGPU_STRLEN};
-    camera_layout_desc.entryCount = 1;
-    camera_layout_desc.entries = camera_layout_entries;
-
-    m_camera_layout =
-        wgpuDeviceCreateBindGroupLayout(device, &camera_layout_desc);
-
     WGPUTextureBindingLayout texture_layout = { 0 };
     texture_layout.sampleType = WGPUTextureSampleType_Float;
     texture_layout.viewDimension = WGPUTextureViewDimension_2D;
@@ -108,29 +95,10 @@ fn fs_main(input: FragmentInput) -> @location(0) vec4f {
     m_material_layout =
         wgpuDeviceCreateBindGroupLayout(device, &material_layout_desc);
 
-    WGPUBindGroupLayoutEntry model_layout_entries[2] = { 0 };
-    model_layout_entries[0].binding = 0;
-    model_layout_entries[0].visibility = WGPUShaderStage_Vertex;
-    model_layout_entries[0].buffer.type = WGPUBufferBindingType_Uniform;
-    model_layout_entries[0].buffer.minBindingSize = sizeof(ModelData);
-    model_layout_entries[1].binding = 1;
-    model_layout_entries[1].visibility = WGPUShaderStage_Vertex;
-    model_layout_entries[1].buffer.type =
-        WGPUBufferBindingType_ReadOnlyStorage;
-    model_layout_entries[1].buffer.minBindingSize = 0;
-
-    WGPUBindGroupLayoutDescriptor model_layout_desc = { 0 };
-    model_layout_desc.label = {"ModelLayout", WGPU_STRLEN};
-    model_layout_desc.entryCount = 2;
-    model_layout_desc.entries = model_layout_entries;
-
-    m_model_layout =
-        wgpuDeviceCreateBindGroupLayout(device, &model_layout_desc);
-
     WGPUBindGroupLayout layouts[3] = {
-        m_camera_layout,
-        m_material_layout,
-        m_model_layout
+        camera_layout(),
+        material_layout(),
+        model_layout()
     };
 
     WGPUPipelineLayoutDescriptor pipeline_layout_desc = { 0 };
@@ -141,38 +109,18 @@ fn fs_main(input: FragmentInput) -> @location(0) vec4f {
         wgpuDeviceCreatePipelineLayout(device, &pipeline_layout_desc);
 }
 
-Effect::~Effect()
+TextureMeshEffect::~TextureMeshEffect()
 {
     wgpuPipelineLayoutRelease(m_pipeline_layout);
-    wgpuBindGroupLayoutRelease(m_model_layout);
     wgpuBindGroupLayoutRelease(m_material_layout);
-    wgpuBindGroupLayoutRelease(m_camera_layout);
     wgpuShaderModuleRelease(m_fragment_shader);
     wgpuShaderModuleRelease(m_vertex_shader);
 }
 
-WGPUBindGroup Effect::create_camera_group(
-    WGPUDevice device,
-    WGPUBuffer buffer) const
-{
-    WGPUBindGroupEntry entries[1] = { 0 };
-    entries[0].binding = 0;
-    entries[0].buffer = buffer;
-    entries[0].size = sizeof(CameraData);
-
-    WGPUBindGroupDescriptor bind_group_desc = { 0 };
-    bind_group_desc.label = {"CameraBindGroup", WGPU_STRLEN};
-    bind_group_desc.layout = m_camera_layout;
-    bind_group_desc.entryCount = 1;
-    bind_group_desc.entries = entries;
-
-    return wgpuDeviceCreateBindGroup(device, &bind_group_desc);
-}
-
-WGPUBindGroup Effect::create_material_group(
+WGPUBindGroup TextureMeshEffect::create_material_group(
     WGPUDevice device,
     WGPUTextureView texture,
-    WGPUSampler sampler) const
+    WGPUSampler sampler)
 {
     WGPUBindGroupEntry entries[2] = { 0 };
     entries[0].binding = 0;
@@ -183,29 +131,6 @@ WGPUBindGroup Effect::create_material_group(
     WGPUBindGroupDescriptor bind_group_desc = { 0 };
     bind_group_desc.label = {"MaterialBindGroup", WGPU_STRLEN};
     bind_group_desc.layout = m_material_layout;
-    bind_group_desc.entryCount = 2;
-    bind_group_desc.entries = entries;
-
-    return wgpuDeviceCreateBindGroup(device, &bind_group_desc);
-}
-
-WGPUBindGroup Effect::create_model_group(
-    WGPUDevice device,
-    WGPUBuffer transform,
-    WGPUBuffer vertices,
-    int vertex_count) const
-{
-    WGPUBindGroupEntry entries[2] = { 0 };
-    entries[0].binding = 0;
-    entries[0].buffer = transform;
-    entries[0].size = sizeof(ModelData);
-    entries[1].binding = 1;
-    entries[1].buffer = vertices;
-    entries[1].size = vertex_count * sizeof(Vertex);
-
-    WGPUBindGroupDescriptor bind_group_desc = { 0 };
-    bind_group_desc.label = {"ModelBindGroup", WGPU_STRLEN};
-    bind_group_desc.layout = m_model_layout;
     bind_group_desc.entryCount = 2;
     bind_group_desc.entries = entries;
 

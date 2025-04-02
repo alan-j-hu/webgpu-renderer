@@ -1,7 +1,7 @@
 #ifndef MODEL_H
 #define MODEL_H
 
-#include "effect.h"
+#include "mesheffect.h"
 #include <glm/mat4x4.hpp>
 #include <glm/vec3.hpp>
 
@@ -11,7 +11,7 @@ struct Mesh;
 class Model
 {
 public:
-    Model(WGPUDevice device, Effect& effect, const Mesh& mesh, Material&);
+    Model(WGPUDevice device, MeshEffect& effect, const Mesh& mesh, Material&);
     virtual ~Model();
 
     const Mesh& mesh() const { return m_mesh; }

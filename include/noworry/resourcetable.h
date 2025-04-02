@@ -5,6 +5,7 @@
 #include "mesh.h"
 #include "model.h"
 #include "texture.h"
+#include "texturematerial.h"
 #include "renderer.h"
 #include <memory>
 #include <vector>
@@ -16,7 +17,7 @@ public:
 
     Texture& add_texture(const std::filesystem::path& path);
 
-    Material& add_material(const Texture&);
+    TextureMaterial& add_texture_material(const Texture&);
 
     Mesh& add_mesh(
         Vertex* vertices,

@@ -3,7 +3,7 @@
 #include <glm/ext/matrix_clip_space.hpp>
 #include <glm/ext/matrix_transform.hpp>
 
-Camera::Camera(WGPUDevice device, Effect& effect)
+Camera::Camera(WGPUDevice device, MeshEffect& effect)
 {
     m_position = glm::vec3(0.0f, 0.0f, -1.0f);
     m_target = glm::vec3(0.0f, 0.0f, 0.0f);

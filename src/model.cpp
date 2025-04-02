@@ -5,7 +5,7 @@
 #include <glm/ext/matrix_transform.hpp>
 
 Model::Model(
-    WGPUDevice device, Effect& effect, const Mesh& mesh, Material& mat)
+    WGPUDevice device, MeshEffect& effect, const Mesh& mesh, Material& mat)
     : m_mesh(mesh)
 {
     m_model.transform = glm::identity<glm::mat4>();
