@@ -9,6 +9,8 @@ class Texture
 {
 public:
     Texture(WGPUDevice device, int w, int h);
+    Texture(WGPUDevice device, int w, int h,
+            WGPUTextureFormat format, WGPUTextureUsage usage);
     Texture(WGPUDevice device, unsigned char* buffer, std::size_t size);
     Texture(WGPUDevice device, const std::filesystem::path& path);
 
@@ -25,7 +27,8 @@ private:
     WGPUTexture m_texture;
     WGPUTextureView m_view;
 
-    void init(WGPUDevice, int w, int h);
+    void init(WGPUDevice, int w, int h,
+              WGPUTextureFormat format, WGPUTextureUsage usage);
 };
 
 #endif

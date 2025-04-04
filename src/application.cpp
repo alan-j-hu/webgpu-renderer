@@ -2,10 +2,11 @@
 #include "noworry/init_wgpu.h"
 #include <webgpu/webgpu_glfw.h>
 
-Application::Application(int width, int height)
+Application::Application(int width, int height, WGPUTextureFormat format)
 {
     m_width = width;
     m_height = height;
+    m_format = format;
 
     if (!glfwInit()) {
         return;
@@ -77,7 +78,7 @@ void Application::resize(int width, int height)
     config.width = width;
     config.height = height;
     config.usage = WGPUTextureUsage_RenderAttachment;
-    config.format = WGPUTextureFormat_BGRA8Unorm;
+    config.format = m_format;
 
     config.viewFormatCount = 0;
     config.viewFormats = nullptr;

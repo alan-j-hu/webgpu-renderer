@@ -7,7 +7,7 @@
 class Application
 {
 public:
-    Application(int width, int height);
+    Application(int width, int height, WGPUTextureFormat format);
 
     Application(const Application&) = delete;
     Application& operator=(const Application&) = delete;
@@ -37,6 +37,7 @@ private:
     WGPUAdapter m_adapter;
     WGPUDevice m_device;
     WGPUSurface m_surface;
+    WGPUTextureFormat m_format;
 
     static void resize_callback(GLFWwindow* window, int width, int height);
 };

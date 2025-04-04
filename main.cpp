@@ -10,14 +10,25 @@
 #include <glm/ext/scalar_constants.hpp>
 #include <webgpu/webgpu.h>
 
+#include "imgui.h"
+#include "imgui_impl_glfw.h"
+#include "imgui_impl_wgpu.h"
+
 class Main : public Application
 {
 public:
     Main(int width, int height)
-        : Application(width, height),
-          m_renderer(device(), width, height),
+        : Application(width, height, WGPUTextureFormat_BGRA8Unorm),
+          m_subwindow_width(500),
+          m_subwindow_height(500),
+          m_subwindow(device(), 500, 500,
+                      WGPUTextureFormat_BGRA8Unorm,
+                      WGPUTextureUsage_TextureBinding
+                      | WGPUTextureUsage_RenderAttachment),
+          m_renderer(device(), m_subwindow_width, m_subwindow_height),
           m_resources(m_renderer)
     {
+        init_imgui();
         m_renderer.set_clear_color({0.5, 0.5, 0.5, 1});
 
         auto& mesh = MeshBuilder()
@@ -57,24 +68,105 @@ public:
         camera.set_target(glm::vec3(0.0f, 0.0f, 0.0f));
     }
 
+    virtual ~Main()
+    {
+        shutdown_imgui();
+    }
+
     virtual void render(WGPUTextureView view) override
     {
-        m_yaw += 0.01;
-        m_model->set_yaw(m_yaw);
-        m_renderer.render(view);
+        draw_imgui();
+
+        WGPURenderPassColorAttachment color_attachments = {};
+        color_attachments.depthSlice = WGPU_DEPTH_SLICE_UNDEFINED;
+        color_attachments.loadOp = WGPULoadOp_Clear;
+        color_attachments.storeOp = WGPUStoreOp_Store;
+        color_attachments.clearValue = {0, 0, 0, 1};
+        color_attachments.view = view;
+
+        WGPURenderPassDescriptor render_pass_desc = {};
+        render_pass_desc.colorAttachmentCount = 1;
+        render_pass_desc.colorAttachments = &color_attachments;
+        render_pass_desc.depthStencilAttachment = nullptr;
+
+        WGPUCommandEncoderDescriptor enc_desc = {};
+        WGPUCommandEncoder encoder = wgpuDeviceCreateCommandEncoder(device(), &enc_desc);
+
+        WGPURenderPassEncoder pass = wgpuCommandEncoderBeginRenderPass(encoder, &render_pass_desc);
+        ImGui_ImplWGPU_RenderDrawData(ImGui::GetDrawData(), pass);
+        wgpuRenderPassEncoderEnd(pass);
+
+        WGPUCommandBufferDescriptor cmd_buffer_desc = {};
+        WGPUCommandBuffer cmd_buffer = wgpuCommandEncoderFinish(encoder, &cmd_buffer_desc);
+        WGPUQueue queue = wgpuDeviceGetQueue(device());
+        wgpuQueueSubmit(queue, 1, &cmd_buffer);
     }
 
     virtual void resize(int width, int height) override
     {
+        ImGui_ImplWGPU_InvalidateDeviceObjects();
         Application::resize(width, height);
-        m_renderer.resize(width, height);
+        ImGui_ImplWGPU_CreateDeviceObjects();
     }
 
 private:
+    Texture m_subwindow;
+    int m_subwindow_width;
+    int m_subwindow_height;
+
     Renderer m_renderer;
     ResourceTable m_resources;
     Model* m_model;
     float m_yaw;
+
+    bool m_show_demo_window = true;
+
+    void init_imgui()
+    {
+        IMGUI_CHECKVERSION();
+        ImGui::CreateContext();
+        ImGui::StyleColorsDark();
+        ImGui_ImplGlfw_InitForOther(window(), true);
+        ImGui_ImplWGPU_InitInfo init_info;
+        init_info.Device = device();
+        init_info.NumFramesInFlight = 3;
+        init_info.RenderTargetFormat = WGPUTextureFormat_BGRA8Unorm;
+        init_info.DepthStencilFormat = WGPUTextureFormat_Undefined;
+        ImGui_ImplWGPU_Init(&init_info);
+    }
+
+    void shutdown_imgui()
+    {
+        ImGui_ImplWGPU_Shutdown();
+        ImGui_ImplGlfw_Shutdown();
+        ImGui::DestroyContext();
+    }
+
+    void draw_imgui()
+    {
+        render_subwindow();
+
+        ImGui_ImplWGPU_NewFrame();
+        ImGui_ImplGlfw_NewFrame();
+        ImGui::NewFrame();
+
+        if (m_show_demo_window)
+            ImGui::ShowDemoWindow(&m_show_demo_window);
+
+        ImGui::Begin("Subwindow");
+        ImGui::Image((ImTextureID)(intptr_t)m_subwindow.view(),
+                     ImVec2(m_subwindow_width, m_subwindow_height));
+        ImGui::End();
+
+        ImGui::Render();
+    }
+
+    void render_subwindow()
+    {
+        m_yaw += 0.01;
+        m_model->set_yaw(m_yaw);
+        m_renderer.render(m_subwindow.view());
+    }
 };
 
 int main()

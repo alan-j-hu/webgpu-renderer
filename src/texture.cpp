@@ -7,7 +7,17 @@ namespace fs = std::filesystem;
 Texture::Texture(WGPUDevice device, int w, int h)
     : m_moved_from{false}
 {
-    init(device, w, h);
+    init(device, w, h,
+         WGPUTextureFormat_RGBA8Unorm,
+         WGPUTextureUsage_TextureBinding | WGPUTextureUsage_CopyDst);
+}
+
+Texture::Texture(WGPUDevice device, int w, int h,
+                 WGPUTextureFormat format,
+                 WGPUTextureUsage usage)
+    : m_moved_from{false}
+{
+    init(device, w, h, format, usage);
 }
 
 Texture::Texture(Texture&& other)
@@ -25,7 +35,9 @@ Texture::Texture(WGPUDevice device, unsigned char* buffer, std::size_t size)
     int h;
     int n;
     stbi_uc* data = stbi_load_from_memory(buffer, size, &w, &h, &n, 4);
-    init(device, w, h);
+    init(device, w, h,
+         WGPUTextureFormat_RGBA8Unorm,
+         WGPUTextureUsage_TextureBinding | WGPUTextureUsage_CopyDst);
     upload(device, data);
     stbi_image_free(data);
 }
@@ -37,7 +49,9 @@ Texture::Texture(WGPUDevice device, const fs::path& path)
     int h;
     int n;
     stbi_uc* data = stbi_load(path.string().c_str(), &w, &h, &n, 4);
-    init(device, w, h);
+    init(device, w, h,
+         WGPUTextureFormat_RGBA8Unorm,
+         WGPUTextureUsage_TextureBinding | WGPUTextureUsage_CopyDst);
     upload(device, data);
     stbi_image_free(data);
 }
@@ -76,13 +90,13 @@ void Texture::upload(WGPUDevice device, void* data)
     wgpuQueueWriteTexture(queue, &dst, data, 4 * w * h, &src, &extent);
 }
 
-void Texture::init(WGPUDevice device, int w, int h)
+void Texture::init(
+    WGPUDevice device, int w, int h,
+    WGPUTextureFormat format,
+    WGPUTextureUsage usage)
 {
-    constexpr WGPUTextureFormat format = WGPUTextureFormat_RGBA8Unorm;
-
     WGPUTextureDescriptor texture_desc = { 0 };
-    texture_desc.usage =
-        WGPUTextureUsage_TextureBinding | WGPUTextureUsage_CopyDst;
+    texture_desc.usage = usage;
     texture_desc.dimension = WGPUTextureDimension_2D;
     texture_desc.size.width = w;
     texture_desc.size.height = h;
