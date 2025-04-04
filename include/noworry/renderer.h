@@ -49,8 +49,7 @@ private:
     WGPUColor m_clear_color;
     int m_width;
     int m_height;
-    WGPUTexture m_depth_texture;
-    WGPUTextureView m_depth_texture_view;
+    Texture m_depth_texture;
 
     WGPUDevice m_device;
     WGPUSampler m_sampler;

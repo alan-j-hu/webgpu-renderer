@@ -17,6 +17,7 @@ public:
     Texture(const Texture&) = delete;
     Texture& operator=(const Texture&) = delete;
     Texture(Texture&&);
+    Texture& operator=(Texture&&);
     ~Texture();
 
     std::uint32_t width() const;
@@ -26,7 +27,6 @@ public:
 
     void upload(WGPUDevice device, void* data);
 private:
-    bool m_moved_from;
     WGPUTexture m_texture;
     WGPUTextureView m_view;
 

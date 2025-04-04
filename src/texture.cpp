@@ -5,7 +5,6 @@
 namespace fs = std::filesystem;
 
 Texture::Texture(WGPUDevice device, int w, int h)
-    : m_moved_from{false}
 {
     init(device, w, h,
          WGPUTextureFormat_RGBA8Unorm,
@@ -15,21 +14,31 @@ Texture::Texture(WGPUDevice device, int w, int h)
 Texture::Texture(WGPUDevice device, int w, int h,
                  WGPUTextureFormat format,
                  WGPUTextureUsage usage)
-    : m_moved_from{false}
 {
     init(device, w, h, format, usage);
 }
 
 Texture::Texture(Texture&& other)
-    : m_moved_from {false},
-      m_texture {other.m_texture},
+    : m_texture {other.m_texture},
       m_view {other.m_view}
 {
-    other.m_moved_from = true;
+    other.m_texture = nullptr;
+    other.m_view = nullptr;
+}
+
+Texture& Texture::operator=(Texture&& other)
+{
+    wgpuTextureViewRelease(m_view);
+    wgpuTextureRelease(m_texture);
+
+    m_texture = other.m_texture;
+    m_view = other.m_view;
+    other.m_texture = nullptr;
+    other.m_view = nullptr;
+    return *this;
 }
 
 Texture::Texture(WGPUDevice device, unsigned char* buffer, std::size_t size)
-    : m_moved_from{false}
 {
     int w;
     int h;
@@ -43,7 +52,6 @@ Texture::Texture(WGPUDevice device, unsigned char* buffer, std::size_t size)
 }
 
 Texture::Texture(WGPUDevice device, const fs::path& path)
-    : m_moved_from{false}
 {
     int w;
     int h;
@@ -58,9 +66,6 @@ Texture::Texture(WGPUDevice device, const fs::path& path)
 
 Texture::~Texture()
 {
-    if (m_moved_from) {
-        return;
-    }
     wgpuTextureViewRelease(m_view);
     wgpuTextureRelease(m_texture);
 }

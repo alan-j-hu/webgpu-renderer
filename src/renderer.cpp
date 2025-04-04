@@ -6,14 +6,15 @@ Renderer::Renderer(WGPUDevice device, int width, int height)
       m_device(device),
       m_width(width),
       m_height(height),
+      m_depth_texture(device, width, height,
+                      WGPUTextureFormat_Depth24Plus,
+                      WGPUTextureUsage_RenderAttachment),
       m_flat_effect(device),
       m_flat_pipeline(device, m_flat_effect),
       m_effect(device),
       m_pipeline(device, m_effect),
       m_camera(device, m_effect)
 {
-    create_depth_buffer(width, height);
-
     WGPUSamplerDescriptor sampler_desc = { 0 };
     sampler_desc.addressModeU = WGPUAddressMode_ClampToEdge;
     sampler_desc.addressModeV = WGPUAddressMode_ClampToEdge;
@@ -31,14 +32,11 @@ Renderer::Renderer(WGPUDevice device, int width, int height)
 Renderer::~Renderer()
 {
     wgpuSamplerRelease(m_sampler);
-    wgpuTextureViewRelease(m_depth_texture_view);
-    wgpuTextureRelease(m_depth_texture);
 }
 
 void Renderer::resize(int width, int height)
 {
-    wgpuTextureViewRelease(m_depth_texture_view);
-    wgpuTextureRelease(m_depth_texture);
+    if (m_width == width && m_height == height) return;
     create_depth_buffer(width, height);
 }
 
@@ -63,7 +61,7 @@ void Renderer::render(WGPUTextureView view)
     color_attachment.view = view;
 
     WGPURenderPassDepthStencilAttachment depth_stencil_attachment = { 0 };
-    depth_stencil_attachment.view = m_depth_texture_view;
+    depth_stencil_attachment.view = m_depth_texture.view();
     depth_stencil_attachment.depthClearValue = 1.0f;
     depth_stencil_attachment.depthLoadOp = WGPULoadOp_Clear;
     depth_stencil_attachment.depthStoreOp = WGPUStoreOp_Store;
@@ -102,29 +100,10 @@ void Renderer::create_depth_buffer(int width, int height)
 {
     m_width = width;
     m_height = height;
-
-    WGPUTextureDescriptor texture_desc = { 0 };
-    texture_desc.dimension = WGPUTextureDimension_2D;
-    texture_desc.format = WGPUTextureFormat_Depth24Plus;
-    texture_desc.mipLevelCount = 1;
-    texture_desc.sampleCount = 1;
-    texture_desc.size.width = width;
-    texture_desc.size.height = height;
-    texture_desc.size.depthOrArrayLayers = 1;
-    texture_desc.usage = WGPUTextureUsage_RenderAttachment;
-    texture_desc.viewFormatCount = 0;
-    texture_desc.viewFormats = nullptr;
-    m_depth_texture = wgpuDeviceCreateTexture(m_device, &texture_desc);
-
-    WGPUTextureViewDescriptor view_desc = { 0 };
-    view_desc.aspect = WGPUTextureAspect_DepthOnly;
-    view_desc.baseArrayLayer = 0;
-    view_desc.arrayLayerCount = 1;
-    view_desc.baseMipLevel = 0;
-    view_desc.mipLevelCount = 1;
-    view_desc.dimension = WGPUTextureViewDimension_2D;
-    view_desc.format = WGPUTextureFormat_Depth24Plus;
-    m_depth_texture_view = wgpuTextureCreateView(m_depth_texture, &view_desc);
+    m_depth_texture =
+        Texture(m_device, width, height,
+                WGPUTextureFormat_Depth24Plus,
+                WGPUTextureUsage_RenderAttachment);
 }
 
 void Renderer::do_render(WGPURenderPassEncoder encoder)
