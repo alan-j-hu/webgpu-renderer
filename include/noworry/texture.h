@@ -19,6 +19,9 @@ public:
     Texture(Texture&&);
     ~Texture();
 
+    std::uint32_t width() const;
+    std::uint32_t height() const;
+
     WGPUTextureView view() const { return m_view; }
 
     void upload(WGPUDevice device, void* data);

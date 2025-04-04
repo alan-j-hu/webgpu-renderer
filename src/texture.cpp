@@ -65,6 +65,16 @@ Texture::~Texture()
     wgpuTextureRelease(m_texture);
 }
 
+std::uint32_t Texture::width() const
+{
+    return wgpuTextureGetWidth(m_texture);
+}
+
+std::uint32_t Texture::height() const
+{
+    return wgpuTextureGetHeight(m_texture);
+}
+
 void Texture::upload(WGPUDevice device, void* data)
 {
     const int w = wgpuTextureGetWidth(m_texture);

@@ -19,13 +19,11 @@ class Main : public Application
 public:
     Main(int width, int height)
         : Application(width, height, WGPUTextureFormat_BGRA8Unorm),
-          m_subwindow_width(500),
-          m_subwindow_height(500),
           m_subwindow(device(), 500, 500,
                       WGPUTextureFormat_BGRA8Unorm,
                       WGPUTextureUsage_TextureBinding
                       | WGPUTextureUsage_RenderAttachment),
-          m_renderer(device(), m_subwindow_width, m_subwindow_height),
+          m_renderer(device(), m_subwindow.width(), m_subwindow.height()),
           m_resources(m_renderer)
     {
         init_imgui();
@@ -90,14 +88,17 @@ public:
         render_pass_desc.depthStencilAttachment = nullptr;
 
         WGPUCommandEncoderDescriptor enc_desc = {};
-        WGPUCommandEncoder encoder = wgpuDeviceCreateCommandEncoder(device(), &enc_desc);
+        WGPUCommandEncoder encoder =
+            wgpuDeviceCreateCommandEncoder(device(), &enc_desc);
 
-        WGPURenderPassEncoder pass = wgpuCommandEncoderBeginRenderPass(encoder, &render_pass_desc);
+        WGPURenderPassEncoder pass =
+            wgpuCommandEncoderBeginRenderPass(encoder, &render_pass_desc);
         ImGui_ImplWGPU_RenderDrawData(ImGui::GetDrawData(), pass);
         wgpuRenderPassEncoderEnd(pass);
 
         WGPUCommandBufferDescriptor cmd_buffer_desc = {};
-        WGPUCommandBuffer cmd_buffer = wgpuCommandEncoderFinish(encoder, &cmd_buffer_desc);
+        WGPUCommandBuffer cmd_buffer =
+            wgpuCommandEncoderFinish(encoder, &cmd_buffer_desc);
         WGPUQueue queue = wgpuDeviceGetQueue(device());
         wgpuQueueSubmit(queue, 1, &cmd_buffer);
     }
@@ -111,8 +112,6 @@ public:
 
 private:
     Texture m_subwindow;
-    int m_subwindow_width;
-    int m_subwindow_height;
 
     Renderer m_renderer;
     ResourceTable m_resources;
@@ -155,7 +154,7 @@ private:
 
         ImGui::Begin("Subwindow");
         ImGui::Image((ImTextureID)(intptr_t)m_subwindow.view(),
-                     ImVec2(m_subwindow_width, m_subwindow_height));
+                     ImVec2(m_subwindow.width(), m_subwindow.height()));
         ImGui::End();
 
         ImGui::Render();
@@ -171,7 +170,7 @@ private:
 
 int main()
 {
-    Main app(500, 500);
+    Main app(1000, 1000);
     app.run();
 
     return 0;
