@@ -56,6 +56,15 @@ void uncaptured_error_callback(
     std::cerr << "Error: " << convert_stringview(message) << std::endl;
 }
 
+void wait_future(WGPUInstance instance, WGPUFuture future)
+{
+    WGPUFutureWaitInfo info = {};
+    info.future = future;
+    while (!info.completed) {
+        wgpuInstanceWaitAny(instance, 1, &info, 0);
+    }
+}
+
 WGPUAdapter request_adapter(WGPUInstance instance, WGPUSurface surface)
 {
     WGPUAdapter adapter;
@@ -74,15 +83,8 @@ WGPUAdapter request_adapter(WGPUInstance instance, WGPUSurface surface)
     info.callback = request_adapter_callback;
     info.userdata1 = &adapter;
     info.userdata2 = NULL;
-    WGPUFuture future = wgpuInstanceRequestAdapter(instance, &options, info);
+    wait_future(instance, wgpuInstanceRequestAdapter(instance, &options, info));
 
-    WGPUWaitStatus status = WGPUWaitStatus_TimedOut;
-    while (status == WGPUWaitStatus_TimedOut) {
-        WGPUFutureWaitInfo wait_info = {
-            .future = future,
-        };
-        status = wgpuInstanceWaitAny(instance, 1, &wait_info, 0);
-    }
     return adapter;
 }
 
@@ -104,15 +106,7 @@ WGPUDevice request_device(WGPUInstance instance, WGPUAdapter adapter)
     info.callback = request_device_callback;
     info.userdata1 = &device;
     info.userdata2 = NULL;
-
-    WGPUFuture future = wgpuAdapterRequestDevice(adapter, &desc, info);
-    WGPUWaitStatus status = WGPUWaitStatus_TimedOut;
-    while (status == WGPUWaitStatus_TimedOut) {
-        WGPUFutureWaitInfo wait_info = {
-            .future = future,
-        };
-        status = wgpuInstanceWaitAny(instance, 1, &wait_info, 0);
-    }
+    wait_future(instance, wgpuAdapterRequestDevice(adapter, &desc, info));
 
     return device;
 }
