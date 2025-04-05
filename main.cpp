@@ -111,14 +111,17 @@ public:
     }
 
 private:
+    const ImGuiWindowFlags WINDOW_FLAGS =
+        ImGuiWindowFlags_NoMove
+      | ImGuiWindowFlags_MenuBar
+      | ImGuiWindowFlags_NoDecoration;
+
     Texture m_subwindow;
 
     Renderer m_renderer;
     ResourceTable m_resources;
     Model* m_model;
     float m_yaw;
-
-    bool m_show_demo_window = true;
 
     void init_imgui()
     {
@@ -149,16 +152,28 @@ private:
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
 
-        if (m_show_demo_window)
-            ImGui::ShowDemoWindow(&m_show_demo_window);
+        ImGuiViewport* viewport = ImGui::GetMainViewport();
+        ImGui::SetNextWindowPos(viewport->Pos);
+        ImGui::SetNextWindowSize(viewport->Size);
+        ImGui::Begin("Window", nullptr, WINDOW_FLAGS);
 
-        ImGui::Begin("Subwindow");
+        draw_menubar();
+
         ImGui::Image((ImTextureID)(intptr_t)m_subwindow.view(),
                      ImVec2(m_subwindow.width(), m_subwindow.height()));
         ImGui::End();
 
         ImGui::Render();
     }
+
+    bool draw_menubar()
+    {
+        if (!ImGui::BeginMenuBar()) return false;
+        ImGui::MenuItem("File");
+        ImGui::MenuItem("Edit");
+        ImGui::EndMenuBar();
+        return true;
+    };
 
     void render_subwindow()
     {
