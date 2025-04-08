@@ -64,7 +64,7 @@ void FlatMeshPipeline::enqueue(Model& model)
     m_queue.push_back(&model);
 }
 
-void FlatMeshPipeline::draw(WGPURenderPassEncoder encoder, Camera& camera)
+void FlatMeshPipeline::draw(WGPURenderPassEncoder encoder)
 {
     wgpuRenderPassEncoderSetPipeline(encoder, m_pipeline);
     for (auto model : m_queue) {

@@ -1,5 +1,5 @@
 #include "noworry/application.h"
-#include "noworry/camera.h"
+#include "noworry/scene/camera.h"
 #include "noworry/mesh.h"
 #include "noworry/meshbuilder.h"
 #include "noworry/renderer.h"
@@ -63,7 +63,7 @@ public:
         m_model = &m_scene.add_model(mesh, material);
         m_model->set_translation(glm::vec3(0.0f, 0.0f, 50.0f));
 
-        auto& camera = m_renderer.camera();
+        auto& camera = m_scene.current_camera();
         camera.set_position(glm::vec3(0.0f, 0.0f, -25.0f));
         camera.set_target(glm::vec3(0.0f, 0.0f, 0.0f));
     }

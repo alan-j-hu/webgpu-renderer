@@ -1,7 +1,6 @@
 #ifndef TEXTUREMESHPIPELINE_H
 #define TEXTUREMESHPIPELINE_H
 
-#include "camera.h"
 #include "pipeline.h"
 #include "texturemesheffect.h"
 #include <memory>
@@ -22,7 +21,7 @@ public:
 
     void enqueue(Model& model);
 
-    void draw(WGPURenderPassEncoder encoder, Camera& camera);
+    void draw(WGPURenderPassEncoder encoder);
 private:
     WGPUDevice m_device;
     TextureMeshEffect& m_effect;

@@ -1,7 +1,6 @@
 #ifndef RENDERER_H
 #define RENDERER_H
 
-#include "camera.h"
 #include "flatmesheffect.h"
 #include "flatmeshpipeline.h"
 #include "mesheffect.h"
@@ -10,9 +9,11 @@
 #include "texture.h"
 #include "texturemesheffect.h"
 #include "texturemeshpipeline.h"
+#include "uniformlayout.h"
 #include <memory>
 #include <vector>
 
+class Camera;
 class Scene;
 
 class Renderer
@@ -34,7 +35,7 @@ public:
 
     WGPUSampler default_sampler() { return m_sampler; }
 
-    Camera& camera() { return m_camera; }
+    UniformLayout& uniform_layout() { return m_uniform_layout; }
 
     void render(WGPUTextureView view, Scene& scene);
 
@@ -49,12 +50,12 @@ private:
     Texture m_depth_texture;
 
     WGPUDevice m_device;
+    UniformLayout m_uniform_layout;
     WGPUSampler m_sampler;
     FlatMeshEffect m_flat_effect;
     FlatMeshPipeline m_flat_pipeline;
     TextureMeshEffect m_effect;
     TextureMeshPipeline m_pipeline;
-    Camera m_camera;
 
     void create_depth_buffer(int width, int height);
     void do_render(WGPURenderPassEncoder encoder);

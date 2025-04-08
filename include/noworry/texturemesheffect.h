@@ -3,10 +3,12 @@
 
 #include "noworry/mesheffect.h"
 
+class UniformLayout;
+
 class TextureMeshEffect : public MeshEffect
 {
 public:
-    TextureMeshEffect(WGPUDevice device);
+    TextureMeshEffect(WGPUDevice device, UniformLayout& ul);
     TextureMeshEffect(const TextureMeshEffect&) = delete;
     TextureMeshEffect& operator=(const TextureMeshEffect&) = delete;
     virtual ~TextureMeshEffect();

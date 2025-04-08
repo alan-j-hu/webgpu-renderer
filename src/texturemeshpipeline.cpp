@@ -64,7 +64,7 @@ void TextureMeshPipeline::enqueue(Model& model)
     m_queue.push_back(&model);
 }
 
-void TextureMeshPipeline::draw(WGPURenderPassEncoder encoder, Camera& camera)
+void TextureMeshPipeline::draw(WGPURenderPassEncoder encoder)
 {
     wgpuRenderPassEncoderSetPipeline(encoder, m_pipeline);
     for (auto model : m_queue) {

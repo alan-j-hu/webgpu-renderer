@@ -1,7 +1,6 @@
 #ifndef FLATMESHPIPELINE_H
 #define FLATMESHPIPELINE_H
 
-#include "camera.h"
 #include "flatmesheffect.h"
 #include "pipeline.h"
 #include <memory>
@@ -22,7 +21,7 @@ public:
 
     void enqueue(Model& model);
 
-    void draw(WGPURenderPassEncoder encoder, Camera& camera);
+    void draw(WGPURenderPassEncoder encoder);
 private:
     WGPUDevice m_device;
     FlatMeshEffect& m_effect;

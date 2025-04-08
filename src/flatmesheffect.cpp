@@ -1,6 +1,7 @@
 #include "noworry/flatmesheffect.h"
+#include "noworry/uniformlayout.h"
 
-FlatMeshEffect::FlatMeshEffect(WGPUDevice device)
+FlatMeshEffect::FlatMeshEffect(WGPUDevice device, UniformLayout& ul)
     : MeshEffect(device)
 {
     const char* code = R"(
@@ -85,7 +86,7 @@ fn fs_main(input: FragmentInput) -> @location(0) vec4f {
         wgpuDeviceCreateBindGroupLayout(device, &material_layout_desc);
 
     WGPUBindGroupLayout layouts[3] = {
-        camera_layout(),
+        ul.layout(),
         material_layout(),
         model_layout()
     };

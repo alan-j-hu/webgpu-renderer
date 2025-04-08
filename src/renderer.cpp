@@ -10,11 +10,11 @@ Renderer::Renderer(WGPUDevice device, int width, int height)
       m_depth_texture(device, width, height,
                       WGPUTextureFormat_Depth24Plus,
                       WGPUTextureUsage_RenderAttachment),
-      m_flat_effect(device),
+      m_uniform_layout(device),
+      m_flat_effect(device, m_uniform_layout),
       m_flat_pipeline(device, m_flat_effect),
-      m_effect(device),
-      m_pipeline(device, m_effect),
-      m_camera(device, m_effect)
+      m_effect(device, m_uniform_layout),
+      m_pipeline(device, m_effect)
 {
     WGPUSamplerDescriptor sampler_desc = { 0 };
     sampler_desc.addressModeU = WGPUAddressMode_ClampToEdge;
@@ -45,7 +45,7 @@ void Renderer::render(WGPUTextureView view, Scene& scene)
 {
     WGPUQueue queue = wgpuDeviceGetQueue(m_device);
 
-    m_camera.copy_to_gpu(m_device);
+    scene.update();
     for (auto it = scene.models_begin(); it != scene.models_end(); ++it) {
         it->get()->copy_to_gpu(m_device);
     }
@@ -79,6 +79,8 @@ void Renderer::render(WGPUTextureView view, Scene& scene)
 
     WGPURenderPassEncoder pass = wgpuCommandEncoderBeginRenderPass(
         encoder, &render_pass_desc);
+    wgpuRenderPassEncoderSetBindGroup(
+        pass, 0, scene.bind_group(), 0, nullptr);
     do_render(pass);
     wgpuRenderPassEncoderEnd(pass);
 
@@ -109,8 +111,6 @@ void Renderer::create_depth_buffer(int width, int height)
 
 void Renderer::do_render(WGPURenderPassEncoder encoder)
 {
-    wgpuRenderPassEncoderSetBindGroup(
-        encoder, 0, m_camera.bind_group(), 0, nullptr);
-    m_pipeline.draw(encoder, m_camera);
-    m_flat_pipeline.draw(encoder, m_camera);
+    m_pipeline.draw(encoder);
+    m_flat_pipeline.draw(encoder);
 }

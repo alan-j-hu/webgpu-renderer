@@ -10,11 +10,6 @@ struct Vertex
     float u, v;
 };
 
-struct CameraData
-{
-    glm::mat4 viewproj;
-};
-
 struct ModelData
 {
     glm::mat4 transform;
@@ -32,11 +27,8 @@ public:
     virtual WGPUShaderModule fragment_shader() = 0;
     virtual WGPUPipelineLayout pipeline_layout() = 0;
 
-    WGPUBindGroupLayout camera_layout() { return m_camera_layout; }
     virtual WGPUBindGroupLayout material_layout() = 0;
     WGPUBindGroupLayout model_layout() { return m_model_layout; }
-
-    WGPUBindGroup create_camera_group(WGPUDevice, WGPUBuffer buffer);
 
     WGPUBindGroup create_model_group(
         WGPUDevice,
@@ -45,7 +37,6 @@ public:
         int tri_count);
 private:
 
-    WGPUBindGroupLayout m_camera_layout;
     WGPUBindGroupLayout m_model_layout;
 };
 

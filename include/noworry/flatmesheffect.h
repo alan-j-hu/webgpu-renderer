@@ -1,12 +1,14 @@
 #ifndef FLATMESHEFFECT_H
 #define FLATMESHEFFECT_H
 
-#include "noworry/mesheffect.h"
+#include "mesheffect.h"
+
+class UniformLayout;
 
 class FlatMeshEffect : public MeshEffect
 {
 public:
-    FlatMeshEffect(WGPUDevice device);
+    FlatMeshEffect(WGPUDevice device, UniformLayout&);
     FlatMeshEffect(const FlatMeshEffect&) = delete;
     FlatMeshEffect& operator=(const FlatMeshEffect&) = delete;
     virtual ~FlatMeshEffect();

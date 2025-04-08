@@ -1,6 +1,5 @@
 add_library(noworry
   application.cpp
-  camera.cpp
   flatmaterial.cpp
   flatmesheffect.cpp
   flatmeshpipeline.cpp
@@ -15,6 +14,8 @@ add_library(noworry
   texturematerial.cpp
   texturemesheffect.cpp
   texturemeshpipeline.cpp
+  uniformlayout.cpp
+  scene/camera.cpp
   scene/model.cpp
   scene/scene.cpp)
 target_include_directories(noworry PRIVATE ../include)
