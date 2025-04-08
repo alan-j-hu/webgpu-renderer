@@ -1,4 +1,5 @@
 #include "noworry/renderer.h"
+#include "noworry/scene/scene.h"
 #include <utility>
 
 Renderer::Renderer(WGPUDevice device, int width, int height)
@@ -40,13 +41,13 @@ void Renderer::resize(int width, int height)
     create_depth_buffer(width, height);
 }
 
-void Renderer::render(WGPUTextureView view)
+void Renderer::render(WGPUTextureView view, Scene& scene)
 {
     WGPUQueue queue = wgpuDeviceGetQueue(m_device);
 
     m_camera.copy_to_gpu(m_device);
-    for (auto& model : m_models) {
-        model->copy_to_gpu(m_device);
+    for (auto it = scene.models_begin(); it != scene.models_end(); ++it) {
+        it->get()->copy_to_gpu(m_device);
     }
 
     WGPUCommandEncoderDescriptor encoder_desc = { 0 };
@@ -108,9 +109,6 @@ void Renderer::create_depth_buffer(int width, int height)
 
 void Renderer::do_render(WGPURenderPassEncoder encoder)
 {
-    for (auto& model : m_models) {
-        model->material().pipeline().enqueue(*model);
-    }
     wgpuRenderPassEncoderSetBindGroup(
         encoder, 0, m_camera.bind_group(), 0, nullptr);
     m_pipeline.draw(encoder, m_camera);

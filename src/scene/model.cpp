@@ -1,4 +1,4 @@
-#include "noworry/model.h"
+#include "noworry/scene/model.h"
 #include "noworry/material.h"
 #include "noworry/mesh.h"
 #include <cstring>
@@ -53,6 +53,7 @@ void Model::copy_to_gpu(WGPUDevice device)
     WGPUQueue queue = wgpuDeviceGetQueue(device);
     wgpuQueueWriteBuffer(
         queue, m_buffer, 0, &m_model.transform, sizeof(float[4][4]));
+    m_material->pipeline().enqueue(*this);
 }
 
 void Model::update_matrix()

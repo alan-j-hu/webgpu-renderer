@@ -3,7 +3,6 @@
 
 #include "material.h"
 #include "mesh.h"
-#include "model.h"
 #include "flatmaterial.h"
 #include "texture.h"
 #include "texturematerial.h"
@@ -28,7 +27,6 @@ public:
         std::uint16_t* indices,
         std::size_t tri_count);
 
-    Model& add_model(const Mesh& mesh, Material& material);
 private:
 
     WGPUDevice m_device;
@@ -39,7 +37,6 @@ private:
     std::vector<std::unique_ptr<Texture>> m_textures;
     std::vector<std::unique_ptr<Material>> m_materials;
     std::vector<std::unique_ptr<Mesh>> m_meshes;
-    std::vector<std::unique_ptr<Model>> m_models;
 };
 
 #endif

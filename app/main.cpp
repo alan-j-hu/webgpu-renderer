@@ -2,9 +2,10 @@
 #include "noworry/camera.h"
 #include "noworry/mesh.h"
 #include "noworry/meshbuilder.h"
-#include "noworry/model.h"
 #include "noworry/renderer.h"
 #include "noworry/resourcetable.h"
+#include "noworry/scene/model.h"
+#include "noworry/scene/scene.h"
 
 #include <array>
 #include <glm/ext/scalar_constants.hpp>
@@ -24,7 +25,8 @@ public:
                       WGPUTextureUsage_TextureBinding
                       | WGPUTextureUsage_RenderAttachment),
           m_renderer(device(), m_subwindow.width(), m_subwindow.height()),
-          m_resources(m_renderer)
+          m_resources(m_renderer),
+          m_scene(m_renderer)
     {
         init_imgui();
         m_renderer.set_clear_color({0.5, 0.5, 0.5, 1});
@@ -58,7 +60,7 @@ public:
         auto& material2 = m_resources.add_flat_material(1, 0, 0);
 
         m_yaw = glm::pi<float>() * 0.25f;
-        m_model = &m_resources.add_model(mesh, material);
+        m_model = &m_scene.add_model(mesh, material);
         m_model->set_translation(glm::vec3(0.0f, 0.0f, 50.0f));
 
         auto& camera = m_renderer.camera();
@@ -120,6 +122,7 @@ private:
 
     Renderer m_renderer;
     ResourceTable m_resources;
+    Scene m_scene;
     Model* m_model;
     float m_yaw;
 
@@ -179,7 +182,7 @@ private:
     {
         m_yaw += 0.01;
         m_model->set_yaw(m_yaw);
-        m_renderer.render(m_subwindow.view());
+        m_renderer.render(m_subwindow.view(), m_scene);
     }
 };
 

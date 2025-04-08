@@ -47,15 +47,3 @@ Mesh& ResourceTable::add_mesh(
         m_renderer.device(), vertices, vertex_count, indices, tri_count));
     return *m_meshes[m_meshes.size() - 1];
 }
-
-Model& ResourceTable::add_model(const Mesh& mesh, Material& mat)
-{
-    m_models.push_back(
-        std::make_unique<Model>(
-            m_renderer.device(),
-            m_renderer.texture_mesh_effect(),
-            mesh,
-            mat));
-    m_renderer.add_model(*m_models[m_models.size() - 1]);
-    return *m_models[m_models.size() - 1];
-}

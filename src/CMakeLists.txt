@@ -8,14 +8,15 @@ add_library(noworry
   mesh.cpp
   meshbuilder.cpp
   mesheffect.cpp
-  model.cpp
   renderer.cpp
   resourcetable.cpp
   stb_image.c
   texture.cpp
   texturematerial.cpp
   texturemesheffect.cpp
-  texturemeshpipeline.cpp)
+  texturemeshpipeline.cpp
+  scene/model.cpp
+  scene/scene.cpp)
 target_include_directories(noworry PRIVATE ../include)
 target_link_libraries(noworry dawn::webgpu_dawn glm::glm glfw webgpu_glfw)
 set_property(TARGET noworry PROPERTY CXX_STANDARD 23)

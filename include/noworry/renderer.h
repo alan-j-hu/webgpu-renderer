@@ -7,12 +7,13 @@
 #include "mesheffect.h"
 #include "material.h"
 #include "mesh.h"
-#include "model.h"
 #include "texture.h"
 #include "texturemesheffect.h"
 #include "texturemeshpipeline.h"
 #include <memory>
 #include <vector>
+
+class Scene;
 
 class Renderer
 {
@@ -35,16 +36,12 @@ public:
 
     Camera& camera() { return m_camera; }
 
-    void render(WGPUTextureView view);
+    void render(WGPUTextureView view, Scene& scene);
 
     void resize(int width, int height);
 
     void set_clear_color(WGPUColor);
 
-    void add_model(Model& model)
-    {
-        m_models.push_back(&model);
-    }
 private:
     WGPUColor m_clear_color;
     int m_width;
@@ -58,8 +55,6 @@ private:
     TextureMeshEffect m_effect;
     TextureMeshPipeline m_pipeline;
     Camera m_camera;
-
-    std::vector<Model*> m_models;
 
     void create_depth_buffer(int width, int height);
     void do_render(WGPURenderPassEncoder encoder);
