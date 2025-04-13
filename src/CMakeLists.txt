@@ -1,20 +1,20 @@
 add_library(noworry
   application.cpp
-  flatmaterial.cpp
-  flatmesheffect.cpp
-  flatmeshpipeline.cpp
   init_wgpu.cpp
   mesh.cpp
   meshbuilder.cpp
-  mesheffect.cpp
   renderer.cpp
   resourcetable.cpp
   stb_image.c
   texture.cpp
-  texturematerial.cpp
-  texturemesheffect.cpp
-  texturemeshpipeline.cpp
-  uniformlayout.cpp
+  material/flatmaterial.cpp
+  material/flatmesheffect.cpp
+  material/flatmeshpipeline.cpp
+  material/mesheffect.cpp
+  material/texturematerial.cpp
+  material/texturemesheffect.cpp
+  material/texturemeshpipeline.cpp
+  material/uniformlayout.cpp
   scene/camera.cpp
   scene/model.cpp
   scene/scene.cpp)

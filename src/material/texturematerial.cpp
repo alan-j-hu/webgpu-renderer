@@ -1,4 +1,4 @@
-#include "noworry/texturematerial.h"
+#include "noworry/material/texturematerial.h"
 
 TextureMaterial::TextureMaterial(
     int id,

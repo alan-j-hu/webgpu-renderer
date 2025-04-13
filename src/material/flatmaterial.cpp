@@ -1,4 +1,4 @@
-#include "noworry/flatmaterial.h"
+#include "noworry/material/flatmaterial.h"
 #include <glm/vec3.hpp>
 
 FlatMaterial::FlatMaterial(

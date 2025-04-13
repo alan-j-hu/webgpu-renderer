@@ -1,7 +1,7 @@
-#include "noworry/texturemesheffect.h"
-#include "noworry/uniformlayout.h"
+#include "noworry/material/flatmesheffect.h"
+#include "noworry/material/uniformlayout.h"
 
-TextureMeshEffect::TextureMeshEffect(WGPUDevice device, UniformLayout& ul)
+FlatMeshEffect::FlatMeshEffect(WGPUDevice device, UniformLayout& ul)
     : MeshEffect(device)
 {
     const char* code = R"(
@@ -23,8 +23,7 @@ struct Vertex {
 
 @group(0) @binding(0) var<uniform> camera: Camera;
 
-@group(1) @binding(0) var the_texture: texture_2d<f32>;
-@group(1) @binding(1) var the_sampler: sampler;
+@group(1) @binding(0) var<uniform> color: vec3f;
 
 @group(2) @binding(0) var<uniform> model: Model;
 @group(2) @binding(1) var<storage, read> vertices: array<Vertex>;
@@ -50,7 +49,7 @@ fn vs_main(vertex: VertexInput) -> FragmentInput {
 
 @fragment
 fn fs_main(input: FragmentInput) -> @location(0) vec4f {
-  return textureSample(the_texture, the_sampler, input.tex_coords);
+  return vec4(color, 1);
 }
 )";
 
@@ -72,25 +71,15 @@ fn fs_main(input: FragmentInput) -> @location(0) vec4f {
     m_fragment_shader =
         wgpuDeviceCreateShaderModule(device, &frag_desc);
 
-    WGPUTextureBindingLayout texture_layout = { 0 };
-    texture_layout.sampleType = WGPUTextureSampleType_Float;
-    texture_layout.viewDimension = WGPUTextureViewDimension_2D;
-    texture_layout.multisampled = 0;
-
-    WGPUSamplerBindingLayout sampler_layout = { 0 };
-    sampler_layout.type = WGPUSamplerBindingType_Filtering;
-
-    WGPUBindGroupLayoutEntry material_layout_entries[2] = { 0 };
+    WGPUBindGroupLayoutEntry material_layout_entries[1] = { 0 };
     material_layout_entries[0].binding = 0;
     material_layout_entries[0].visibility = WGPUShaderStage_Fragment;
-    material_layout_entries[0].texture = texture_layout;
-    material_layout_entries[1].binding = 1;
-    material_layout_entries[1].visibility = WGPUShaderStage_Fragment;
-    material_layout_entries[1].sampler = sampler_layout;
+    material_layout_entries[0].buffer.type = WGPUBufferBindingType_Uniform;
+    material_layout_entries[0].buffer.minBindingSize = 12;
 
     WGPUBindGroupLayoutDescriptor material_layout_desc = { 0 };
     material_layout_desc.label = {"MaterialLayout", WGPU_STRLEN};
-    material_layout_desc.entryCount = 2;
+    material_layout_desc.entryCount = 1;
     material_layout_desc.entries = material_layout_entries;
 
     m_material_layout =
@@ -110,7 +99,7 @@ fn fs_main(input: FragmentInput) -> @location(0) vec4f {
         wgpuDeviceCreatePipelineLayout(device, &pipeline_layout_desc);
 }
 
-TextureMeshEffect::~TextureMeshEffect()
+FlatMeshEffect::~FlatMeshEffect()
 {
     wgpuPipelineLayoutRelease(m_pipeline_layout);
     wgpuBindGroupLayoutRelease(m_material_layout);
@@ -118,21 +107,18 @@ TextureMeshEffect::~TextureMeshEffect()
     wgpuShaderModuleRelease(m_vertex_shader);
 }
 
-WGPUBindGroup TextureMeshEffect::create_material_group(
-    WGPUDevice device,
-    WGPUTextureView texture,
-    WGPUSampler sampler)
+WGPUBindGroup FlatMeshEffect::create_material_group(
+    WGPUDevice device, WGPUBuffer buffer)
 {
     WGPUBindGroupEntry entries[2] = { 0 };
     entries[0].binding = 0;
-    entries[0].textureView = texture;
-    entries[1].binding = 1;
-    entries[1].sampler = sampler;
+    entries[0].buffer = buffer;
+    entries[0].size = 12;
 
     WGPUBindGroupDescriptor bind_group_desc = { 0 };
     bind_group_desc.label = {"MaterialBindGroup", WGPU_STRLEN};
     bind_group_desc.layout = m_material_layout;
-    bind_group_desc.entryCount = 2;
+    bind_group_desc.entryCount = 1;
     bind_group_desc.entries = entries;
 
     return wgpuDeviceCreateBindGroup(device, &bind_group_desc);

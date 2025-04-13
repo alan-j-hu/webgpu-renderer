@@ -1,15 +1,15 @@
 #ifndef RENDERER_H
 #define RENDERER_H
 
-#include "flatmesheffect.h"
-#include "flatmeshpipeline.h"
-#include "mesheffect.h"
-#include "material.h"
 #include "mesh.h"
 #include "texture.h"
-#include "texturemesheffect.h"
-#include "texturemeshpipeline.h"
-#include "uniformlayout.h"
+#include "material/flatmesheffect.h"
+#include "material/flatmeshpipeline.h"
+#include "material/mesheffect.h"
+#include "material/material.h"
+#include "material/texturemesheffect.h"
+#include "material/texturemeshpipeline.h"
+#include "material/uniformlayout.h"
 #include <memory>
 #include <vector>
 

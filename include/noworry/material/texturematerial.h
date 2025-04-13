@@ -2,8 +2,8 @@
 #define TEXTUREMATERIAL_H
 
 #include "material.h"
-#include "texture.h"
 #include "texturemeshpipeline.h"
+#include "../texture.h"
 #include <webgpu/webgpu.h>
 
 class TextureMaterial : public Material

@@ -1,7 +1,7 @@
 #ifndef PIPELINE_H
 #define PIPELINE_H
 
-#include "scene/model.h"
+#include "../scene/model.h"
 
 class Pipeline
 {

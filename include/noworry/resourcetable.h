@@ -1,12 +1,12 @@
 #ifndef RESOURCE_TABLE_H
 #define RESOURCE_TABLE_H
 
-#include "material.h"
 #include "mesh.h"
-#include "flatmaterial.h"
 #include "texture.h"
-#include "texturematerial.h"
 #include "renderer.h"
+#include "material/material.h"
+#include "material/flatmaterial.h"
+#include "material/texturematerial.h"
 #include <memory>
 #include <vector>
 

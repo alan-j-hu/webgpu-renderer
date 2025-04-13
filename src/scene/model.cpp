@@ -1,5 +1,5 @@
+#include "noworry/material/material.h"
 #include "noworry/scene/model.h"
-#include "noworry/material.h"
 #include "noworry/mesh.h"
 #include <cstring>
 #include <glm/ext/matrix_transform.hpp>

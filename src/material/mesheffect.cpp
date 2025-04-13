@@ -1,4 +1,4 @@
-#include "noworry/mesheffect.h"
+#include "noworry/material/mesheffect.h"
 
 MeshEffect::MeshEffect(WGPUDevice device)
 {

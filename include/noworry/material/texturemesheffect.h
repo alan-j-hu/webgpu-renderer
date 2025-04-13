@@ -1,7 +1,7 @@
 #ifndef TEXTUREMESHEFFECT_H
 #define TEXTUREMESHEFFECT_H
 
-#include "noworry/mesheffect.h"
+#include "mesheffect.h"
 
 class UniformLayout;
 

@@ -1,4 +1,4 @@
-#include "noworry/uniformlayout.h"
+#include "noworry/material/uniformlayout.h"
 
 UniformLayout::UniformLayout(WGPUDevice device)
 {

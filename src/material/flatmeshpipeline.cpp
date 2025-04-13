@@ -1,8 +1,8 @@
-#include "noworry/texturemeshpipeline.h"
+#include "noworry/material/flatmeshpipeline.h"
 #include "noworry/mesh.h"
 
-TextureMeshPipeline::TextureMeshPipeline(
-    WGPUDevice device, TextureMeshEffect& effect)
+FlatMeshPipeline::FlatMeshPipeline(
+    WGPUDevice device, FlatMeshEffect& effect)
     : m_device(device), m_effect(effect)
 {
     WGPUDepthStencilState depth_stencil = { 0 };
@@ -54,17 +54,17 @@ TextureMeshPipeline::TextureMeshPipeline(
     m_pipeline = wgpuDeviceCreateRenderPipeline(device, &pipeline_desc);
 }
 
-TextureMeshPipeline::~TextureMeshPipeline()
+FlatMeshPipeline::~FlatMeshPipeline()
 {
     wgpuRenderPipelineRelease(m_pipeline);
 }
 
-void TextureMeshPipeline::enqueue(Model& model)
+void FlatMeshPipeline::enqueue(Model& model)
 {
     m_queue.push_back(&model);
 }
 
-void TextureMeshPipeline::draw(WGPURenderPassEncoder encoder)
+void FlatMeshPipeline::draw(WGPURenderPassEncoder encoder)
 {
     wgpuRenderPassEncoderSetPipeline(encoder, m_pipeline);
     for (auto model : m_queue) {

@@ -2,11 +2,11 @@
 #define SCENE_H
 
 #include "camera.h"
-#include "../material.h"
-#include "../mesh.h"
 #include "model.h"
+#include "../mesh.h"
 #include "../renderer.h"
-#include "../uniformlayout.h"
+#include "../material/material.h"
+#include "../material/uniformlayout.h"
 #include <memory>
 #include <vector>
 
