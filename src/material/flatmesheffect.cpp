@@ -5,62 +5,18 @@ FlatMeshEffect::FlatMeshEffect(WGPUDevice device, UniformLayout& ul)
     : MeshEffect(device)
 {
     const char* code = R"(
-struct Camera {
-  viewproj: mat4x4<f32>,
-};
-
-struct Model {
-  transform: mat4x4<f32>,
-};
-
-struct Vertex {
-  x: f32,
-  y: f32,
-  z: f32,
-  u: f32,
-  v: f32,
-};
-
-@group(0) @binding(0) var<uniform> camera: Camera;
-
 @group(1) @binding(0) var<uniform> color: vec3f;
-
-@group(2) @binding(0) var<uniform> model: Model;
-@group(2) @binding(1) var<storage, read> vertices: array<Vertex>;
-
-struct VertexInput {
-  @builtin(vertex_index) vertexID : u32,
-}
 
 struct FragmentInput {
   @builtin(position) pos: vec4f,
   @location(0) tex_coords: vec2f,
 };
 
-@vertex
-fn vs_main(vertex: VertexInput) -> FragmentInput {
-  var v = vertices[vertex.vertexID];
-
-  var out: FragmentInput;
-  out.pos = camera.viewproj * model.transform * vec4(v.x, v.y, v.z, 1);
-  out.tex_coords = vec2(v.u, v.v);
-  return out;
-}
-
 @fragment
 fn fs_main(input: FragmentInput) -> @location(0) vec4f {
   return vec4(color, 1);
 }
 )";
-
-    WGPUShaderModuleWGSLDescriptor vertex_wgsl_desc = { 0 };
-    vertex_wgsl_desc.chain.sType = WGPUSType_ShaderSourceWGSL;
-    vertex_wgsl_desc.code = {code, WGPU_STRLEN};
-
-    WGPUShaderModuleDescriptor vertex_desc = { 0 };
-    vertex_desc.nextInChain = &vertex_wgsl_desc.chain;
-    m_vertex_shader =
-        wgpuDeviceCreateShaderModule(device, &vertex_desc);
 
     WGPUShaderModuleWGSLDescriptor frag_wgsl_desc = { 0 };
     frag_wgsl_desc.chain.sType = WGPUSType_ShaderSourceWGSL;
@@ -104,7 +60,6 @@ FlatMeshEffect::~FlatMeshEffect()
     wgpuPipelineLayoutRelease(m_pipeline_layout);
     wgpuBindGroupLayoutRelease(m_material_layout);
     wgpuShaderModuleRelease(m_fragment_shader);
-    wgpuShaderModuleRelease(m_vertex_shader);
 }
 
 WGPUBindGroup FlatMeshEffect::create_material_group(

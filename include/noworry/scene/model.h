@@ -18,6 +18,8 @@ public:
     Material& material() { return *m_material; }
     WGPUBindGroup bind_group() { return m_bind_group; }
 
+    void set_material(Material& material);
+
     void set_translation(const glm::vec3& translation);
     void set_yaw(float yaw);
     void set_scale(float scale);

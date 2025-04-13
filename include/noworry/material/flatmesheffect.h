@@ -13,11 +13,6 @@ public:
     FlatMeshEffect& operator=(const FlatMeshEffect&) = delete;
     virtual ~FlatMeshEffect();
 
-    virtual WGPUShaderModule vertex_shader() override
-    {
-        return m_vertex_shader;
-    }
-
     virtual WGPUShaderModule fragment_shader() override
     {
         return m_fragment_shader;
@@ -34,9 +29,8 @@ public:
     }
 
     WGPUBindGroup create_material_group(WGPUDevice, WGPUBuffer);
-private:
 
-    WGPUShaderModule m_vertex_shader;
+private:
     WGPUShaderModule m_fragment_shader;
     WGPUBindGroupLayout m_material_layout;
     WGPUPipelineLayout m_pipeline_layout;

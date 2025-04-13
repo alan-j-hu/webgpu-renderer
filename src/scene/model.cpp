@@ -32,6 +32,11 @@ Model::~Model()
     wgpuBufferRelease(m_buffer);
 }
 
+void Model::set_material(Material& material)
+{
+    m_material = &material;
+}
+
 void Model::set_translation(const glm::vec3& translation)
 {
     m_translation = translation;

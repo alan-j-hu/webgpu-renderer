@@ -23,7 +23,11 @@ public:
     MeshEffect& operator=(const MeshEffect&) = delete;
     virtual ~MeshEffect();
 
-    virtual WGPUShaderModule vertex_shader() = 0;
+    WGPUShaderModule vertex_shader()
+    {
+        return m_vertex_shader;
+    }
+
     virtual WGPUShaderModule fragment_shader() = 0;
     virtual WGPUPipelineLayout pipeline_layout() = 0;
 
@@ -35,8 +39,9 @@ public:
         WGPUBuffer transform,
         WGPUBuffer vertices,
         int tri_count);
-private:
 
+private:
+    WGPUShaderModule m_vertex_shader;
     WGPUBindGroupLayout m_model_layout;
 };
 

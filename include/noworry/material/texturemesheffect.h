@@ -13,11 +13,6 @@ public:
     TextureMeshEffect& operator=(const TextureMeshEffect&) = delete;
     virtual ~TextureMeshEffect();
 
-    virtual WGPUShaderModule vertex_shader() override
-    {
-        return m_vertex_shader;
-    }
-
     virtual WGPUShaderModule fragment_shader() override
     {
         return m_fragment_shader;
@@ -35,9 +30,8 @@ public:
 
     virtual WGPUBindGroup create_material_group(
         WGPUDevice, WGPUTextureView, WGPUSampler);
-private:
 
-    WGPUShaderModule m_vertex_shader;
+private:
     WGPUShaderModule m_fragment_shader;
     WGPUBindGroupLayout m_material_layout;
     WGPUPipelineLayout m_pipeline_layout;

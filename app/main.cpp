@@ -1,9 +1,9 @@
 #include "noworry/application.h"
-#include "noworry/scene/camera.h"
 #include "noworry/mesh.h"
 #include "noworry/meshbuilder.h"
 #include "noworry/renderer.h"
 #include "noworry/resourcetable.h"
+#include "noworry/scene/camera.h"
 #include "noworry/scene/model.h"
 #include "noworry/scene/scene.h"
 
@@ -55,12 +55,12 @@ public:
             .build(m_resources);
 
         auto& texture = m_resources.add_texture("../assets/cat.png");
-        auto& material = m_resources.add_texture_material(texture);
+        m_material = &m_resources.add_texture_material(texture);
 
-        auto& material2 = m_resources.add_flat_material(1, 0, 0);
+        m_material2 = &m_resources.add_flat_material(1, 0, 0);
 
         m_yaw = glm::pi<float>() * 0.25f;
-        m_model = &m_scene.add_model(mesh, material);
+        m_model = &m_scene.add_model(mesh, *m_material);
         m_model->set_translation(glm::vec3(0.0f, 0.0f, 50.0f));
 
         auto& camera = m_scene.current_camera();
@@ -122,9 +122,14 @@ private:
 
     Renderer m_renderer;
     ResourceTable m_resources;
+
+    Material* m_material;
+    Material* m_material2;
+
     Scene m_scene;
     Model* m_model;
     float m_yaw;
+    int m_selected = 0;
 
     void init_imgui()
     {
@@ -161,6 +166,30 @@ private:
         ImGui::Begin("Window", nullptr, WINDOW_FLAGS);
 
         draw_menubar();
+
+        const char* items[] = {
+            "Texture",
+            "Flat"
+        };
+
+        if (ImGui::BeginCombo("##combo", items[m_selected])) {
+            for (int i = 0; i < IM_ARRAYSIZE(items); ++i) {
+                bool is_selected = i == m_selected;
+                if (ImGui::Selectable(items[i], is_selected)) {
+                    m_selected = i;
+                }
+                if (is_selected) {
+                    ImGui::SetItemDefaultFocus();
+                }
+            }
+            ImGui::EndCombo();
+        }
+
+        if (m_selected == 0) {
+            m_model->set_material(*m_material);
+        } else {
+            m_model->set_material(*m_material2);
+        }
 
         ImGui::Image((ImTextureID)(intptr_t)m_subwindow.view(),
                      ImVec2(m_subwindow.width(), m_subwindow.height()));
