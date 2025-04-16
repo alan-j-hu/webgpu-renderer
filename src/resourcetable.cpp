@@ -16,7 +16,7 @@ FlatMaterial& ResourceTable::add_flat_material(float r, float g, float b)
     auto ptr = std::make_unique<FlatMaterial>(
         m_mat_id++,
         m_renderer.device(),
-        m_renderer.flat_mesh_pipeline(),
+        m_renderer.flat_mesh_effect(),
         r, g, b);
     FlatMaterial& mat = *ptr;
     m_materials.emplace_back(std::move(ptr));
@@ -29,7 +29,7 @@ TextureMaterial& ResourceTable::add_texture_material(
     auto ptr = std::make_unique<TextureMaterial>(
         m_mat_id++,
         m_renderer.device(),
-        m_renderer.texture_mesh_pipeline(),
+        m_renderer.texture_mesh_effect(),
         texture,
         m_renderer.default_sampler());
     TextureMaterial& mat = *ptr;

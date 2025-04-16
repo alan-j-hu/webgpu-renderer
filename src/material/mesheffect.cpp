@@ -1,6 +1,12 @@
 #include "noworry/material/mesheffect.h"
+#include "noworry/material/material.h"
+#include "noworry/material/uniformlayout.h"
+#include "noworry/scene/model.h"
+#include "noworry/mesh.h"
 
-MeshEffect::MeshEffect(WGPUDevice device)
+MeshEffect::MeshEffect(WGPUDevice device, UniformLayout& ul)
+    : m_pipeline(nullptr), m_pipeline_layout(nullptr),
+      m_device(device), m_ul(&ul)
 {
     const char* code = R"(
 struct Camera {
@@ -75,6 +81,12 @@ fn vs_main(vertex: VertexInput) -> FragmentInput {
 
 MeshEffect::~MeshEffect()
 {
+    if (m_pipeline != nullptr) {
+        wgpuRenderPipelineRelease(m_pipeline);
+    }
+    if (m_pipeline_layout != nullptr) {
+        wgpuPipelineLayoutRelease(m_pipeline_layout);
+    }
     wgpuBindGroupLayoutRelease(m_model_layout);
     wgpuShaderModuleRelease(m_vertex_shader);
 }
@@ -100,4 +112,110 @@ WGPUBindGroup MeshEffect::create_model_group(
     bind_group_desc.entries = entries;
 
     return wgpuDeviceCreateBindGroup(device, &bind_group_desc);
+}
+
+WGPUPipelineLayout MeshEffect::pipeline_layout()
+{
+    // Pipeline layout cannot be created in the constructor because it
+    // requires a virtual call to get the material layout.
+    if (m_pipeline_layout != nullptr) {
+        return m_pipeline_layout;
+    }
+
+    WGPUBindGroupLayout layouts[3] = {
+        m_ul->layout(),
+        material_layout(),
+        model_layout()
+    };
+
+    WGPUPipelineLayoutDescriptor pipeline_layout_desc = { 0 };
+    pipeline_layout_desc.bindGroupLayoutCount = 3;
+    pipeline_layout_desc.bindGroupLayouts = layouts;
+
+    m_pipeline_layout =
+        wgpuDeviceCreatePipelineLayout(m_device, &pipeline_layout_desc);
+    return m_pipeline_layout;
+}
+
+WGPURenderPipeline MeshEffect::pipeline()
+{
+    if (m_pipeline != nullptr) {
+        return m_pipeline;
+    }
+
+    WGPUDepthStencilState depth_stencil = { 0 };
+    depth_stencil.format = WGPUTextureFormat_Depth24Plus;
+    depth_stencil.depthWriteEnabled = WGPUOptionalBool_True;
+    depth_stencil.depthCompare = WGPUCompareFunction_Less;
+
+    WGPUBlendState blend = {
+        .color= {
+            .operation = WGPUBlendOperation_Add,
+            .srcFactor = WGPUBlendFactor_Src,
+            .dstFactor = WGPUBlendFactor_Zero
+        },
+        .alpha = {
+            .operation = WGPUBlendOperation_Add,
+            .srcFactor = WGPUBlendFactor_Src,
+            .dstFactor = WGPUBlendFactor_Zero
+        }
+    };
+
+    WGPUColorTargetState color_target = {
+        .format = WGPUTextureFormat_BGRA8Unorm,
+        .blend = &blend,
+        .writeMask = WGPUColorWriteMask_All
+    };
+
+    WGPUFragmentState fragment = { 0 };
+    fragment.module = fragment_shader();
+    fragment.entryPoint = {"fs_main", WGPU_STRLEN};
+    fragment.targetCount = 1;
+    fragment.targets = &color_target;
+
+    WGPURenderPipelineDescriptor pipeline_desc = { 0 };
+    pipeline_desc.label = {"pipeline", WGPU_STRLEN};
+    pipeline_desc.layout = pipeline_layout();
+    pipeline_desc.vertex.module = vertex_shader();
+    pipeline_desc.vertex.entryPoint = {"vs_main", WGPU_STRLEN};
+    pipeline_desc.vertex.bufferCount = 0;
+    pipeline_desc.vertex.buffers = nullptr;
+    pipeline_desc.primitive.topology = WGPUPrimitiveTopology_TriangleList;
+    pipeline_desc.primitive.frontFace = WGPUFrontFace_CCW;
+    pipeline_desc.primitive.cullMode = WGPUCullMode_None;
+    pipeline_desc.depthStencil = &depth_stencil;
+    pipeline_desc.multisample.count = 1;
+    pipeline_desc.multisample.count = 1;
+    pipeline_desc.multisample.mask = ~0u;
+    pipeline_desc.fragment = &fragment;
+
+    m_pipeline = wgpuDeviceCreateRenderPipeline(m_device, &pipeline_desc);
+    return m_pipeline;
+}
+
+void MeshEffect::enqueue(Model& model)
+{
+    m_queue.push_back(&model);
+}
+
+void MeshEffect::draw(WGPURenderPassEncoder encoder)
+{
+    wgpuRenderPassEncoderSetPipeline(encoder, pipeline());
+    for (auto model : m_queue) {
+        int count = 3 * model->mesh().tri_count;
+        wgpuRenderPassEncoderSetBindGroup(
+            encoder, 1, model->material().bind_group(), 0, nullptr);
+        wgpuRenderPassEncoderSetBindGroup(
+            encoder, 2, model->bind_group(), 0, nullptr);
+
+        wgpuRenderPassEncoderSetIndexBuffer(
+            encoder,
+            model->mesh().index_buffer,
+            WGPUIndexFormat_Uint16,
+            0,
+            count * sizeof(std::uint16_t));
+
+        wgpuRenderPassEncoderDrawIndexed(encoder, count, 1, 0, 0, 0);
+    }
+    m_queue.clear();
 }

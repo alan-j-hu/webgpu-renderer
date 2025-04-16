@@ -9,11 +9,9 @@ add_library(noworry
   texture.cpp
   material/flatmaterial.cpp
   material/flatmesheffect.cpp
-  material/flatmeshpipeline.cpp
   material/mesheffect.cpp
   material/texturematerial.cpp
   material/texturemesheffect.cpp
-  material/texturemeshpipeline.cpp
   material/uniformlayout.cpp
   scene/camera.cpp
   scene/model.cpp

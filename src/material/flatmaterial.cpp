@@ -4,7 +4,7 @@
 FlatMaterial::FlatMaterial(
     int id,
     WGPUDevice device,
-    FlatMeshPipeline& pipeline,
+    FlatMeshEffect& effect,
     float r, float g, float b)
 {
     WGPUBufferDescriptor buffer_desc = { 0 };
@@ -20,9 +20,8 @@ FlatMaterial::FlatMaterial(
         queue, m_buffer, 0, &color, sizeof(glm::vec3));
 
     m_id = id;
-    m_pipeline = &pipeline;
-    m_bind_group = pipeline
-        .effect()
+    m_effect = &effect;
+    m_bind_group = effect
         .create_material_group(device, m_buffer);
 }
 

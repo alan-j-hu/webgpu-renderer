@@ -4,11 +4,9 @@
 #include "mesh.h"
 #include "texture.h"
 #include "material/flatmesheffect.h"
-#include "material/flatmeshpipeline.h"
 #include "material/mesheffect.h"
 #include "material/material.h"
 #include "material/texturemesheffect.h"
-#include "material/texturemeshpipeline.h"
 #include "material/uniformlayout.h"
 #include <memory>
 #include <vector>
@@ -27,11 +25,7 @@ public:
 
     FlatMeshEffect& flat_mesh_effect() { return m_flat_effect; }
 
-    FlatMeshPipeline& flat_mesh_pipeline() { return m_flat_pipeline; }
-
     TextureMeshEffect& texture_mesh_effect() { return m_effect; }
-
-    TextureMeshPipeline& texture_mesh_pipeline() { return m_pipeline; }
 
     WGPUSampler default_sampler() { return m_sampler; }
 
@@ -53,9 +47,7 @@ private:
     UniformLayout m_uniform_layout;
     WGPUSampler m_sampler;
     FlatMeshEffect m_flat_effect;
-    FlatMeshPipeline m_flat_pipeline;
     TextureMeshEffect m_effect;
-    TextureMeshPipeline m_pipeline;
 
     void create_depth_buffer(int width, int height);
     void do_render(WGPURenderPassEncoder encoder);

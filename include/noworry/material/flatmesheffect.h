@@ -18,11 +18,6 @@ public:
         return m_fragment_shader;
     }
 
-    virtual WGPUPipelineLayout pipeline_layout() override
-    {
-        return m_pipeline_layout;
-    }
-
     virtual WGPUBindGroupLayout material_layout() override
     {
         return m_material_layout;
@@ -33,7 +28,6 @@ public:
 private:
     WGPUShaderModule m_fragment_shader;
     WGPUBindGroupLayout m_material_layout;
-    WGPUPipelineLayout m_pipeline_layout;
 };
 
 #endif

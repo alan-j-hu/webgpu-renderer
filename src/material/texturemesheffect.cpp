@@ -2,7 +2,7 @@
 #include "noworry/material/uniformlayout.h"
 
 TextureMeshEffect::TextureMeshEffect(WGPUDevice device, UniformLayout& ul)
-    : MeshEffect(device)
+    : MeshEffect(device, ul)
 {
     const char* code = R"(
 @group(1) @binding(0) var the_texture: texture_2d<f32>;
@@ -50,24 +50,10 @@ fn fs_main(input: FragmentInput) -> @location(0) vec4f {
 
     m_material_layout =
         wgpuDeviceCreateBindGroupLayout(device, &material_layout_desc);
-
-    WGPUBindGroupLayout layouts[3] = {
-        ul.layout(),
-        material_layout(),
-        model_layout()
-    };
-
-    WGPUPipelineLayoutDescriptor pipeline_layout_desc = { 0 };
-    pipeline_layout_desc.bindGroupLayoutCount = 3;
-    pipeline_layout_desc.bindGroupLayouts = layouts;
-
-    m_pipeline_layout =
-        wgpuDeviceCreatePipelineLayout(device, &pipeline_layout_desc);
 }
 
 TextureMeshEffect::~TextureMeshEffect()
 {
-    wgpuPipelineLayoutRelease(m_pipeline_layout);
     wgpuBindGroupLayoutRelease(m_material_layout);
     wgpuShaderModuleRelease(m_fragment_shader);
 }

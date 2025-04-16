@@ -2,7 +2,7 @@
 #define TEXTUREMATERIAL_H
 
 #include "material.h"
-#include "texturemeshpipeline.h"
+#include "texturemesheffect.h"
 #include "../texture.h"
 #include <webgpu/webgpu.h>
 
@@ -12,16 +12,17 @@ public:
     TextureMaterial(
         int id,
         WGPUDevice device,
-        TextureMeshPipeline&,
+        TextureMeshEffect&,
         const Texture&,
         WGPUSampler sampler);
 
     int id() { return m_id; }
     virtual WGPUBindGroup bind_group() override { return m_bind_group; }
-    virtual TextureMeshPipeline& pipeline() override { return *m_pipeline; }
+    virtual TextureMeshEffect& effect() override { return *m_effect; }
+
 private:
     int m_id;
-    TextureMeshPipeline* m_pipeline;
+    TextureMeshEffect* m_effect;
     const Texture* m_texture;
     WGPUBindGroup m_bind_group;
 };

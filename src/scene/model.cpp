@@ -58,7 +58,7 @@ void Model::copy_to_gpu(WGPUDevice device)
     WGPUQueue queue = wgpuDeviceGetQueue(device);
     wgpuQueueWriteBuffer(
         queue, m_buffer, 0, &m_model.transform, sizeof(float[4][4]));
-    m_material->pipeline().enqueue(*this);
+    m_material->effect().enqueue(*this);
 }
 
 void Model::update_matrix()

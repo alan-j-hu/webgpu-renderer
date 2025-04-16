@@ -3,15 +3,14 @@
 TextureMaterial::TextureMaterial(
     int id,
     WGPUDevice device,
-    TextureMeshPipeline& pipeline,
+    TextureMeshEffect& effect,
     const Texture& texture,
     WGPUSampler sampler)
 {
     m_id = id;
-    m_pipeline = &pipeline;
+    m_effect = &effect;
     m_texture = &texture;
-    m_bind_group = pipeline
-        .effect()
+    m_bind_group = effect
         .create_material_group(device, texture.view(), sampler);
 }
 

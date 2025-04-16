@@ -12,9 +12,7 @@ Renderer::Renderer(WGPUDevice device, int width, int height)
                       WGPUTextureUsage_RenderAttachment),
       m_uniform_layout(device),
       m_flat_effect(device, m_uniform_layout),
-      m_flat_pipeline(device, m_flat_effect),
-      m_effect(device, m_uniform_layout),
-      m_pipeline(device, m_effect)
+      m_effect(device, m_uniform_layout)
 {
     WGPUSamplerDescriptor sampler_desc = { 0 };
     sampler_desc.addressModeU = WGPUAddressMode_ClampToEdge;
@@ -111,6 +109,6 @@ void Renderer::create_depth_buffer(int width, int height)
 
 void Renderer::do_render(WGPURenderPassEncoder encoder)
 {
-    m_pipeline.draw(encoder);
-    m_flat_pipeline.draw(encoder);
+    m_effect.draw(encoder);
+    m_flat_effect.draw(encoder);
 }

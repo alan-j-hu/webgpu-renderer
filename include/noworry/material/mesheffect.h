@@ -1,6 +1,7 @@
 #ifndef MESH_EFFECT_H
 #define MESH_EFFECT_H
 
+#include <vector>
 #include <glm/mat4x4.hpp>
 #include <webgpu/webgpu.h>
 
@@ -15,10 +16,13 @@ struct ModelData
     glm::mat4 transform;
 };
 
+struct Model;
+struct UniformLayout;
+
 class MeshEffect
 {
 public:
-    MeshEffect(WGPUDevice device);
+    MeshEffect(WGPUDevice device, UniformLayout&);
     MeshEffect(const MeshEffect&) = delete;
     MeshEffect& operator=(const MeshEffect&) = delete;
     virtual ~MeshEffect();
@@ -29,8 +33,6 @@ public:
     }
 
     virtual WGPUShaderModule fragment_shader() = 0;
-    virtual WGPUPipelineLayout pipeline_layout() = 0;
-
     virtual WGPUBindGroupLayout material_layout() = 0;
     WGPUBindGroupLayout model_layout() { return m_model_layout; }
 
@@ -40,9 +42,24 @@ public:
         WGPUBuffer vertices,
         int tri_count);
 
+    void enqueue(Model& model);
+
+    void draw(WGPURenderPassEncoder encoder);
+
+    WGPUPipelineLayout pipeline_layout();
+    WGPURenderPipeline pipeline();
+
 private:
+    WGPUDevice m_device;
     WGPUShaderModule m_vertex_shader;
     WGPUBindGroupLayout m_model_layout;
+    UniformLayout* m_ul;
+
+    WGPUPipelineLayout m_pipeline_layout;
+    WGPURenderPipeline m_pipeline;
+    std::vector<Model*> m_queue;
+
+    void create_pipeline();
 };
 
 #endif
