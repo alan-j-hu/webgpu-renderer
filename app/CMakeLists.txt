@@ -8,7 +8,10 @@ set(IMGUI_SRC
   ${IMGUI_DIR}/imgui_tables.cpp
   ${IMGUI_DIR}/imgui_widgets.cpp)
 
-add_executable(demo main.cpp ${IMGUI_SRC})
+add_executable(demo
+  main.cpp
+  modal.cpp
+  ${IMGUI_SRC})
 set_property(TARGET demo PROPERTY CXX_STANDARD 23)
 set_property(TARGET demo PROPERTY C_STANDARD 23)
 target_compile_definitions(demo PUBLIC "IMGUI_IMPL_WEBGPU_BACKEND_DAWN")

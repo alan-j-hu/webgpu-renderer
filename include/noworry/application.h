@@ -14,6 +14,9 @@ public:
 
     virtual ~Application();
 
+    int width() { return m_width; }
+    int height() { return m_height; }
+
     int run();
 
     void tick();

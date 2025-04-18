@@ -1,3 +1,5 @@
+#include "modal.h"
+
 #include "noworry/application.h"
 #include "noworry/mesh.h"
 #include "noworry/meshbuilder.h"
@@ -29,6 +31,7 @@ public:
           m_scene(m_renderer)
     {
         init_imgui();
+
         m_renderer.set_clear_color({0.5, 0.5, 0.5, 1});
 
         auto& mesh = MeshBuilder()
@@ -116,6 +119,7 @@ private:
     const ImGuiWindowFlags WINDOW_FLAGS =
         ImGuiWindowFlags_NoMove
       | ImGuiWindowFlags_MenuBar
+      | ImGuiWindowFlags_NoBringToFrontOnFocus
       | ImGuiWindowFlags_NoDecoration;
 
     Texture m_subwindow;
@@ -130,6 +134,8 @@ private:
     Model* m_model;
     float m_yaw;
     int m_selected = 0;
+
+    ModalStack m_modals;
 
     void init_imgui()
     {
@@ -160,12 +166,41 @@ private:
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
 
+        ImGui::BeginDisabled(m_modals.has_focus());
+
         ImGuiViewport* viewport = ImGui::GetMainViewport();
         ImGui::SetNextWindowPos(viewport->Pos);
         ImGui::SetNextWindowSize(viewport->Size);
         ImGui::Begin("Window", nullptr, WINDOW_FLAGS);
 
         draw_menubar();
+
+        draw_left_pane();
+        ImGui::SameLine();
+        draw_right_pane();
+
+        ImGui::End();
+
+        ImGui::EndDisabled();
+
+        m_modals.render();
+
+        ImGui::Render();
+    }
+
+    bool draw_menubar()
+    {
+        if (!ImGui::BeginMenuBar()) return false;
+        ImGui::MenuItem("File");
+        ImGui::MenuItem("Edit");
+        ImGui::EndMenuBar();
+        return true;
+    };
+
+    void draw_left_pane()
+    {
+        ImGui::BeginChild("Tilemap Editor", ImVec2(width() / 2, 0),
+                          ImGuiChildFlags_Borders, 0);
 
         const char* items[] = {
             "Texture",
@@ -193,19 +228,19 @@ private:
 
         ImGui::Image((ImTextureID)(intptr_t)m_subwindow.view(),
                      ImVec2(m_subwindow.width(), m_subwindow.height()));
-        ImGui::End();
 
-        ImGui::Render();
+        ImGui::EndChild();
     }
 
-    bool draw_menubar()
+    void draw_right_pane()
     {
-        if (!ImGui::BeginMenuBar()) return false;
-        ImGui::MenuItem("File");
-        ImGui::MenuItem("Edit");
-        ImGui::EndMenuBar();
-        return true;
-    };
+        ImGui::BeginChild("Tileset Editor", ImVec2(width() / 2, 0),
+                          ImGuiChildFlags_Borders, 0);
+        if (ImGui::Button("Add Button", ImVec2(0, 0))) {
+            m_modals.push(std::make_unique<Modal>("Add Tile"));
+        }
+        ImGui::EndChild();
+    }
 
     void render_subwindow()
     {
