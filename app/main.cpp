@@ -1,4 +1,4 @@
-#include "modal.h"
+#include "filedialog.h"
 
 #include "noworry/application.h"
 #include "noworry/mesh.h"
@@ -10,6 +10,7 @@
 #include "noworry/scene/scene.h"
 
 #include <array>
+#include <filesystem>
 #include <glm/ext/scalar_constants.hpp>
 #include <webgpu/webgpu.h>
 
@@ -136,6 +137,7 @@ private:
     int m_selected = 0;
 
     ModalStack m_modals;
+    std::vector<std::filesystem::path> m_sink;
 
     void init_imgui()
     {
@@ -199,45 +201,48 @@ private:
 
     void draw_left_pane()
     {
-        ImGui::BeginChild("Tilemap Editor", ImVec2(width() / 2, 0),
-                          ImGuiChildFlags_Borders, 0);
+        if (ImGui::BeginChild("Tilemap Editor", ImVec2(width() / 2, 0),
+                              ImGuiChildFlags_Borders, 0)) {
 
-        const char* items[] = {
-            "Texture",
-            "Flat"
-        };
+            const char* items[] = {
+                "Texture",
+                "Flat"
+            };
 
-        if (ImGui::BeginCombo("##combo", items[m_selected])) {
-            for (int i = 0; i < IM_ARRAYSIZE(items); ++i) {
-                bool is_selected = i == m_selected;
-                if (ImGui::Selectable(items[i], is_selected)) {
-                    m_selected = i;
+            if (ImGui::BeginCombo("##combo", items[m_selected])) {
+                for (int i = 0; i < IM_ARRAYSIZE(items); ++i) {
+                    bool is_selected = i == m_selected;
+                    if (ImGui::Selectable(items[i], is_selected)) {
+                        m_selected = i;
+                    }
+                    if (is_selected) {
+                        ImGui::SetItemDefaultFocus();
+                    }
                 }
-                if (is_selected) {
-                    ImGui::SetItemDefaultFocus();
-                }
+                ImGui::EndCombo();
             }
-            ImGui::EndCombo();
+
+            if (m_selected == 0) {
+                m_model->set_material(*m_material);
+            } else {
+                m_model->set_material(*m_material2);
+            }
+
+            ImGui::Image((ImTextureID)(intptr_t)m_subwindow.view(),
+                         ImVec2(m_subwindow.width(), m_subwindow.height()));
         }
-
-        if (m_selected == 0) {
-            m_model->set_material(*m_material);
-        } else {
-            m_model->set_material(*m_material2);
-        }
-
-        ImGui::Image((ImTextureID)(intptr_t)m_subwindow.view(),
-                     ImVec2(m_subwindow.width(), m_subwindow.height()));
-
         ImGui::EndChild();
     }
 
     void draw_right_pane()
     {
-        ImGui::BeginChild("Tileset Editor", ImVec2(width() / 2, 0),
-                          ImGuiChildFlags_Borders, 0);
-        if (ImGui::Button("Add Button", ImVec2(0, 0))) {
-            m_modals.push(std::make_unique<Modal>("Add Tile"));
+        namespace fs = std::filesystem;
+        if (ImGui::BeginChild("Tileset Editor", ImVec2(width() / 2, 0),
+                              ImGuiChildFlags_Borders, 0)) {
+            if (ImGui::Button("Add Button", ImVec2(0, 0))) {
+                m_modals.push(
+                    std::make_unique<FileDialog>(fs::current_path(), m_sink));
+            }
         }
         ImGui::EndChild();
     }

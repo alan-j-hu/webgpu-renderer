@@ -13,11 +13,7 @@ public:
 
     const std::string& title() { return m_title; }
 
-    virtual void render();
-
-    virtual void on_submit();
-
-    virtual void on_cancel();
+    virtual bool render();
 
 private:
     std::string m_title;

@@ -7,16 +7,9 @@ Modal::Modal(std::string_view title)
 {
 }
 
-void Modal::render()
+bool Modal::render()
 {
-}
-
-void Modal::on_submit()
-{
-}
-
-void Modal::on_cancel()
-{
+    return false;
 }
 
 void ModalStack::push(std::unique_ptr<Modal> modal)
@@ -46,19 +39,11 @@ void ModalStack::render()
 bool ModalStack::render_modal(Modal& modal)
 {
     bool close = false;
+    ImGui::SetNextWindowSize(ImVec2(0, 0));
     ImGui::Begin(modal.title().c_str());
 
-    modal.render();
+    close = modal.render();
 
-    if (ImGui::Button("Ok", ImVec2(0, 0))) {
-        close = true;
-        modal.on_submit();
-    }
-    ImGui::SameLine();
-    if (ImGui::Button("Cancel", ImVec2(0, 0))) {
-        close = true;
-        modal.on_cancel();
-    }
     ImGui::End();
     return close;
 }

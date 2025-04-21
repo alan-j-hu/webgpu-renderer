@@ -9,6 +9,7 @@ set(IMGUI_SRC
   ${IMGUI_DIR}/imgui_widgets.cpp)
 
 add_executable(demo
+  filedialog.cpp
   main.cpp
   modal.cpp
   ${IMGUI_SRC})
