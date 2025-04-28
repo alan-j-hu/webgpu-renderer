@@ -43,6 +43,7 @@ bool FileDialog::render()
                 }
             }
         }
+        m_sink.clear();
         for (auto& entry : m_files) {
             if (ImGui::Selectable(entry.path().filename().c_str(),
                                   false,
@@ -58,7 +59,7 @@ bool FileDialog::render()
     }
 
     if (ImGui::Button("Cancel", ImVec2(0, 0))) {
-        close = close || true;
+        close = true;
     }
 
     if (next_dir != m_current_dir) {

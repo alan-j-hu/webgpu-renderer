@@ -12,6 +12,9 @@ add_executable(demo
   filedialog.cpp
   main.cpp
   modal.cpp
+  tileset/addnewtile.cpp
+  tileset/tiledefinition.cpp
+  tileset/tileset.cpp
   ${IMGUI_SRC})
 set_property(TARGET demo PROPERTY CXX_STANDARD 23)
 set_property(TARGET demo PROPERTY C_STANDARD 23)
@@ -20,4 +23,4 @@ target_include_directories(demo PRIVATE
   ../include
   ${IMGUI_DIR}
   ${IMGUI_DIR}/backends)
-target_link_libraries(demo noworry)
+target_link_libraries(demo assimp noworry)

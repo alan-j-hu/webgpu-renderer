@@ -1,4 +1,5 @@
-#include "filedialog.h"
+#include "tileset/addnewtile.h"
+#include "tileset/tileset.h"
 
 #include "noworry/application.h"
 #include "noworry/mesh.h"
@@ -137,7 +138,7 @@ private:
     int m_selected = 0;
 
     ModalStack m_modals;
-    std::vector<std::filesystem::path> m_sink;
+    Tileset m_tileset;
 
     void init_imgui()
     {
@@ -239,9 +240,9 @@ private:
         namespace fs = std::filesystem;
         if (ImGui::BeginChild("Tileset Editor", ImVec2(width() / 2, 0),
                               ImGuiChildFlags_Borders, 0)) {
-            if (ImGui::Button("Add Button", ImVec2(0, 0))) {
+            if (ImGui::Button("Add Tile", ImVec2(0, 0))) {
                 m_modals.push(
-                    std::make_unique<FileDialog>(fs::current_path(), m_sink));
+                    std::make_unique<AddNewTile>(m_tileset, m_modals));
             }
         }
         ImGui::EndChild();
