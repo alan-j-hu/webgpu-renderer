@@ -25,7 +25,7 @@ public:
         Vertex* vertices,
         std::size_t vertex_count,
         std::uint16_t* indices,
-        std::size_t tri_count);
+        std::size_t index_count);
 
 private:
 

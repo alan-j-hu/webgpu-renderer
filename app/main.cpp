@@ -1,5 +1,4 @@
-#include "tileset/addnewtile.h"
-#include "tileset/tileset.h"
+#include "tileset/tileseteditor.h"
 
 #include "noworry/application.h"
 #include "noworry/mesh.h"
@@ -30,7 +29,8 @@ public:
                       | WGPUTextureUsage_RenderAttachment),
           m_renderer(device(), m_subwindow.width(), m_subwindow.height()),
           m_resources(m_renderer),
-          m_scene(m_renderer)
+          m_scene(m_renderer),
+          m_tileset_editor(m_modals, m_renderer)
     {
         init_imgui();
 
@@ -138,7 +138,7 @@ private:
     int m_selected = 0;
 
     ModalStack m_modals;
-    Tileset m_tileset;
+    TilesetEditor m_tileset_editor;
 
     void init_imgui()
     {
@@ -237,13 +237,9 @@ private:
 
     void draw_right_pane()
     {
-        namespace fs = std::filesystem;
         if (ImGui::BeginChild("Tileset Editor", ImVec2(width() / 2, 0),
                               ImGuiChildFlags_Borders, 0)) {
-            if (ImGui::Button("Add Tile", ImVec2(0, 0))) {
-                m_modals.push(
-                    std::make_unique<AddNewTile>(m_tileset, m_modals));
-            }
+            m_tileset_editor.render();
         }
         ImGui::EndChild();
     }

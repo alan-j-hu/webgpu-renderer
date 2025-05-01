@@ -18,7 +18,7 @@ Model::Model(
     m_buffer = wgpuDeviceCreateBuffer(device, &buffer_desc);
 
     m_bind_group = effect.create_model_group(device,
-        m_buffer, mesh.vertex_buffer, mesh.vertex_count);
+        m_buffer, mesh.vertex_buffer(), mesh.vertex_count());
 
     m_material = &mat;
 

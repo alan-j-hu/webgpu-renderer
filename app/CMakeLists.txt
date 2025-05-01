@@ -15,6 +15,7 @@ add_executable(demo
   tileset/addnewtile.cpp
   tileset/tiledefinition.cpp
   tileset/tileset.cpp
+  tileset/tileseteditor.cpp
   ${IMGUI_SRC})
 set_property(TARGET demo PROPERTY CXX_STANDARD 23)
 set_property(TARGET demo PROPERTY C_STANDARD 23)

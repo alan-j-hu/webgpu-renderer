@@ -53,5 +53,5 @@ Mesh& MeshBuilder::build(ResourceTable& table)
 {
     return table.add_mesh(
         m_vertices.data(), m_vertices.size(),
-        m_indices.data(), m_indices.size() / 3);
+        m_indices.data(), m_indices.size());
 }
