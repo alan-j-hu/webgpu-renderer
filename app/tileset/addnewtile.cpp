@@ -1,6 +1,7 @@
 #include "addnewtile.h"
 #include "tiledefinition.h"
 #include "tileset.h"
+#include "tileseteditor.h"
 #include "../filedialog.h"
 #include <algorithm>
 #include <utility>
@@ -12,9 +13,9 @@
 
 namespace fs = std::filesystem;
 
-AddNewTile::AddNewTile(Tileset& tileset, ModalStack& modals)
+AddNewTile::AddNewTile(TilesetEditor& tileset_editor, ModalStack& modals)
     : Modal("Add New Tile"),
-      m_tileset(tileset),
+      m_tileset_editor(tileset_editor),
       m_modals(modals),
       m_width(1),
       m_height(1),
@@ -29,6 +30,14 @@ bool AddNewTile::render()
     if (ImGui::Button("Choose Mesh File", ImVec2(0, 0))) {
         m_modals.push(
             std::make_unique<FileDialog>(fs::current_path(), m_sink));
+    }
+
+    if (ImGui::BeginListBox("##Meshes", ImVec2(-FLT_MIN, 0))) {
+        for (auto& pair : m_tileset_editor.mesh_map()) {
+            if (ImGui::Selectable(pair.first.c_str(), false, 0)) {
+            }
+        }
+        ImGui::EndListBox();
     }
 
     ImGui::InputInt("Width", &m_width);
@@ -77,7 +86,7 @@ bool AddNewTile::try_add_tile()
         m_error = Error::BadMesh;
         return false;
     }
-    m_tileset.add_tile(TileDefinition(m_width, m_height));
+    m_tileset_editor.tileset().add_tile(TileDefinition(m_width, m_height));
 
     return true;
 }

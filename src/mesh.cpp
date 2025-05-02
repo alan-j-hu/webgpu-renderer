@@ -27,6 +27,37 @@ Mesh::Mesh(WGPUDevice device,
     wgpuQueueWriteBuffer(queue, m_index_buffer, 0, indices, ibuffer_size);
 }
 
+Mesh::Mesh(Mesh&& other)
+{
+    m_vertex_count = other.m_vertex_count;
+    m_index_count = other.m_index_count;
+    m_vertex_buffer = other.m_vertex_buffer;
+    m_index_buffer = other.m_index_buffer;
+
+    other.m_vertex_count = 0;
+    other.m_index_count = 0;
+    other.m_vertex_buffer = nullptr;
+    other.m_index_buffer = nullptr;
+}
+
+Mesh& Mesh::operator=(Mesh&& other)
+{
+    wgpuBufferRelease(m_vertex_buffer);
+    wgpuBufferRelease(m_index_buffer);
+
+    m_vertex_count = other.m_vertex_count;
+    m_index_count = other.m_index_count;
+    m_vertex_buffer = other.m_vertex_buffer;
+    m_index_buffer = other.m_index_buffer;
+
+    other.m_vertex_count = 0;
+    other.m_index_count = 0;
+    other.m_vertex_buffer = nullptr;
+    other.m_index_buffer = nullptr;
+
+    return *this;
+}
+
 Mesh::~Mesh()
 {
     wgpuBufferRelease(m_vertex_buffer);

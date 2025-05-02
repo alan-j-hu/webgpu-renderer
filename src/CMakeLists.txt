@@ -4,6 +4,7 @@ add_library(noworry
   mesh.cpp
   meshbuilder.cpp
   renderer.cpp
+  rendertarget.cpp
   resourcetable.cpp
   stb_image.c
   texture.cpp

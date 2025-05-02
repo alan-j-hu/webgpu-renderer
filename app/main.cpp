@@ -4,6 +4,7 @@
 #include "noworry/mesh.h"
 #include "noworry/meshbuilder.h"
 #include "noworry/renderer.h"
+#include "noworry/rendertarget.h"
 #include "noworry/resourcetable.h"
 #include "noworry/scene/camera.h"
 #include "noworry/scene/model.h"
@@ -23,18 +24,15 @@ class Main : public Application
 public:
     Main(int width, int height)
         : Application(width, height, WGPUTextureFormat_BGRA8Unorm),
-          m_subwindow(device(), 500, 500,
-                      WGPUTextureFormat_BGRA8Unorm,
-                      WGPUTextureUsage_TextureBinding
-                      | WGPUTextureUsage_RenderAttachment),
-          m_renderer(device(), m_subwindow.width(), m_subwindow.height()),
+          m_subwindow(device(), 500, 500),
+          m_renderer(device()),
           m_resources(m_renderer),
           m_scene(m_renderer),
           m_tileset_editor(m_modals, m_renderer)
     {
         init_imgui();
 
-        m_renderer.set_clear_color({0.5, 0.5, 0.5, 1});
+        m_subwindow.set_clear_color({0.5, 0.5, 0.5, 1});
 
         auto& mesh = MeshBuilder()
             .quad( // front
@@ -124,7 +122,7 @@ private:
       | ImGuiWindowFlags_NoBringToFrontOnFocus
       | ImGuiWindowFlags_NoDecoration;
 
-    Texture m_subwindow;
+    RenderTarget m_subwindow;
 
     Renderer m_renderer;
     ResourceTable m_resources;
@@ -229,7 +227,7 @@ private:
                 m_model->set_material(*m_material2);
             }
 
-            ImGui::Image((ImTextureID)(intptr_t)m_subwindow.view(),
+            ImGui::Image((ImTextureID)(intptr_t)m_subwindow.texture().view(),
                          ImVec2(m_subwindow.width(), m_subwindow.height()));
         }
         ImGui::EndChild();
@@ -248,7 +246,7 @@ private:
     {
         m_yaw += 0.01;
         m_model->set_yaw(m_yaw);
-        m_renderer.render(m_subwindow.view(), m_scene);
+        m_renderer.render(m_subwindow, m_scene);
     }
 };
 

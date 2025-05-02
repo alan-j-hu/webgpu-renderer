@@ -6,7 +6,7 @@
 #include <optional>
 #include <vector>
 
-class Tileset;
+class TilesetEditor;
 
 class AddNewTile : public Modal
 {
@@ -17,12 +17,12 @@ public:
         BadMesh
     };
 
-    AddNewTile(Tileset&, ModalStack&);
+    AddNewTile(TilesetEditor&, ModalStack&);
 
     bool render() override;
 
 private:
-    Tileset& m_tileset;
+    TilesetEditor& m_tileset_editor;
     ModalStack& m_modals;
     std::vector<std::filesystem::path> m_sink;
     int m_width;

@@ -1,15 +1,10 @@
 #include "noworry/renderer.h"
+#include "noworry/rendertarget.h"
 #include "noworry/scene/scene.h"
 #include <utility>
 
-Renderer::Renderer(WGPUDevice device, int width, int height)
-    : m_clear_color {0, 0, 0, 1},
-      m_device(device),
-      m_width(width),
-      m_height(height),
-      m_depth_texture(device, width, height,
-                      WGPUTextureFormat_Depth24Plus,
-                      WGPUTextureUsage_RenderAttachment),
+Renderer::Renderer(WGPUDevice device)
+    : m_device(device),
       m_uniform_layout(device),
       m_flat_effect(device, m_uniform_layout),
       m_effect(device, m_uniform_layout)
@@ -33,13 +28,7 @@ Renderer::~Renderer()
     wgpuSamplerRelease(m_sampler);
 }
 
-void Renderer::resize(int width, int height)
-{
-    if (m_width == width && m_height == height) return;
-    create_depth_buffer(width, height);
-}
-
-void Renderer::render(WGPUTextureView view, Scene& scene)
+void Renderer::render(RenderTarget& target, Scene& scene)
 {
     WGPUQueue queue = wgpuDeviceGetQueue(m_device);
 
@@ -56,11 +45,11 @@ void Renderer::render(WGPUTextureView view, Scene& scene)
     color_attachment.depthSlice = WGPU_DEPTH_SLICE_UNDEFINED;
     color_attachment.loadOp = WGPULoadOp_Clear;
     color_attachment.storeOp = WGPUStoreOp_Store;
-    color_attachment.clearValue = m_clear_color;
-    color_attachment.view = view;
+    color_attachment.clearValue = target.clear_color();
+    color_attachment.view = target.texture().view();
 
     WGPURenderPassDepthStencilAttachment depth_stencil_attachment = { 0 };
-    depth_stencil_attachment.view = m_depth_texture.view();
+    depth_stencil_attachment.view = target.depth_texture().view();
     depth_stencil_attachment.depthClearValue = 1.0f;
     depth_stencil_attachment.depthLoadOp = WGPULoadOp_Clear;
     depth_stencil_attachment.depthStoreOp = WGPUStoreOp_Store;
@@ -90,21 +79,6 @@ void Renderer::render(WGPUTextureView view, Scene& scene)
     wgpuRenderPassEncoderRelease(pass);
     wgpuCommandEncoderRelease(encoder);
     wgpuCommandBufferRelease(command_buffer);
-}
-
-void Renderer::set_clear_color(WGPUColor color)
-{
-    m_clear_color = color;
-}
-
-void Renderer::create_depth_buffer(int width, int height)
-{
-    m_width = width;
-    m_height = height;
-    m_depth_texture =
-        Texture(m_device, width, height,
-                WGPUTextureFormat_Depth24Plus,
-                WGPUTextureUsage_RenderAttachment);
 }
 
 void Renderer::do_render(WGPURenderPassEncoder encoder)
