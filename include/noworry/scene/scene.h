@@ -16,6 +16,10 @@ public:
     using ModelIterator = std::vector<std::unique_ptr<Model>>::iterator;
 
     Scene(Renderer&);
+    Scene(const Scene&) = delete;
+    Scene& operator=(const Scene&) = delete;
+    Scene(Scene&&);
+    Scene& operator=(Scene&&);
     virtual ~Scene();
 
     Model& add_model(const Mesh& mesh, Material& mat);
@@ -30,6 +34,7 @@ public:
     WGPUBindGroup bind_group() { return m_bind_group; }
 
 private:
+    bool m_moved = false;
     Renderer* m_renderer;
     int m_camera = 0;
 

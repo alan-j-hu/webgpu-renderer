@@ -14,6 +14,10 @@ class ResourceTable
 {
 public:
     ResourceTable(Renderer&);
+    ResourceTable(const ResourceTable&) = delete;
+    ResourceTable& operator=(const ResourceTable&) = delete;
+    ResourceTable(ResourceTable&&) = default;
+    ResourceTable& operator=(ResourceTable&&) = default;
 
     Texture& add_texture(const std::filesystem::path& path);
 
@@ -30,7 +34,7 @@ public:
 private:
 
     WGPUDevice m_device;
-    Renderer& m_renderer;
+    Renderer* m_renderer;
 
     int m_mat_id;
 

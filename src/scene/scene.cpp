@@ -16,8 +16,43 @@ Scene::Scene(Renderer& renderer)
     m_cameras.push_back(std::make_unique<Camera>());
 }
 
+Scene::Scene(Scene&& other)
+    : m_renderer(other.m_renderer),
+      m_camera(other.m_camera),
+      m_uniforms(other.m_uniforms),
+      m_buffer(other.m_buffer),
+      m_bind_group(other.m_bind_group),
+      m_cameras(std::move(other.m_cameras)),
+      m_models(std::move(other.m_models))
+{
+    other.m_moved = true;
+    other.m_buffer = nullptr;
+    other.m_bind_group = nullptr;
+}
+
+Scene& Scene::operator=(Scene&& other)
+{
+    wgpuBindGroupRelease(m_bind_group);
+    wgpuBufferRelease(m_buffer);
+
+    m_renderer = other.m_renderer;
+    m_camera = other.m_camera;
+    m_uniforms = other.m_uniforms;
+    m_buffer = other.m_buffer;
+    m_bind_group = other.m_bind_group;
+    m_cameras = std::move(other.m_cameras);
+    m_models = std::move(other.m_models);
+
+    other.m_moved = true;
+    other.m_buffer = nullptr;
+    other.m_bind_group = nullptr;
+
+    return *this;
+}
+
 Scene::~Scene()
 {
+    if (m_moved) return;
     wgpuBindGroupRelease(m_bind_group);
     wgpuBufferRelease(m_buffer);
 }

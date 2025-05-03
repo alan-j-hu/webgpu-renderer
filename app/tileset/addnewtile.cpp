@@ -86,7 +86,6 @@ bool AddNewTile::try_add_tile()
         m_error = Error::BadMesh;
         return false;
     }
-    m_tileset_editor.tileset().add_tile(TileDefinition(m_width, m_height));
 
     return true;
 }
