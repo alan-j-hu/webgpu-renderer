@@ -1,5 +1,5 @@
 #include "addnewtile.h"
-#include "tiledefinition.h"
+#include "tilemesh.h"
 #include "tileset.h"
 #include "tileseteditor.h"
 #include "../filedialog.h"
@@ -19,7 +19,9 @@ AddNewTile::AddNewTile(TilesetEditor& tileset_editor, ModalStack& modals)
       m_modals(modals),
       m_width(1),
       m_height(1),
-      m_error(Error::None)
+      m_error(Error::None),
+      m_tile_preview(tileset_editor.renderer().device(), 100, 100),
+      m_selected_mesh(nullptr)
 {
 }
 
@@ -27,14 +29,11 @@ bool AddNewTile::render()
 {
     bool close = false;
 
-    if (ImGui::Button("Choose Mesh File", ImVec2(0, 0))) {
-        m_modals.push(
-            std::make_unique<FileDialog>(fs::current_path(), m_sink));
-    }
-
     if (ImGui::BeginListBox("##Meshes", ImVec2(-FLT_MIN, 0))) {
         for (auto& pair : m_tileset_editor.mesh_map()) {
-            if (ImGui::Selectable(pair.first.c_str(), false, 0)) {
+            bool selected = m_selected_mesh == pair.second;
+            if (ImGui::Selectable(pair.second->name().c_str(), false, 0)) {
+                m_selected_mesh = pair.second;
             }
         }
         ImGui::EndListBox();
@@ -44,6 +43,14 @@ bool AddNewTile::render()
     m_width = std::min(1, m_width);
     ImGui::InputInt("Height", &m_height);
     m_height = std::min(1, m_height);
+
+    if (m_selected_mesh != nullptr) {
+        m_tileset_editor
+            .renderer()
+            .render(m_tile_preview, m_selected_mesh->scene());
+        ImGui::Image((ImTextureID)(intptr_t)m_tile_preview.texture().view(),
+                     ImVec2(m_tile_preview.width(), m_tile_preview.height()));
+    }
 
     render_error();
     if (ImGui::Button("Add", ImVec2(0, 0))) {

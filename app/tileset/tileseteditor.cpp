@@ -42,7 +42,7 @@ void TilesetEditor::render()
     if (ImGui::BeginListBox("##Meshes", ImVec2(-FLT_MIN, 0))) {
         for (auto& pair : m_mesh_map) {
             bool selected = pair.second == m_selected_tile;
-            if (ImGui::Selectable(pair.first.c_str(), selected, 0)) {
+            if (ImGui::Selectable(pair.second->name().c_str(), selected, 0)) {
                 m_selected_tile = pair.second;
             }
         }
@@ -55,8 +55,7 @@ void TilesetEditor::render()
                      ImVec2(m_tile_preview.width(), m_tile_preview.height()));
 
         if (ImGui::BeginListBox("##Vertices", ImVec2(-FLT_MIN, 0))) {
-            TileMesh& mesh = m_selected_tile->mesh();
-            for (auto index : mesh.indices()) {
+            for (auto index : m_selected_tile->indices()) {
                 ImGui::Value("x", index);
             }
             ImGui::EndListBox();
@@ -74,7 +73,6 @@ void TilesetEditor::load_meshes(std::filesystem::path& path)
     m_selected_tile = nullptr;
     m_mesh_map.clear();
     m_meshes.clear();
-    m_tiles.clear();
     Assimp::Importer importer;
 
     const aiScene* scene = importer.ReadFile(
@@ -87,31 +85,26 @@ void TilesetEditor::load_meshes(std::filesystem::path& path)
         return;
     }
 
-    for (int i = 0; i < scene->mNumMeshes; ++i) {
-        load_mesh(scene->mMeshes[i]);
-    }
-
-    visit_node(scene->mRootNode);
+    visit_node(scene, scene->mRootNode);
 }
 
-void TilesetEditor::visit_node(aiNode* node)
+void TilesetEditor::visit_node(const aiScene* scene, const aiNode* node)
 {
     if (node->mNumMeshes != 0) {
-        m_tiles.emplace_back(
-            std::make_unique<TileDefinition>(
-                *this, *m_meshes[node->mMeshes[0]], 1, 1));
-        TileDefinition* tile = m_tiles[m_tiles.size() - 1].get();
-        m_mesh_map.emplace(node->mName.C_Str(), tile);
+        TileMesh& mesh = load_mesh(
+            node->mName.C_Str(),
+            scene->mMeshes[node->mMeshes[0]]);
+        m_mesh_map.emplace(mesh.name(), &mesh);
     }
 
     const unsigned int count = node->mNumChildren;
     aiNode** const children = node->mChildren;
     for (int i = 0; i < count; ++i) {
-        visit_node(children[i]);
+        visit_node(scene, children[i]);
     }
 }
 
-void TilesetEditor::load_mesh(aiMesh* mesh)
+TileMesh& TilesetEditor::load_mesh(const char* name, aiMesh* mesh)
 {
     std::vector<Vertex> vertices;
     const int vc = mesh->mNumVertices;
@@ -143,5 +136,11 @@ void TilesetEditor::load_mesh(aiMesh* mesh)
     Mesh& gpu_mesh = m_resources.add_mesh(
         vertices.data(), vc, indices.data(), indices.size());
     m_meshes.push_back(
-        std::make_unique<TileMesh>(gpu_mesh, vertices, indices));
+        std::make_unique<TileMesh>(
+            *this,
+            name,
+            gpu_mesh,
+            vertices,
+            indices));
+    return *m_meshes[m_meshes.size() - 1];
 }

@@ -2,10 +2,12 @@
 #define TILESET_ADDNEWTILE_H
 
 #include "../modal.h"
+#include "noworry/rendertarget.h"
 #include <filesystem>
 #include <optional>
 #include <vector>
 
+class TileMesh;
 class TilesetEditor;
 
 class AddNewTile : public Modal
@@ -28,6 +30,9 @@ private:
     int m_width;
     int m_height;
     Error m_error;
+
+    TileMesh* m_selected_mesh;
+    RenderTarget m_tile_preview;
 
     bool try_add_tile();
     void render_error();

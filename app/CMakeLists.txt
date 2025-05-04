@@ -13,7 +13,6 @@ add_executable(demo
   main.cpp
   modal.cpp
   tileset/addnewtile.cpp
-  tileset/tiledefinition.cpp
   tileset/tilemesh.cpp
   tileset/tileset.cpp
   tileset/tileseteditor.cpp
