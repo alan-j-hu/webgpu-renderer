@@ -11,6 +11,6 @@ TileDefinition::TileDefinition(
         tileset_editor.default_material());
 
     Camera& camera = m_scene.current_camera();
-    camera.set_position(glm::vec3(0.5f, 2.0f, -2.0f));
-    camera.set_target(glm::vec3(0.5f, 0.0f, 0.0f));
+    camera.set_position(glm::vec3(1.0f, 2.0f, -0.5f));
+    camera.set_target(glm::vec3(1.0f, 1.0f, 0.5f));
 }

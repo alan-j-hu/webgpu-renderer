@@ -41,7 +41,6 @@ private:
     ModalStack& m_modals;
     Renderer& m_renderer;
     Tileset m_tileset;
-    std::vector<std::string> m_names;
     std::map<std::string, TileDefinition*> m_mesh_map;
     std::vector<std::unique_ptr<TileDefinition>> m_tiles;
     std::vector<std::unique_ptr<TileMesh>> m_meshes;

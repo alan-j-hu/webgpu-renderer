@@ -11,7 +11,7 @@
 TilesetEditor::TilesetEditor(ModalStack& modals, Renderer& renderer)
     : m_modals(modals),
       m_renderer(renderer),
-      m_tile_preview(renderer.device(), 100, 100),
+      m_tile_preview(renderer.device(), 200, 200),
       m_resources(m_renderer),
       m_scene(m_renderer)
 {
@@ -71,7 +71,10 @@ void TilesetEditor::render()
 
 void TilesetEditor::load_meshes(std::filesystem::path& path)
 {
-    m_names.clear();
+    m_selected_tile = nullptr;
+    m_mesh_map.clear();
+    m_meshes.clear();
+    m_tiles.clear();
     Assimp::Importer importer;
 
     const aiScene* scene = importer.ReadFile(
@@ -93,7 +96,6 @@ void TilesetEditor::load_meshes(std::filesystem::path& path)
 
 void TilesetEditor::visit_node(aiNode* node)
 {
-    m_names.push_back(node->mName.C_Str());
     if (node->mNumMeshes != 0) {
         m_tiles.emplace_back(
             std::make_unique<TileDefinition>(
