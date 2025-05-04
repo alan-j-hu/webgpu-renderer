@@ -5,11 +5,20 @@ ResourceTable::ResourceTable(Renderer& renderer)
 {
 }
 
-Texture& ResourceTable::add_texture(const std::filesystem::path& path)
+std::shared_ptr<Texture>
+ResourceTable::add_texture(const std::filesystem::path& path)
 {
-    m_textures.push_back(
-        std::make_unique<Texture>(m_renderer->device(), path));
-    return *m_textures[m_textures.size() - 1];
+    auto it = m_textures.find(path);
+    if (it != m_textures.end()) {
+        if (auto shared = it->second.lock()) {
+            return shared;
+        }
+    }
+
+    auto texture = std::make_shared<Texture>(m_renderer->device(), path);
+    std::weak_ptr<Texture> handle = texture;
+    m_textures.emplace(path, std::move(handle));
+    return texture;
 }
 
 FlatMaterial& ResourceTable::add_flat_material(float r, float g, float b)
@@ -25,13 +34,13 @@ FlatMaterial& ResourceTable::add_flat_material(float r, float g, float b)
 }
 
 TextureMaterial& ResourceTable::add_texture_material(
-    const Texture& texture)
+    std::shared_ptr<Texture> texture)
 {
     auto ptr = std::make_unique<TextureMaterial>(
         m_mat_id++,
         m_renderer->device(),
         m_renderer->texture_mesh_effect(),
-        texture,
+        std::move(texture),
         m_renderer->default_sampler());
     TextureMaterial& mat = *ptr;
     m_materials.emplace_back(std::move(ptr));

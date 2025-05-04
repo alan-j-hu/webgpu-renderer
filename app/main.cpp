@@ -57,8 +57,8 @@ public:
                 XYZUV(-20, 20, -20, 1, 0))
             .build(m_resources);
 
-        auto& texture = m_resources.add_texture("../assets/cat.png");
-        m_material = &m_resources.add_texture_material(texture);
+        auto texture = m_resources.add_texture("../assets/cat.png");
+        m_material = &m_resources.add_texture_material(std::move(texture));
 
         m_material2 = &m_resources.add_flat_material(1, 0, 0);
 

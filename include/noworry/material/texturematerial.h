@@ -13,7 +13,7 @@ public:
         int id,
         WGPUDevice device,
         TextureMeshEffect&,
-        const Texture&,
+        std::shared_ptr<const Texture>,
         WGPUSampler sampler);
 
     int id() { return m_id; }
@@ -23,7 +23,7 @@ public:
 private:
     int m_id;
     TextureMeshEffect* m_effect;
-    const Texture* m_texture;
+    std::shared_ptr<const Texture> m_texture;
     WGPUBindGroup m_bind_group;
 };
 

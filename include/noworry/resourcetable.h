@@ -7,7 +7,9 @@
 #include "material/material.h"
 #include "material/flatmaterial.h"
 #include "material/texturematerial.h"
+#include <filesystem>
 #include <memory>
+#include <unordered_map>
 #include <vector>
 
 class ResourceTable
@@ -19,11 +21,11 @@ public:
     ResourceTable(ResourceTable&&) = default;
     ResourceTable& operator=(ResourceTable&&) = default;
 
-    Texture& add_texture(const std::filesystem::path& path);
+    std::shared_ptr<Texture> add_texture(const std::filesystem::path& path);
 
     FlatMaterial& add_flat_material(float, float, float);
 
-    TextureMaterial& add_texture_material(const Texture&);
+    TextureMaterial& add_texture_material(std::shared_ptr<Texture>);
 
     Mesh& add_mesh(
         Vertex* vertices,
@@ -32,13 +34,13 @@ public:
         std::size_t index_count);
 
 private:
-
     WGPUDevice m_device;
     Renderer* m_renderer;
 
     int m_mat_id;
 
-    std::vector<std::unique_ptr<Texture>> m_textures;
+    std::unordered_map<std::filesystem::path,
+                       std::weak_ptr<Texture>> m_textures;
     std::vector<std::unique_ptr<Material>> m_materials;
     std::vector<std::unique_ptr<Mesh>> m_meshes;
 };
