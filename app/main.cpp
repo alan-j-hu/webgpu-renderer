@@ -57,9 +57,7 @@ public:
                 XYZUV(-20, 20, -20, 1, 0))
             .build(m_resources);
 
-        auto texture = m_resources.add_texture("../assets/cat.png");
-        m_material = &m_resources.add_texture_material(std::move(texture));
-
+        m_material = m_resources.load_texture_material("../assets/cat.png");
         m_material2 = &m_resources.add_flat_material(1, 0, 0);
 
         m_yaw = glm::pi<float>() * 0.25f;
@@ -127,7 +125,7 @@ private:
     Renderer m_renderer;
     ResourceTable m_resources;
 
-    Material* m_material;
+    std::shared_ptr<TextureMaterial> m_material;
     Material* m_material2;
 
     Scene m_scene;

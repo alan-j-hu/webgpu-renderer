@@ -21,7 +21,10 @@ public:
     ResourceTable(ResourceTable&&) = default;
     ResourceTable& operator=(ResourceTable&&) = default;
 
-    std::shared_ptr<Texture> add_texture(const std::filesystem::path& path);
+    std::shared_ptr<Texture> load_texture(const std::filesystem::path& path);
+
+    std::shared_ptr<TextureMaterial>
+    load_texture_material(const std::filesystem::path& path);
 
     FlatMaterial& add_flat_material(float, float, float);
 
@@ -41,6 +44,8 @@ private:
 
     std::unordered_map<std::filesystem::path,
                        std::weak_ptr<Texture>> m_textures;
+    std::unordered_map<std::filesystem::path,
+                       std::weak_ptr<TextureMaterial>> m_texture_materials;
     std::vector<std::unique_ptr<Material>> m_materials;
     std::vector<std::unique_ptr<Mesh>> m_meshes;
 };
