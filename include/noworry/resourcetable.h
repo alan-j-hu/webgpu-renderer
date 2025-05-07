@@ -28,6 +28,8 @@ public:
 
     FlatMaterial& add_flat_material(float, float, float);
 
+    FlatMaterial& add_wireframe_material(float, float, float);
+
     TextureMaterial& add_texture_material(std::shared_ptr<Texture>);
 
     Mesh& add_mesh(

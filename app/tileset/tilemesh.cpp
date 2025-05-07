@@ -15,6 +15,9 @@ TileMesh::TileMesh(
       m_scene(editor.renderer())
 {
     m_model = &m_scene.add_model(mesh, editor.default_material());
+    m_grid = &m_scene.add_model(
+        editor.grid_mesh(),
+        editor.wireframe_material());
 
     Camera& camera = m_scene.current_camera();
     camera.set_position(glm::vec3(1.0f, 2.0f, -0.5f));

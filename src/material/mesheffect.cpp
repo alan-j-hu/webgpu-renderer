@@ -180,7 +180,7 @@ WGPURenderPipeline MeshEffect::pipeline()
     pipeline_desc.vertex.entryPoint = {"vs_main", WGPU_STRLEN};
     pipeline_desc.vertex.bufferCount = 0;
     pipeline_desc.vertex.buffers = nullptr;
-    pipeline_desc.primitive.topology = WGPUPrimitiveTopology_TriangleList;
+    pipeline_desc.primitive.topology = topology();
     pipeline_desc.primitive.frontFace = WGPUFrontFace_CCW;
     pipeline_desc.primitive.cullMode = WGPUCullMode_None;
     pipeline_desc.depthStencil = &depth_stencil;

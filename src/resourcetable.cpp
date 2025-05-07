@@ -55,6 +55,19 @@ FlatMaterial& ResourceTable::add_flat_material(float r, float g, float b)
     return mat;
 }
 
+FlatMaterial& ResourceTable::add_wireframe_material(float r, float g, float b)
+{
+    auto ptr = std::make_unique<FlatMaterial>(
+        m_mat_id++,
+        m_renderer->device(),
+        m_renderer->wireframe_mesh_effect(),
+        r, g, b);
+    FlatMaterial& mat = *ptr;
+    m_materials.emplace_back(std::move(ptr));
+    return mat;
+}
+
+
 TextureMaterial& ResourceTable::add_texture_material(
     std::shared_ptr<Texture> texture)
 {

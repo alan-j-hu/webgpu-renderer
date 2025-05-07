@@ -23,6 +23,11 @@ public:
         return m_material_layout;
     }
 
+    virtual WGPUPrimitiveTopology topology() override
+    {
+        return WGPUPrimitiveTopology_TriangleList;
+    }
+
     WGPUBindGroup create_material_group(WGPUDevice, WGPUBuffer);
 
 private:

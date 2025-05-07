@@ -1,5 +1,6 @@
 add_library(noworry
   application.cpp
+  grid.cpp
   init_wgpu.cpp
   mesh.cpp
   meshbuilder.cpp

@@ -46,6 +46,7 @@ public:
 
     void draw(WGPURenderPassEncoder encoder);
 
+    virtual WGPUPrimitiveTopology topology() = 0;
     WGPUPipelineLayout pipeline_layout();
     WGPURenderPipeline pipeline();
 

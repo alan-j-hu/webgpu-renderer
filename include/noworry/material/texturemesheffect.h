@@ -23,7 +23,12 @@ public:
         return m_material_layout;
     }
 
-    virtual WGPUBindGroup create_material_group(
+    virtual WGPUPrimitiveTopology topology() override
+    {
+        return WGPUPrimitiveTopology_TriangleList;
+    }
+
+    WGPUBindGroup create_material_group(
         WGPUDevice, WGPUTextureView, WGPUSampler);
 
 private:

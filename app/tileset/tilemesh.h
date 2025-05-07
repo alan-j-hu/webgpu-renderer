@@ -32,6 +32,7 @@ private:
     TilesetEditor* m_tileset_editor;
     Scene m_scene;
     Model* m_model;
+    Model* m_grid;
 };
 
 #endif

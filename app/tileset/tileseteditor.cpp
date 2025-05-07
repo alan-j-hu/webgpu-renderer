@@ -2,6 +2,7 @@
 #include "addnewtile.h"
 #include "../filedialog.h"
 
+#include "noworry/grid.h"
 #include <utility>
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
@@ -13,11 +14,19 @@ TilesetEditor::TilesetEditor(ModalStack& modals, Renderer& renderer)
       m_renderer(renderer),
       m_tile_preview(renderer.device(), 200, 200),
       m_resources(m_renderer),
-      m_scene(m_renderer)
+      m_scene(m_renderer),
+      m_grid_mesh(
+          create_grid(renderer.device(),
+                      glm::vec3(0, 0, 0),
+                      5,
+                      5,
+                      glm::vec3(5, 0, 0),
+                      glm::vec3(0, 0, 5)))
 {
     m_tile_preview.set_clear_color({1, 1, 1, 1});
 
     m_default_material = &m_resources.add_flat_material(0.5, 0.5, 0.5);
+    m_wireframe_material = &m_resources.add_wireframe_material(0.5, 0.5, 0.5);
 }
 
 bool TilesetEditor::render_preview()

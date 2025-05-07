@@ -29,7 +29,11 @@ public:
 
     Material& default_material() { return *m_default_material; }
 
+    Material& wireframe_material() { return *m_wireframe_material; }
+
     Tileset& tileset() { return m_tileset; }
+
+    Mesh& grid_mesh() { return m_grid_mesh; }
 
     const std::map<std::string_view, TileMesh*>& mesh_map() const
     { return m_mesh_map; }
@@ -46,9 +50,11 @@ private:
     TileMesh* m_selected_tile = nullptr;
 
     RenderTarget m_tile_preview;
+    Mesh m_grid_mesh;
     Scene m_scene;
     ResourceTable m_resources;
     Material* m_default_material;
+    Material* m_wireframe_material;
 
     std::vector<std::filesystem::path> m_sink;
 

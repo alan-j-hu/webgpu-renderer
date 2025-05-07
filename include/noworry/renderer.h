@@ -8,6 +8,7 @@
 #include "material/material.h"
 #include "material/texturemesheffect.h"
 #include "material/uniformlayout.h"
+#include "material/wireframemesheffect.h"
 #include <memory>
 #include <vector>
 
@@ -28,6 +29,8 @@ public:
 
     TextureMeshEffect& texture_mesh_effect() { return m_effect; }
 
+    WireframeMeshEffect& wireframe_mesh_effect() { return m_wireframe_effect; }
+
     WGPUSampler default_sampler() { return m_sampler; }
 
     UniformLayout& uniform_layout() { return m_uniform_layout; }
@@ -40,6 +43,7 @@ private:
     WGPUSampler m_sampler;
     FlatMeshEffect m_flat_effect;
     TextureMeshEffect m_effect;
+    WireframeMeshEffect m_wireframe_effect;
 
     void do_render(WGPURenderPassEncoder encoder);
 };
