@@ -7,7 +7,7 @@
 #include "noworry/rendertarget.h"
 #include "noworry/resourcetable.h"
 #include "noworry/scene/camera.h"
-#include "noworry/scene/model.h"
+#include "noworry/scene/renderobject.h"
 #include "noworry/scene/scene.h"
 
 #include <array>
@@ -61,7 +61,7 @@ public:
         m_material2 = &m_resources.add_flat_material(1, 0, 0);
 
         m_yaw = glm::pi<float>() * 0.25f;
-        m_model = &m_scene.add_model(mesh, *m_material);
+        m_model = &m_scene.add_renderobject(mesh, *m_material);
         m_model->set_translation(glm::vec3(0.0f, 0.0f, 50.0f));
 
         auto& camera = m_scene.current_camera();
@@ -129,7 +129,7 @@ private:
     Material* m_material2;
 
     Scene m_scene;
-    Model* m_model;
+    RenderObject* m_model;
     float m_yaw;
     int m_selected = 0;
 

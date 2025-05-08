@@ -16,7 +16,7 @@ struct ModelData
     glm::mat4 transform;
 };
 
-struct Model;
+struct RenderObject;
 struct UniformLayout;
 
 class MeshEffect
@@ -42,7 +42,7 @@ public:
         WGPUBuffer vertices,
         int tri_count);
 
-    void enqueue(Model& model);
+    void enqueue(RenderObject& model);
 
     void draw(WGPURenderPassEncoder encoder);
 
@@ -58,7 +58,7 @@ private:
 
     WGPUPipelineLayout m_pipeline_layout;
     WGPURenderPipeline m_pipeline;
-    std::vector<Model*> m_queue;
+    std::vector<RenderObject*> m_queue;
 
     void create_pipeline();
 };

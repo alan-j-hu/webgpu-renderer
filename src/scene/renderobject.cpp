@@ -1,10 +1,10 @@
 #include "noworry/material/material.h"
-#include "noworry/scene/model.h"
+#include "noworry/scene/renderobject.h"
 #include "noworry/mesh.h"
 #include <cstring>
 #include <glm/ext/matrix_transform.hpp>
 
-Model::Model(
+RenderObject::RenderObject(
     WGPUDevice device, MeshEffect& effect, const Mesh& mesh, Material& mat)
     : m_mesh(mesh)
 {
@@ -13,7 +13,7 @@ Model::Model(
     WGPUBufferDescriptor buffer_desc = { 0 };
     buffer_desc.nextInChain = nullptr;
     buffer_desc.usage = WGPUBufferUsage_CopyDst | WGPUBufferUsage_Uniform;
-    buffer_desc.size = sizeof(Model);
+    buffer_desc.size = sizeof(ModelData);
     buffer_desc.mappedAtCreation = false;
     m_buffer = wgpuDeviceCreateBuffer(device, &buffer_desc);
 
@@ -26,33 +26,33 @@ Model::Model(
     m_scale = 1;
 }
 
-Model::~Model()
+RenderObject::~RenderObject()
 {
     wgpuBindGroupRelease(m_bind_group);
     wgpuBufferRelease(m_buffer);
 }
 
-void Model::set_material(Material& material)
+void RenderObject::set_material(Material& material)
 {
     m_material = &material;
 }
 
-void Model::set_translation(const glm::vec3& translation)
+void RenderObject::set_translation(const glm::vec3& translation)
 {
     m_translation = translation;
 }
 
-void Model::set_yaw(float yaw)
+void RenderObject::set_yaw(float yaw)
 {
     m_yaw = yaw;
 }
 
-void Model::set_scale(float scale)
+void RenderObject::set_scale(float scale)
 {
     m_scale = scale;
 }
 
-void Model::copy_to_gpu(WGPUDevice device)
+void RenderObject::copy_to_gpu(WGPUDevice device)
 {
     update_matrix();
     WGPUQueue queue = wgpuDeviceGetQueue(device);
@@ -61,7 +61,7 @@ void Model::copy_to_gpu(WGPUDevice device)
     m_material->effect().enqueue(*this);
 }
 
-void Model::update_matrix()
+void RenderObject::update_matrix()
 {
     glm::mat4 transform = glm::mat4(1);
     // Unintuitively, the matrix argument is the *left* mtrix (i.e. the

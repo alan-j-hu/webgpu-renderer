@@ -1,7 +1,7 @@
 #include "noworry/material/mesheffect.h"
 #include "noworry/material/material.h"
 #include "noworry/material/uniformlayout.h"
-#include "noworry/scene/model.h"
+#include "noworry/scene/renderobject.h"
 #include "noworry/mesh.h"
 
 MeshEffect::MeshEffect(WGPUDevice device, UniformLayout& ul)
@@ -193,7 +193,7 @@ WGPURenderPipeline MeshEffect::pipeline()
     return m_pipeline;
 }
 
-void MeshEffect::enqueue(Model& model)
+void MeshEffect::enqueue(RenderObject& model)
 {
     m_queue.push_back(&model);
 }

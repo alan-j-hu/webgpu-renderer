@@ -23,7 +23,7 @@ Scene::Scene(Scene&& other)
       m_buffer(other.m_buffer),
       m_bind_group(other.m_bind_group),
       m_cameras(std::move(other.m_cameras)),
-      m_models(std::move(other.m_models))
+      m_renderobjects(std::move(other.m_renderobjects))
 {
     other.m_moved = true;
     other.m_buffer = nullptr;
@@ -41,7 +41,7 @@ Scene& Scene::operator=(Scene&& other)
     m_buffer = other.m_buffer;
     m_bind_group = other.m_bind_group;
     m_cameras = std::move(other.m_cameras);
-    m_models = std::move(other.m_models);
+    m_renderobjects = std::move(other.m_renderobjects);
 
     other.m_moved = true;
     other.m_buffer = nullptr;
@@ -57,15 +57,15 @@ Scene::~Scene()
     wgpuBufferRelease(m_buffer);
 }
 
-Model& Scene::add_model(const Mesh& mesh, Material& mat)
+RenderObject& Scene::add_renderobject(const Mesh& mesh, Material& mat)
 {
-    m_models.push_back(
-        std::make_unique<Model>(
+    m_renderobjects.push_back(
+        std::make_unique<RenderObject>(
             m_renderer->device(),
             m_renderer->texture_mesh_effect(),
             mesh,
             mat));
-    return *m_models[m_models.size() - 1];
+    return *m_renderobjects[m_renderobjects.size() - 1];
 }
 
 void Scene::update()

@@ -16,7 +16,7 @@ add_library(noworry
   material/texturemesheffect.cpp
   material/uniformlayout.cpp
   scene/camera.cpp
-  scene/model.cpp
+  scene/renderobject.cpp
   scene/scene.cpp)
 target_include_directories(noworry PRIVATE ../include)
 target_link_libraries(noworry dawn::webgpu_dawn glm::glm glfw webgpu_glfw)

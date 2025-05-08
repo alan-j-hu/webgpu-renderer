@@ -2,7 +2,7 @@
 #define SCENE_H
 
 #include "camera.h"
-#include "model.h"
+#include "renderobject.h"
 #include "../mesh.h"
 #include "../renderer.h"
 #include "../material/material.h"
@@ -13,7 +13,8 @@
 class Scene
 {
 public:
-    using ModelIterator = std::vector<std::unique_ptr<Model>>::iterator;
+    using RenderObjectIterator =
+        std::vector<std::unique_ptr<RenderObject>>::iterator;
 
     Scene(Renderer&);
     Scene(const Scene&) = delete;
@@ -22,10 +23,13 @@ public:
     Scene& operator=(Scene&&);
     virtual ~Scene();
 
-    Model& add_model(const Mesh& mesh, Material& mat);
+    RenderObject& add_renderobject(const Mesh& mesh, Material& mat);
 
-    ModelIterator models_begin() { return m_models.begin(); }
-    ModelIterator models_end() { return m_models.end(); }
+    RenderObjectIterator renderobjects_begin()
+    { return m_renderobjects.begin(); }
+
+    RenderObjectIterator renderobjects_end()
+    { return m_renderobjects.end(); }
 
     void update();
 
@@ -43,7 +47,7 @@ private:
     WGPUBindGroup m_bind_group;
 
     std::vector<std::unique_ptr<Camera>> m_cameras;
-    std::vector<std::unique_ptr<Model>> m_models;
+    std::vector<std::unique_ptr<RenderObject>> m_renderobjects;
 };
 
 #endif

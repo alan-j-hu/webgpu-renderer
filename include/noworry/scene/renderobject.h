@@ -1,5 +1,5 @@
-#ifndef MODEL_H
-#define MODEL_H
+#ifndef RENDEROBJECT_H
+#define RENDEROBJECT_H
 
 #include "../material/mesheffect.h"
 #include <glm/mat4x4.hpp>
@@ -8,11 +8,12 @@
 struct Material;
 struct Mesh;
 
-class Model
+class RenderObject
 {
 public:
-    Model(WGPUDevice device, MeshEffect& effect, const Mesh& mesh, Material&);
-    virtual ~Model();
+    RenderObject(
+        WGPUDevice device, MeshEffect& effect, const Mesh& mesh, Material&);
+    virtual ~RenderObject();
 
     const Mesh& mesh() const { return m_mesh; }
     Material& material() { return *m_material; }

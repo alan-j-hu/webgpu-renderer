@@ -34,7 +34,10 @@ void Renderer::render(RenderTarget& target, Scene& scene)
     WGPUQueue queue = wgpuDeviceGetQueue(m_device);
 
     scene.update();
-    for (auto it = scene.models_begin(); it != scene.models_end(); ++it) {
+    for (auto it = scene.renderobjects_begin();
+         it != scene.renderobjects_end();
+         ++it) {
+
         it->get()->copy_to_gpu(m_device);
     }
 

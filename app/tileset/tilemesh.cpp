@@ -14,8 +14,8 @@ TileMesh::TileMesh(
       m_indices(std::move(indices)),
       m_scene(editor.renderer())
 {
-    m_model = &m_scene.add_model(mesh, editor.default_material());
-    m_grid = &m_scene.add_model(
+    m_model = &m_scene.add_renderobject(mesh, editor.default_material());
+    m_grid = &m_scene.add_renderobject(
         editor.grid_mesh(),
         editor.wireframe_material());
 
