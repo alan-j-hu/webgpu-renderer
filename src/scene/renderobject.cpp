@@ -52,7 +52,7 @@ void RenderObject::set_scale(float scale)
     m_scale = scale;
 }
 
-void RenderObject::copy_to_gpu(WGPUDevice device)
+void RenderObject::enqueue(WGPUDevice device)
 {
     update_matrix();
     WGPUQueue queue = wgpuDeviceGetQueue(device);

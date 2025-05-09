@@ -6,9 +6,8 @@
 #include "material/flatmesheffect.h"
 #include "material/mesheffect.h"
 #include "material/material.h"
-#include "material/texturemesheffect.h"
 #include "material/uniformlayout.h"
-#include "material/wireframemesheffect.h"
+
 #include <memory>
 #include <vector>
 
@@ -25,11 +24,18 @@ public:
 
     WGPUDevice device() { return m_device; }
 
-    FlatMeshEffect& flat_mesh_effect() { return m_flat_effect; }
-
-    TextureMeshEffect& texture_mesh_effect() { return m_effect; }
-
-    WireframeMeshEffect& wireframe_mesh_effect() { return m_wireframe_effect; }
+    template<class T>
+    T* mesh_effect()
+    {
+        for (auto& effect : m_mesh_effects) {
+            if (auto casted = dynamic_cast<T*>(effect.get())) {
+                if (typeid(*casted) == typeid(T)) {
+                    return casted;
+                }
+            }
+        }
+        return nullptr;
+    }
 
     WGPUSampler default_sampler() { return m_sampler; }
 
@@ -41,9 +47,7 @@ private:
     WGPUDevice m_device;
     UniformLayout m_uniform_layout;
     WGPUSampler m_sampler;
-    FlatMeshEffect m_flat_effect;
-    TextureMeshEffect m_effect;
-    WireframeMeshEffect m_wireframe_effect;
+    std::vector<std::unique_ptr<MeshEffect>> m_mesh_effects;
 
     void do_render(WGPURenderPassEncoder encoder);
 };

@@ -1,4 +1,5 @@
 #include "noworry/scene/scene.h"
+#include "noworry/material/texturemesheffect.h"
 
 Scene::Scene(Renderer& renderer)
     : m_renderer(&renderer)
@@ -62,7 +63,7 @@ RenderObject& Scene::add_renderobject(const Mesh& mesh, Material& mat)
     m_renderobjects.push_back(
         std::make_unique<RenderObject>(
             m_renderer->device(),
-            m_renderer->texture_mesh_effect(),
+            *m_renderer->mesh_effect<TextureMeshEffect>(),
             mesh,
             mat));
     return *m_renderobjects[m_renderobjects.size() - 1];

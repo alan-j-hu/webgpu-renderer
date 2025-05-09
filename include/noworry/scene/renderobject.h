@@ -25,7 +25,7 @@ public:
     void set_yaw(float yaw);
     void set_scale(float scale);
 
-    void copy_to_gpu(WGPUDevice device);
+    void enqueue(WGPUDevice device);
 
 private:
     ModelData m_model;

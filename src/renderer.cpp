@@ -1,15 +1,22 @@
 #include "noworry/renderer.h"
 #include "noworry/rendertarget.h"
+#include "noworry/material/texturemesheffect.h"
+#include "noworry/material/uniformlayout.h"
+#include "noworry/material/wireframemesheffect.h"
 #include "noworry/scene/scene.h"
 #include <utility>
 
 Renderer::Renderer(WGPUDevice device)
     : m_device(device),
-      m_uniform_layout(device),
-      m_flat_effect(device, m_uniform_layout),
-      m_effect(device, m_uniform_layout),
-      m_wireframe_effect(device, m_uniform_layout)
+      m_uniform_layout(device)
 {
+    m_mesh_effects.emplace_back(
+        std::make_unique<FlatMeshEffect>(device, m_uniform_layout));
+    m_mesh_effects.emplace_back(
+        std::make_unique<TextureMeshEffect>(device, m_uniform_layout));
+    m_mesh_effects.emplace_back(
+        std::make_unique<WireframeMeshEffect>(device, m_uniform_layout));
+
     WGPUSamplerDescriptor sampler_desc = { 0 };
     sampler_desc.addressModeU = WGPUAddressMode_ClampToEdge;
     sampler_desc.addressModeV = WGPUAddressMode_ClampToEdge;
@@ -38,7 +45,7 @@ void Renderer::render(RenderTarget& target, Scene& scene)
          it != scene.renderobjects_end();
          ++it) {
 
-        it->get()->copy_to_gpu(m_device);
+        it->get()->enqueue(m_device);
     }
 
     WGPUCommandEncoderDescriptor encoder_desc = { 0 };
@@ -87,7 +94,7 @@ void Renderer::render(RenderTarget& target, Scene& scene)
 
 void Renderer::do_render(WGPURenderPassEncoder encoder)
 {
-    m_effect.draw(encoder);
-    m_flat_effect.draw(encoder);
-    m_wireframe_effect.draw(encoder);
+    for (auto& effect : m_mesh_effects) {
+        effect->draw(encoder);
+    }
 }
