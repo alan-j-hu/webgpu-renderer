@@ -4,8 +4,7 @@
 #include <cstring>
 #include <glm/ext/matrix_transform.hpp>
 
-RenderObject::RenderObject(
-    WGPUDevice device, MeshEffect& effect, const Mesh& mesh, Material& mat)
+RenderObject::RenderObject(WGPUDevice device, const Mesh& mesh, Material& mat)
     : m_mesh(mesh)
 {
     m_model.transform = glm::identity<glm::mat4>();
@@ -17,7 +16,7 @@ RenderObject::RenderObject(
     buffer_desc.mappedAtCreation = false;
     m_buffer = wgpuDeviceCreateBuffer(device, &buffer_desc);
 
-    m_bind_group = effect.create_model_group(device,
+    m_bind_group = mat.effect().create_model_group(device,
         m_buffer, mesh.vertex_buffer(), mesh.vertex_count());
 
     m_material = &mat;

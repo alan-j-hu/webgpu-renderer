@@ -61,11 +61,7 @@ Scene::~Scene()
 RenderObject& Scene::add_renderobject(const Mesh& mesh, Material& mat)
 {
     m_renderobjects.push_back(
-        std::make_unique<RenderObject>(
-            m_renderer->device(),
-            *m_renderer->mesh_effect<TextureMeshEffect>(),
-            mesh,
-            mat));
+        std::make_unique<RenderObject>(m_renderer->device(), mesh, mat));
     return *m_renderobjects[m_renderobjects.size() - 1];
 }
 

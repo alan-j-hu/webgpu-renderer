@@ -11,8 +11,7 @@ struct Mesh;
 class RenderObject
 {
 public:
-    RenderObject(
-        WGPUDevice device, MeshEffect& effect, const Mesh& mesh, Material&);
+    RenderObject(WGPUDevice, const Mesh&, Material&);
     virtual ~RenderObject();
 
     const Mesh& mesh() const { return m_mesh; }
