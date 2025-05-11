@@ -4,6 +4,7 @@
 #include "noworry/mesh.h"
 #include "noworry/scene/scene.h"
 #include <cstdint>
+#include <memory>
 #include <string>
 
 class TilesetEditor;
@@ -23,6 +24,8 @@ public:
     const std::vector<std::uint16_t>& indices() const { return m_indices; }
     Scene& scene() { return m_scene; }
 
+    void render_scene(Renderer&, RenderTarget&);
+
 private:
     std::string m_name;
     Mesh* m_mesh;
@@ -31,8 +34,8 @@ private:
 
     TilesetEditor* m_tileset_editor;
     Scene m_scene;
-    RenderObject* m_model;
-    RenderObject* m_grid;
+    std::unique_ptr<RenderObject> m_model;
+    std::unique_ptr<RenderObject> m_grid;
 };
 
 #endif

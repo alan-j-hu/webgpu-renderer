@@ -6,6 +6,25 @@
 #include "noworry/scene/scene.h"
 #include <utility>
 
+Frame::Frame(Renderer& renderer, RenderTarget& target, Scene& scene)
+{
+    m_renderer = &renderer;
+    m_target = &target;
+    m_scene = &scene;
+}
+
+Frame& Frame::add_renderobject(RenderObject& object)
+{
+    object.enqueue(m_renderer->device());
+    return *this;
+}
+
+Frame::~Frame()
+{
+    m_scene->update(*m_renderer);
+    m_renderer->render(*m_target, *m_scene);
+}
+
 Renderer::Renderer(WGPUDevice device)
     : m_device(device),
       m_uniform_layout(device)
@@ -39,14 +58,6 @@ Renderer::~Renderer()
 void Renderer::render(RenderTarget& target, Scene& scene)
 {
     WGPUQueue queue = wgpuDeviceGetQueue(m_device);
-
-    scene.update();
-    for (auto it = scene.renderobjects_begin();
-         it != scene.renderobjects_end();
-         ++it) {
-
-        it->get()->enqueue(m_device);
-    }
 
     WGPUCommandEncoderDescriptor encoder_desc = { 0 };
     WGPUCommandEncoder encoder =

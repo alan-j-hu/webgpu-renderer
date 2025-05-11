@@ -2,7 +2,6 @@
 #include "noworry/material/texturemesheffect.h"
 
 Scene::Scene(Renderer& renderer)
-    : m_renderer(&renderer)
 {
     WGPUBufferDescriptor buffer_desc = { 0 };
     buffer_desc.nextInChain = nullptr;
@@ -14,17 +13,14 @@ Scene::Scene(Renderer& renderer)
     m_bind_group = renderer
         .uniform_layout().create_bind_group(renderer.device(), m_buffer);
 
-    m_cameras.push_back(std::make_unique<Camera>());
+    m_camera = std::make_unique<Camera>();
 }
 
 Scene::Scene(Scene&& other)
-    : m_renderer(other.m_renderer),
-      m_camera(other.m_camera),
-      m_uniforms(other.m_uniforms),
+    : m_uniforms(other.m_uniforms),
       m_buffer(other.m_buffer),
       m_bind_group(other.m_bind_group),
-      m_cameras(std::move(other.m_cameras)),
-      m_renderobjects(std::move(other.m_renderobjects))
+      m_camera(std::move(other.m_camera))
 {
     other.m_moved = true;
     other.m_buffer = nullptr;
@@ -36,13 +32,10 @@ Scene& Scene::operator=(Scene&& other)
     wgpuBindGroupRelease(m_bind_group);
     wgpuBufferRelease(m_buffer);
 
-    m_renderer = other.m_renderer;
-    m_camera = other.m_camera;
     m_uniforms = other.m_uniforms;
     m_buffer = other.m_buffer;
     m_bind_group = other.m_bind_group;
-    m_cameras = std::move(other.m_cameras);
-    m_renderobjects = std::move(other.m_renderobjects);
+    m_camera = std::move(other.m_camera);
 
     other.m_moved = true;
     other.m_buffer = nullptr;
@@ -58,18 +51,10 @@ Scene::~Scene()
     wgpuBufferRelease(m_buffer);
 }
 
-RenderObject& Scene::add_renderobject(const Mesh& mesh, Material& mat)
+void Scene::update(Renderer& renderer)
 {
-    m_renderobjects.push_back(
-        std::make_unique<RenderObject>(m_renderer->device(), mesh, mat));
-    return *m_renderobjects[m_renderobjects.size() - 1];
-}
-
-void Scene::update()
-{
-    Camera& camera = current_camera();
-    camera.update_matrix(&m_uniforms.camera);
-    WGPUQueue queue = wgpuDeviceGetQueue(m_renderer->device());
+    m_camera->update_matrix(&m_uniforms.camera);
+    WGPUQueue queue = wgpuDeviceGetQueue(renderer.device());
     wgpuQueueWriteBuffer(
         queue, m_buffer, 0, &m_uniforms, sizeof(Uniforms));
 }

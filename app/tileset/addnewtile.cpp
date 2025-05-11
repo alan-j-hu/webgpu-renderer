@@ -45,9 +45,8 @@ bool AddNewTile::render()
     m_height = std::min(1, m_height);
 
     if (m_selected_mesh != nullptr) {
-        m_tileset_editor
-            .renderer()
-            .render(m_tile_preview, m_selected_mesh->scene());
+        m_selected_mesh->render_scene(
+            m_tileset_editor.renderer(), m_tile_preview);
         ImGui::Image((ImTextureID)(intptr_t)m_tile_preview.texture().view(),
                      ImVec2(m_tile_preview.width(), m_tile_preview.height()));
     }

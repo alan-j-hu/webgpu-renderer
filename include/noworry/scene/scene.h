@@ -13,8 +13,6 @@
 class Scene
 {
 public:
-    using RenderObjectIterator =
-        std::vector<std::unique_ptr<RenderObject>>::iterator;
 
     Scene(Renderer&);
     Scene(const Scene&) = delete;
@@ -23,31 +21,21 @@ public:
     Scene& operator=(Scene&&);
     virtual ~Scene();
 
-    RenderObject& add_renderobject(const Mesh& mesh, Material& mat);
+    void update(Renderer&);
 
-    RenderObjectIterator renderobjects_begin()
-    { return m_renderobjects.begin(); }
-
-    RenderObjectIterator renderobjects_end()
-    { return m_renderobjects.end(); }
-
-    void update();
-
-    Camera& current_camera() { return *m_cameras[m_camera]; }
+    Camera& camera() { return *m_camera; }
 
     WGPUBindGroup bind_group() { return m_bind_group; }
 
 private:
     bool m_moved = false;
     Renderer* m_renderer;
-    int m_camera = 0;
 
     Uniforms m_uniforms;
     WGPUBuffer m_buffer;
     WGPUBindGroup m_bind_group;
 
-    std::vector<std::unique_ptr<Camera>> m_cameras;
-    std::vector<std::unique_ptr<RenderObject>> m_renderobjects;
+    std::unique_ptr<Camera> m_camera;
 };
 
 #endif

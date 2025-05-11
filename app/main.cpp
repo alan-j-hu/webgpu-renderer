@@ -61,10 +61,11 @@ public:
         m_material2 = &m_resources.add_flat_material(1, 0, 0);
 
         m_yaw = glm::pi<float>() * 0.25f;
-        m_model = &m_scene.add_renderobject(mesh, *m_material);
+        m_model = std::make_unique<RenderObject>(
+            m_renderer.device(), mesh, *m_material);
         m_model->set_translation(glm::vec3(0.0f, 0.0f, 50.0f));
 
-        auto& camera = m_scene.current_camera();
+        auto& camera = m_scene.camera();
         camera.set_position(glm::vec3(0.0f, 0.0f, -25.0f));
         camera.set_target(glm::vec3(0.0f, 0.0f, 0.0f));
     }
@@ -129,7 +130,7 @@ private:
     Material* m_material2;
 
     Scene m_scene;
-    RenderObject* m_model;
+    std::unique_ptr<RenderObject> m_model;
     float m_yaw;
     int m_selected = 0;
 
@@ -244,7 +245,8 @@ private:
     {
         m_yaw += 0.01;
         m_model->set_yaw(m_yaw);
-        m_renderer.render(m_subwindow, m_scene);
+        Frame(m_renderer, m_subwindow, m_scene)
+            .add_renderobject(*m_model);
     }
 };
 

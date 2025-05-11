@@ -31,7 +31,7 @@ TilesetEditor::TilesetEditor(ModalStack& modals, Renderer& renderer)
 
 bool TilesetEditor::render_preview()
 {
-    m_renderer.render(m_tile_preview, m_selected_tile->scene());
+    m_selected_tile->render_scene(m_renderer, m_tile_preview);
     return true;
 }
 

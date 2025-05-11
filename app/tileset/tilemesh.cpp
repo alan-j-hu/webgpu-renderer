@@ -14,12 +14,21 @@ TileMesh::TileMesh(
       m_indices(std::move(indices)),
       m_scene(editor.renderer())
 {
-    m_model = &m_scene.add_renderobject(mesh, editor.default_material());
-    m_grid = &m_scene.add_renderobject(
+    m_model = std::make_unique<RenderObject>(
+        editor.renderer().device(), mesh, editor.default_material());
+    m_grid = std::make_unique<RenderObject>(
+        editor.renderer().device(),
         editor.grid_mesh(),
         editor.wireframe_material());
 
-    Camera& camera = m_scene.current_camera();
+    Camera& camera = m_scene.camera();
     camera.set_position(glm::vec3(1.0f, 2.0f, -0.5f));
     camera.set_target(glm::vec3(1.0f, 1.0f, 0.5f));
+}
+
+void TileMesh::render_scene(Renderer& renderer, RenderTarget& target)
+{
+    Frame(renderer, target, m_scene)
+        .add_renderobject(*m_model)
+        .add_renderobject(*m_grid);
 }

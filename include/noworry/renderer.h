@@ -12,8 +12,24 @@
 #include <vector>
 
 class Camera;
+class RenderObject;
 class RenderTarget;
 class Scene;
+class Renderer;
+
+class Frame
+{
+public:
+    Frame(Renderer& renderer, RenderTarget& target, Scene& scene);
+    ~Frame();
+
+    Frame& add_renderobject(RenderObject&);
+
+private:
+    Renderer* m_renderer;
+    RenderTarget* m_target;
+    Scene* m_scene;
+};
 
 class Renderer
 {
