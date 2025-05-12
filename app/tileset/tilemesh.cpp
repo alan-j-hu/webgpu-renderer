@@ -5,17 +5,20 @@
 TileMesh::TileMesh(
     TilesetEditor& editor,
     std::string name,
-    Mesh& mesh,
     std::vector<Vertex> vertices,
     std::vector<std::uint16_t> indices)
     : m_name(std::move(name)),
-      m_mesh(&mesh),
       m_vertices(std::move(vertices)),
       m_indices(std::move(indices)),
       m_scene(editor.renderer())
 {
+    m_mesh = std::make_unique<Mesh>(
+        editor.renderer().device(),
+        m_vertices.data(), m_vertices.size(),
+        m_indices.data(), m_indices.size());
+
     m_model = std::make_unique<RenderObject>(
-        editor.renderer().device(), mesh, editor.default_material());
+        editor.renderer().device(), *m_mesh, editor.default_material());
     m_grid = std::make_unique<RenderObject>(
         editor.renderer().device(),
         editor.grid_mesh(),

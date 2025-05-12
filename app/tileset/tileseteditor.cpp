@@ -142,14 +142,7 @@ TileMesh& TilesetEditor::load_mesh(const char* name, aiMesh* mesh)
         indices.push_back(0);
     }
 
-    Mesh& gpu_mesh = m_resources.add_mesh(
-        vertices.data(), vc, indices.data(), indices.size());
     m_meshes.push_back(
-        std::make_unique<TileMesh>(
-            *this,
-            name,
-            gpu_mesh,
-            vertices,
-            indices));
+        std::make_unique<TileMesh>(*this, name, vertices, indices));
     return *m_meshes[m_meshes.size() - 1];
 }
