@@ -12,6 +12,7 @@
 TilesetEditor::TilesetEditor(ModalStack& modals, Renderer& renderer)
     : m_modals(modals),
       m_renderer(renderer),
+      m_rotation(0),
       m_tile_preview(renderer.device(), 200, 200),
       m_resources(m_renderer),
       m_scene(m_renderer),
@@ -27,11 +28,41 @@ TilesetEditor::TilesetEditor(ModalStack& modals, Renderer& renderer)
 
     m_default_material = &m_resources.add_flat_material(0.5, 0.5, 0.5);
     m_wireframe_material = &m_resources.add_wireframe_material(0.5, 0.5, 0.5);
+
+    m_grid = std::make_unique<RenderObject>(
+        m_renderer.device(),
+        m_grid_mesh,
+        *m_wireframe_material);
+
+    Camera& camera = m_scene.camera();
+    camera.set_position(glm::vec3(1.0f, 2.0f, -0.5f));
+    camera.set_target(glm::vec3(1.0f, 1.0f, 0.5f));
 }
 
 bool TilesetEditor::render_preview()
 {
-    m_selected_tile->render_scene(m_renderer, m_tile_preview);
+    Frame frame(m_renderer, m_tile_preview, m_scene);
+    frame.add_renderobject(*m_grid);
+    if (m_selected_tile != nullptr) {
+        switch (m_rotation) {
+        case 0: {
+            frame.add_renderobject(m_selected_tile->rotate0().renderobject());
+        }
+        break;
+        case 1: {
+            frame.add_renderobject(m_selected_tile->rotate90().renderobject());
+        }
+        break;
+        case 2: {
+            frame.add_renderobject(m_selected_tile->rotate180().renderobject());
+        }
+        break;
+        case 3: {
+            frame.add_renderobject(m_selected_tile->rotate270().renderobject());
+        }
+        break;
+        }
+    }
     return true;
 }
 
@@ -58,18 +89,29 @@ void TilesetEditor::render()
         ImGui::EndListBox();
     }
 
-    if (m_selected_tile != nullptr) {
-        render_preview();
-        ImGui::Image((ImTextureID)(intptr_t)m_tile_preview.texture().view(),
-                     ImVec2(m_tile_preview.width(), m_tile_preview.height()));
+    const char* items[] = {
+        "0",
+        "90",
+        "180",
+        "270"
+    };
 
-        if (ImGui::BeginListBox("##Vertices", ImVec2(-FLT_MIN, 0))) {
-            for (auto index : m_selected_tile->indices()) {
-                ImGui::Value("x", index);
+    if (ImGui::BeginCombo("##rotation", items[m_rotation])) {
+        for (int i = 0; i < IM_ARRAYSIZE(items); ++i) {
+            bool is_selected = i == m_rotation;
+            if (ImGui::Selectable(items[i], is_selected)) {
+                m_rotation = i;
             }
-            ImGui::EndListBox();
+            if (is_selected) {
+                ImGui::SetItemDefaultFocus();
+            }
         }
+        ImGui::EndCombo();
     }
+
+    render_preview();
+    ImGui::Image((ImTextureID)(intptr_t)m_tile_preview.texture().view(),
+                 ImVec2(m_tile_preview.width(), m_tile_preview.height()));
 
     if (m_sink.size() != 0) {
         load_meshes(m_sink[0]);
@@ -100,7 +142,7 @@ void TilesetEditor::load_meshes(std::filesystem::path& path)
 void TilesetEditor::visit_node(const aiScene* scene, const aiNode* node)
 {
     if (node->mNumMeshes != 0) {
-        TileMesh& mesh = load_mesh(
+        TileRotations& mesh = load_mesh(
             node->mName.C_Str(),
             scene->mMeshes[node->mMeshes[0]]);
         m_mesh_map.emplace(mesh.name(), &mesh);
@@ -113,7 +155,7 @@ void TilesetEditor::visit_node(const aiScene* scene, const aiNode* node)
     }
 }
 
-TileMesh& TilesetEditor::load_mesh(const char* name, aiMesh* mesh)
+TileRotations& TilesetEditor::load_mesh(const char* name, aiMesh* mesh)
 {
     std::vector<Vertex> vertices;
     const int vc = mesh->mNumVertices;
@@ -143,6 +185,6 @@ TileMesh& TilesetEditor::load_mesh(const char* name, aiMesh* mesh)
     }
 
     m_meshes.push_back(
-        std::make_unique<TileMesh>(*this, name, vertices, indices));
+        std::make_unique<TileRotations>(*this, name, vertices, indices));
     return *m_meshes[m_meshes.size() - 1];
 }

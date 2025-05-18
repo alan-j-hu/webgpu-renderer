@@ -2,6 +2,7 @@
 #define TILESET_TILESETEDITOR_H
 
 #include "tilemesh.h"
+#include "tilerotations.h"
 #include "tileset.h"
 #include "../modal.h"
 #include "noworry/mesh.h"
@@ -35,7 +36,9 @@ public:
 
     Mesh& grid_mesh() { return m_grid_mesh; }
 
-    const std::map<std::string_view, TileMesh*>& mesh_map() const
+    const RenderObject& grid() const { return *m_grid; }
+
+    const std::map<std::string_view, TileRotations*>& mesh_map() const
     { return m_mesh_map; }
 
     void render();
@@ -44,13 +47,16 @@ private:
     ModalStack& m_modals;
     Renderer& m_renderer;
     Tileset m_tileset;
-    std::map<std::string_view, TileMesh*> m_mesh_map;
-    std::vector<std::unique_ptr<TileMesh>> m_meshes;
+    std::map<std::string_view, TileRotations*> m_mesh_map;
+    std::vector<std::unique_ptr<TileRotations>> m_meshes;
 
-    TileMesh* m_selected_tile = nullptr;
+    TileRotations* m_selected_tile = nullptr;
+    int m_rotation;
 
     RenderTarget m_tile_preview;
     Mesh m_grid_mesh;
+    std::unique_ptr<RenderObject> m_grid;
+
     Scene m_scene;
     ResourceTable m_resources;
     Material* m_default_material;
@@ -62,7 +68,7 @@ private:
 
     void load_meshes(std::filesystem::path& path);
     void visit_node(const aiScene* scene, const aiNode* node);
-    TileMesh& load_mesh(const char* name, aiMesh* mesh);
+    TileRotations& load_mesh(const char* name, aiMesh* mesh);
 };
 
 #endif

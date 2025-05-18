@@ -14,6 +14,7 @@ add_executable(demo
   modal.cpp
   tileset/addnewtile.cpp
   tileset/tilemesh.cpp
+  tileset/tilerotations.cpp
   tileset/tileset.cpp
   tileset/tileseteditor.cpp
   ${IMGUI_SRC})

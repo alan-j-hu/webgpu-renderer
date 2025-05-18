@@ -8,6 +8,7 @@
 #include <vector>
 
 class TileMesh;
+class TileRotations;
 class TilesetEditor;
 
 class AddNewTile : public Modal
@@ -31,7 +32,7 @@ private:
     int m_height;
     Error m_error;
 
-    TileMesh* m_selected_mesh;
+    TileRotations* m_selected_mesh;
     RenderTarget m_tile_preview;
 
     bool try_add_tile();
