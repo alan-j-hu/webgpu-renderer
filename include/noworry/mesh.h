@@ -11,7 +11,7 @@ struct Mesh
 public:
     Mesh(WGPUDevice device,
          Vertex* vertices, std::size_t vertex_count,
-         std::uint16_t* indices, std::size_t index_count);
+         const std::uint16_t* indices, std::size_t index_count);
     Mesh(const Mesh&) = delete;
     Mesh(Mesh&& other);
     Mesh& operator=(const Mesh&) = delete;

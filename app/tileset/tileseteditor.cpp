@@ -46,19 +46,23 @@ bool TilesetEditor::render_preview()
     if (m_selected_tile != nullptr) {
         switch (m_rotation) {
         case 0: {
-            frame.add_renderobject(m_selected_tile->rotate0().renderobject());
+            frame.add_renderobject(
+                m_selected_tile->rotated0().renderobject());
         }
         break;
         case 1: {
-            frame.add_renderobject(m_selected_tile->rotate90().renderobject());
+            frame.add_renderobject(
+                m_selected_tile->rotated90().renderobject());
         }
         break;
         case 2: {
-            frame.add_renderobject(m_selected_tile->rotate180().renderobject());
+            frame.add_renderobject(
+                m_selected_tile->rotated180().renderobject());
         }
         break;
         case 3: {
-            frame.add_renderobject(m_selected_tile->rotate270().renderobject());
+            frame.add_renderobject(
+                m_selected_tile->rotated270().renderobject());
         }
         break;
         }

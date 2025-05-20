@@ -14,18 +14,25 @@ public:
 
     const std::string& name() { return m_name; }
 
-    TileMesh& rotate0() { return m_original; }
-    TileMesh& rotate90() { return m_rotate90; }
-    TileMesh& rotate180() { return m_rotate180; }
-    TileMesh& rotate270() { return m_rotate270; }
+    TileMesh& rotated0() { return m_original; }
+    TileMesh& rotated90() { return m_rotated90; }
+    TileMesh& rotated180() { return m_rotated180; }
+    TileMesh& rotated270() { return m_rotated270; }
 
 private:
     std::string m_name;
+    std::vector<std::uint16_t> m_indices;
 
     TileMesh m_original;
-    TileMesh m_rotate90;
-    TileMesh m_rotate180;
-    TileMesh m_rotate270;
+    TileMesh m_rotated90;
+    TileMesh m_rotated180;
+    TileMesh m_rotated270;
+
+    TileMesh rotate(TilesetEditor&, int, int, int, int, int, int);
+
+    TileMesh rotate90(TilesetEditor& editor, int x, int y);
+    TileMesh rotate180(TilesetEditor& editor, int x, int y);
+    TileMesh rotate270(TilesetEditor& editor, int x, int y);
 };
 
 #endif

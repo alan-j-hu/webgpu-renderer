@@ -2,7 +2,7 @@
 
 Mesh::Mesh(WGPUDevice device,
     Vertex* vertices, std::size_t vertex_count,
-    std::uint16_t* indices, std::size_t index_count)
+    const std::uint16_t* indices, std::size_t index_count)
 {
     m_vertex_count = vertex_count;
     m_index_count = index_count;
