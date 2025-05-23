@@ -9,6 +9,7 @@
 #include "noworry/renderer.h"
 #include "noworry/rendertarget.h"
 #include "noworry/resourcetable.h"
+#include "noworry/camera/perspectivecamera.h"
 #include "noworry/scene/scene.h"
 
 #include <filesystem>
@@ -58,6 +59,7 @@ private:
     std::unique_ptr<RenderObject> m_grid;
 
     Scene m_scene;
+    PerspectiveCamera m_camera;
     ResourceTable m_resources;
     Material* m_default_material;
     Material* m_wireframe_material;

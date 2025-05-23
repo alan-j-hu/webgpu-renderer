@@ -1,3 +1,4 @@
+#include "tilemap/tilemapeditor.h"
 #include "tileset/tileseteditor.h"
 
 #include "noworry/application.h"
@@ -6,7 +7,6 @@
 #include "noworry/renderer.h"
 #include "noworry/rendertarget.h"
 #include "noworry/resourcetable.h"
-#include "noworry/scene/camera.h"
 #include "noworry/scene/renderobject.h"
 #include "noworry/scene/scene.h"
 
@@ -27,8 +27,8 @@ public:
           m_subwindow(device(), 500, 500),
           m_renderer(device()),
           m_resources(m_renderer),
-          m_scene(m_renderer),
-          m_tileset_editor(m_modals, m_renderer)
+          m_tileset_editor(m_modals, m_renderer),
+          m_tilemap_editor(m_renderer, m_tileset_editor)
     {
         init_imgui();
 
@@ -64,10 +64,6 @@ public:
         m_model = std::make_unique<RenderObject>(
             m_renderer.device(), mesh, *m_material);
         m_model->set_translation(glm::vec3(0.0f, 0.0f, 50.0f));
-
-        auto& camera = m_scene.camera();
-        camera.set_position(glm::vec3(0.0f, 0.0f, -25.0f));
-        camera.set_target(glm::vec3(0.0f, 0.0f, 0.0f));
     }
 
     virtual ~Main()
@@ -129,13 +125,13 @@ private:
     std::shared_ptr<TextureMaterial> m_material;
     Material* m_material2;
 
-    Scene m_scene;
     std::unique_ptr<RenderObject> m_model;
     float m_yaw;
     int m_selected = 0;
 
     ModalStack m_modals;
     TilesetEditor m_tileset_editor;
+    TilemapEditor m_tilemap_editor;
 
     void init_imgui()
     {
@@ -160,8 +156,6 @@ private:
 
     void draw_imgui()
     {
-        render_subwindow();
-
         ImGui_ImplWGPU_NewFrame();
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
@@ -202,32 +196,7 @@ private:
         if (ImGui::BeginChild("Tilemap Editor", ImVec2(width() / 2, 0),
                               ImGuiChildFlags_Borders, 0)) {
 
-            const char* items[] = {
-                "Texture",
-                "Flat"
-            };
-
-            if (ImGui::BeginCombo("##combo", items[m_selected])) {
-                for (int i = 0; i < IM_ARRAYSIZE(items); ++i) {
-                    bool is_selected = i == m_selected;
-                    if (ImGui::Selectable(items[i], is_selected)) {
-                        m_selected = i;
-                    }
-                    if (is_selected) {
-                        ImGui::SetItemDefaultFocus();
-                    }
-                }
-                ImGui::EndCombo();
-            }
-
-            if (m_selected == 0) {
-                m_model->set_material(*m_material);
-            } else {
-                m_model->set_material(*m_material2);
-            }
-
-            ImGui::Image((ImTextureID)(intptr_t)m_subwindow.texture().view(),
-                         ImVec2(m_subwindow.width(), m_subwindow.height()));
+            m_tilemap_editor.render();
         }
         ImGui::EndChild();
     }
@@ -239,14 +208,6 @@ private:
             m_tileset_editor.render();
         }
         ImGui::EndChild();
-    }
-
-    void render_subwindow()
-    {
-        m_yaw += 0.01;
-        m_model->set_yaw(m_yaw);
-        Frame(m_renderer, m_subwindow, m_scene)
-            .add_renderobject(*m_model);
     }
 };
 

@@ -9,13 +9,14 @@ add_library(noworry
   resourcetable.cpp
   stb_image.c
   texture.cpp
+  camera/orthographiccamera.cpp
+  camera/perspectivecamera.cpp
   material/flatmaterial.cpp
   material/flatmesheffect.cpp
   material/mesheffect.cpp
   material/texturematerial.cpp
   material/texturemesheffect.cpp
   material/uniformlayout.cpp
-  scene/camera.cpp
   scene/renderobject.cpp
   scene/scene.cpp)
 target_include_directories(noworry PRIVATE ../include)

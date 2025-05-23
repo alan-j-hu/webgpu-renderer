@@ -12,6 +12,7 @@ add_executable(demo
   filedialog.cpp
   main.cpp
   modal.cpp
+  tilemap/tilemapeditor.cpp
   tileset/addnewtile.cpp
   tileset/tilemesh.cpp
   tileset/tilerotations.cpp

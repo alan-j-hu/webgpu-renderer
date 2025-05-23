@@ -1,7 +1,8 @@
 #include "noworry/scene/scene.h"
 #include "noworry/material/texturemesheffect.h"
 
-Scene::Scene(Renderer& renderer)
+Scene::Scene(Renderer& renderer, Camera& camera)
+    : m_camera(&camera)
 {
     WGPUBufferDescriptor buffer_desc = { 0 };
     buffer_desc.nextInChain = nullptr;
@@ -12,15 +13,13 @@ Scene::Scene(Renderer& renderer)
 
     m_bind_group = renderer
         .uniform_layout().create_bind_group(renderer.device(), m_buffer);
-
-    m_camera = std::make_unique<Camera>();
 }
 
 Scene::Scene(Scene&& other)
     : m_uniforms(other.m_uniforms),
       m_buffer(other.m_buffer),
       m_bind_group(other.m_bind_group),
-      m_camera(std::move(other.m_camera))
+      m_camera(other.m_camera)
 {
     other.m_moved = true;
     other.m_buffer = nullptr;
@@ -35,7 +34,7 @@ Scene& Scene::operator=(Scene&& other)
     m_uniforms = other.m_uniforms;
     m_buffer = other.m_buffer;
     m_bind_group = other.m_bind_group;
-    m_camera = std::move(other.m_camera);
+    m_camera = other.m_camera;
 
     other.m_moved = true;
     other.m_buffer = nullptr;
@@ -49,6 +48,11 @@ Scene::~Scene()
     if (m_moved) return;
     wgpuBindGroupRelease(m_bind_group);
     wgpuBufferRelease(m_buffer);
+}
+
+void Scene::set_camera(Camera& camera)
+{
+    m_camera = &camera;
 }
 
 void Scene::update(Renderer& renderer)

@@ -15,7 +15,7 @@ TilesetEditor::TilesetEditor(ModalStack& modals, Renderer& renderer)
       m_rotation(0),
       m_tile_preview(renderer.device(), 200, 200),
       m_resources(m_renderer),
-      m_scene(m_renderer),
+      m_scene(m_renderer, m_camera),
       m_grid_mesh(
           create_grid(renderer.device(),
                       glm::vec3(0, 0, 0),
@@ -34,9 +34,8 @@ TilesetEditor::TilesetEditor(ModalStack& modals, Renderer& renderer)
         m_grid_mesh,
         *m_wireframe_material);
 
-    Camera& camera = m_scene.camera();
-    camera.set_position(glm::vec3(1.0f, 2.0f, -0.5f));
-    camera.set_target(glm::vec3(1.0f, 1.0f, 0.5f));
+    m_camera.set_position(glm::vec3(1.0f, 2.0f, -0.5f));
+    m_camera.set_target(glm::vec3(1.0f, 1.0f, 0.5f));
 }
 
 bool TilesetEditor::render_preview()
