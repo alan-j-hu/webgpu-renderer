@@ -22,7 +22,7 @@ TilesetEditor::TilesetEditor(ModalStack& modals, Renderer& renderer)
                       5,
                       5,
                       glm::vec3(5, 0, 0),
-                      glm::vec3(0, 0, 5)))
+                      glm::vec3(0, 5, 0)))
 {
     m_tile_preview.set_clear_color({1, 1, 1, 1});
 
@@ -34,8 +34,8 @@ TilesetEditor::TilesetEditor(ModalStack& modals, Renderer& renderer)
         m_grid_mesh,
         *m_wireframe_material);
 
-    m_camera.set_position(glm::vec3(1.0f, 2.0f, -0.5f));
-    m_camera.set_target(glm::vec3(1.0f, 1.0f, 0.5f));
+    m_camera.set_position(glm::vec3(2.0f, -0.5f, 2.0f));
+    m_camera.set_target(glm::vec3(2.0f, 0.5f, 1.0f));
 }
 
 bool TilesetEditor::render_preview()
@@ -166,8 +166,8 @@ TileRotations& TilesetEditor::load_mesh(const char* name, aiMesh* mesh)
     for (int i = 0; i < vc; ++i) {
         Vertex v;
         v.x = mesh->mVertices[i].x;
-        v.y = mesh->mVertices[i].z;
-        v.z = mesh->mVertices[i].y;
+        v.y = mesh->mVertices[i].y;
+        v.z = mesh->mVertices[i].z;
         v.u = mesh->mTextureCoords[0][i].x;
         v.v = mesh->mTextureCoords[0][i].y;
         vertices.push_back(v);

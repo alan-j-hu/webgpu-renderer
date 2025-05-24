@@ -15,18 +15,18 @@ TilemapEditor::TilemapEditor(Renderer& renderer, TilesetEditor& editor)
                       16,
                       16,
                       glm::vec3(16, 0, 0),
-                      glm::vec3(0, 0, 16)))
+                      glm::vec3(0, 16, 0)))
 {
     m_grid = std::make_unique<RenderObject>(
         m_renderer.device(),
         m_grid_mesh,
         m_tileset_editor->wireframe_material());
 
-    m_camera.set_position(glm::vec3(1.0f, 2.0f, -0.5f));
-    m_camera.set_target(glm::vec3(1.0f, 1.0f, 0.5f));
+    m_camera.set_position(glm::vec3(1.0f, -0.5f, 2.0f));
+    m_camera.set_target(glm::vec3(1.0f, 0.5f, 1.0f));
 
-    m_ortho_camera.set_position(glm::vec3(1.0f, 2.0f, -0.5f));
-    m_ortho_camera.set_target(glm::vec3(1.0f, 1.0f, 0.5f));
+    m_ortho_camera.set_position(glm::vec3(1.0f, -0.5f, 2.0f));
+    m_ortho_camera.set_target(glm::vec3(1.0f, 0.5f, 1.0f));
 }
 
 void TilemapEditor::render()

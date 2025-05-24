@@ -33,15 +33,16 @@ TileMesh TileRotations::rotate(
         [=](Vertex v)
         {
             glm::mat4 rotation {};
+            // Column index goes first
             rotation[0][0] = a;
-            rotation[0][2] = b;
-            rotation[1][1] = 1;
-            rotation[2][0] = c;
-            rotation[2][2] = d;
+            rotation[1][0] = b;
+            rotation[0][1] = c;
+            rotation[1][1] = d;
+            rotation[2][2] = 1;
             rotation[3][3] = 1;
 
             const glm::mat4 translation =
-                translate(glm::mat4(1), glm::vec3(x, 0, y));
+                translate(glm::mat4(1), glm::vec3(x, y, 0));
             const glm::vec4 out =
                 translation * rotation * glm::vec4(v.x, v.y, v.z, 1);
 
@@ -57,7 +58,7 @@ TileMesh TileRotations::rotate(
 
 TileMesh TileRotations::rotate90(TilesetEditor& editor, int x, int y)
 {
-    return rotate(editor, 0, 1, -1, 0, y, 0);
+    return rotate(editor, 0, -1, 1, 0, y, 0);
 }
 
 TileMesh TileRotations::rotate180(TilesetEditor& editor, int x, int y)
@@ -67,5 +68,5 @@ TileMesh TileRotations::rotate180(TilesetEditor& editor, int x, int y)
 
 TileMesh TileRotations::rotate270(TilesetEditor& editor, int x, int y)
 {
-    return rotate(editor, 0, -1, 1, 0, 0, x);
+    return rotate(editor, 0, 1, -1, 0, 0, x);
 }
