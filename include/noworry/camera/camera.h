@@ -5,6 +5,7 @@
 
 class CameraData;
 
+// Camera interface.
 struct Camera
 {
 public:

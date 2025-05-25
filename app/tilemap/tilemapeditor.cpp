@@ -22,11 +22,11 @@ TilemapEditor::TilemapEditor(Renderer& renderer, TilesetEditor& editor)
         m_grid_mesh,
         m_tileset_editor->wireframe_material());
 
-    m_camera.set_position(glm::vec3(1.0f, -0.5f, 2.0f));
-    m_camera.set_target(glm::vec3(1.0f, 0.5f, 1.0f));
+    m_camera.set_position(glm::vec3(8.0f, 8.0f, 10.0f));
+    m_camera.set_target(glm::vec3(8.0f, 8.0f, 0.0f));
 
-    m_ortho_camera.set_position(glm::vec3(1.0f, -0.5f, 2.0f));
-    m_ortho_camera.set_target(glm::vec3(1.0f, 0.5f, 1.0f));
+    m_ortho_camera.set_position(glm::vec3(0.0f, 1.0f, 10.0f));
+    m_ortho_camera.set_target(glm::vec3(0.0f, 0.0f, 0.0f));
 }
 
 void TilemapEditor::render()

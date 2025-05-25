@@ -9,6 +9,7 @@ add_library(noworry
   resourcetable.cpp
   stb_image.c
   texture.cpp
+  camera/abstractcamera.cpp
   camera/orthographiccamera.cpp
   camera/perspectivecamera.cpp
   material/flatmaterial.cpp

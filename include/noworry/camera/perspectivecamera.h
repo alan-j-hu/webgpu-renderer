@@ -1,21 +1,17 @@
 #ifndef PERSPECTIVECAMERA_H
 #define PERSPECTIVECAMERA_H
 
-#include "camera.h"
+#include "abstractcamera.h"
 
-class PerspectiveCamera : public Camera
+// Perspective camera, where objects that are far away appear smaller.
+class PerspectiveCamera : public AbstractCamera
 {
 public:
     PerspectiveCamera();
 
-    virtual void set_position(const glm::vec3& position) override;
-    virtual void set_target(const glm::vec3& target) override;
     virtual void update_matrix(CameraData*) override;
 
 private:
-    glm::vec3 m_position;
-    glm::vec3 m_target;
-    glm::vec3 m_up;
 };
 
 #endif
