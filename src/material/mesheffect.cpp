@@ -4,6 +4,38 @@
 #include "noworry/scene/renderobject.h"
 #include "noworry/mesh.h"
 
+const std::array<WGPUVertexAttribute, 5>& Vertex::attributes()
+{
+    static std::array<WGPUVertexAttribute, 5> attributes;
+    static bool initialized = false;
+
+    if (!initialized) {
+        attributes[0].shaderLocation = 0;
+        attributes[0].format = WGPUVertexFormat_Float32;
+        attributes[0].offset = offsetof(Vertex, x);
+
+        attributes[1].shaderLocation = 1;
+        attributes[1].format = WGPUVertexFormat_Float32;
+        attributes[1].offset = offsetof(Vertex, y);
+
+        attributes[2].shaderLocation = 2;
+        attributes[2].format = WGPUVertexFormat_Float32;
+        attributes[2].offset = offsetof(Vertex, z);
+
+        attributes[3].shaderLocation = 3;
+        attributes[3].format = WGPUVertexFormat_Float32;
+        attributes[3].offset = offsetof(Vertex, u);
+
+        attributes[4].shaderLocation = 4;
+        attributes[4].format = WGPUVertexFormat_Float32;
+        attributes[4].offset = offsetof(Vertex, v);
+
+        initialized = true;
+    }
+
+    return attributes;
+}
+
 MeshEffect::MeshEffect(WGPUDevice device, UniformLayout& ul)
     : m_pipeline(nullptr), m_pipeline_layout(nullptr),
       m_device(device), m_ul(&ul)
@@ -18,21 +50,16 @@ struct Model {
 };
 
 struct Vertex {
-  x: f32,
-  y: f32,
-  z: f32,
-  u: f32,
-  v: f32,
+  @location(0) x: f32,
+  @location(1) y: f32,
+  @location(2) z: f32,
+  @location(3) u: f32,
+  @location(4) v: f32,
 };
 
 @group(0) @binding(0) var<uniform> camera: Camera;
 
 @group(2) @binding(0) var<uniform> model: Model;
-@group(2) @binding(1) var<storage, read> vertices: array<Vertex>;
-
-struct VertexInput {
-  @builtin(vertex_index) vertexID : u32,
-}
 
 struct FragmentInput {
   @builtin(position) pos: vec4f,
@@ -40,9 +67,7 @@ struct FragmentInput {
 };
 
 @vertex
-fn vs_main(vertex: VertexInput) -> FragmentInput {
-  var v = vertices[vertex.vertexID];
-
+fn vs_main(v: Vertex) -> FragmentInput {
   var out: FragmentInput;
   out.pos = camera.viewproj * model.transform * vec4(v.x, v.y, v.z, 1);
   out.tex_coords = vec2(v.u, v.v);
@@ -64,15 +89,10 @@ fn vs_main(vertex: VertexInput) -> FragmentInput {
     model_layout_entries[0].visibility = WGPUShaderStage_Vertex;
     model_layout_entries[0].buffer.type = WGPUBufferBindingType_Uniform;
     model_layout_entries[0].buffer.minBindingSize = sizeof(ModelData);
-    model_layout_entries[1].binding = 1;
-    model_layout_entries[1].visibility = WGPUShaderStage_Vertex;
-    model_layout_entries[1].buffer.type =
-        WGPUBufferBindingType_ReadOnlyStorage;
-    model_layout_entries[1].buffer.minBindingSize = 0;
 
     WGPUBindGroupLayoutDescriptor model_layout_desc = { 0 };
     model_layout_desc.label = {"ModelLayout", WGPU_STRLEN};
-    model_layout_desc.entryCount = 2;
+    model_layout_desc.entryCount = 1;
     model_layout_desc.entries = model_layout_entries;
 
     m_model_layout =
@@ -93,22 +113,17 @@ MeshEffect::~MeshEffect()
 
 WGPUBindGroup MeshEffect::create_model_group(
     WGPUDevice device,
-    WGPUBuffer transform,
-    WGPUBuffer vertices,
-    int vertex_count)
+    WGPUBuffer transform)
 {
-    WGPUBindGroupEntry entries[2] = { 0 };
+    WGPUBindGroupEntry entries[1] = { 0 };
     entries[0].binding = 0;
     entries[0].buffer = transform;
     entries[0].size = sizeof(ModelData);
-    entries[1].binding = 1;
-    entries[1].buffer = vertices;
-    entries[1].size = vertex_count * sizeof(Vertex);
 
     WGPUBindGroupDescriptor bind_group_desc = { 0 };
     bind_group_desc.label = {"ModelBindGroup", WGPU_STRLEN};
     bind_group_desc.layout = model_layout();
-    bind_group_desc.entryCount = 2;
+    bind_group_desc.entryCount = 1;
     bind_group_desc.entries = entries;
 
     return wgpuDeviceCreateBindGroup(device, &bind_group_desc);
@@ -142,6 +157,12 @@ WGPURenderPipeline MeshEffect::pipeline()
     if (m_pipeline != nullptr) {
         return m_pipeline;
     }
+
+    WGPUVertexBufferLayout vertex_buffer_layout;
+    vertex_buffer_layout.attributeCount = Vertex::attributes().size();
+    vertex_buffer_layout.attributes = Vertex::attributes().data();
+    vertex_buffer_layout.arrayStride = sizeof(Vertex);
+    vertex_buffer_layout.stepMode = WGPUVertexStepMode_Vertex;
 
     WGPUDepthStencilState depth_stencil = { 0 };
     depth_stencil.format = WGPUTextureFormat_Depth24Plus;
@@ -178,8 +199,8 @@ WGPURenderPipeline MeshEffect::pipeline()
     pipeline_desc.layout = pipeline_layout();
     pipeline_desc.vertex.module = vertex_shader();
     pipeline_desc.vertex.entryPoint = {"vs_main", WGPU_STRLEN};
-    pipeline_desc.vertex.bufferCount = 0;
-    pipeline_desc.vertex.buffers = nullptr;
+    pipeline_desc.vertex.bufferCount = 1;
+    pipeline_desc.vertex.buffers = &vertex_buffer_layout;
     pipeline_desc.primitive.topology = topology();
     pipeline_desc.primitive.frontFace = WGPUFrontFace_CCW;
     pipeline_desc.primitive.cullMode = WGPUCullMode_None;
@@ -207,6 +228,13 @@ void MeshEffect::draw(WGPURenderPassEncoder encoder)
             encoder, 1, model->material().bind_group(), 0, nullptr);
         wgpuRenderPassEncoderSetBindGroup(
             encoder, 2, model->bind_group(), 0, nullptr);
+
+        wgpuRenderPassEncoderSetVertexBuffer(
+            encoder,
+            0,
+            model->mesh().vertex_buffer(),
+            0,
+            wgpuBufferGetSize(model->mesh().vertex_buffer()));
 
         wgpuRenderPassEncoderSetIndexBuffer(
             encoder,

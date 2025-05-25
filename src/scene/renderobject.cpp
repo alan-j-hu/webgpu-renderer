@@ -16,8 +16,7 @@ RenderObject::RenderObject(WGPUDevice device, const Mesh& mesh, Material& mat)
     buffer_desc.mappedAtCreation = false;
     m_buffer = wgpuDeviceCreateBuffer(device, &buffer_desc);
 
-    m_bind_group = mat.effect().create_model_group(device,
-        m_buffer, mesh.vertex_buffer(), mesh.vertex_count());
+    m_bind_group = mat.effect().create_model_group(device, m_buffer);
 
     m_material = &mat;
 

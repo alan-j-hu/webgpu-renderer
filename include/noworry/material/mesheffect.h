@@ -1,6 +1,7 @@
 #ifndef MESH_EFFECT_H
 #define MESH_EFFECT_H
 
+#include <array>
 #include <vector>
 #include <glm/mat4x4.hpp>
 #include <webgpu/webgpu.h>
@@ -9,6 +10,8 @@ struct Vertex
 {
     float x, y, z;
     float u, v;
+
+    static const std::array<WGPUVertexAttribute, 5>& attributes();
 };
 
 struct ModelData
@@ -36,11 +39,7 @@ public:
     virtual WGPUBindGroupLayout material_layout() = 0;
     WGPUBindGroupLayout model_layout() { return m_model_layout; }
 
-    WGPUBindGroup create_model_group(
-        WGPUDevice,
-        WGPUBuffer transform,
-        WGPUBuffer vertices,
-        int tri_count);
+    WGPUBindGroup create_model_group(WGPUDevice, WGPUBuffer transform);
 
     void enqueue(RenderObject& model);
 

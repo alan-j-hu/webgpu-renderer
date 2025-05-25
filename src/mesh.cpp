@@ -12,7 +12,7 @@ Mesh::Mesh(WGPUDevice device,
     WGPUQueue queue = wgpuDeviceGetQueue(device);
     WGPUBufferDescriptor vbuffer_desc = { 0 };
     vbuffer_desc.nextInChain = nullptr;
-    vbuffer_desc.usage = WGPUBufferUsage_CopyDst | WGPUBufferUsage_Storage;
+    vbuffer_desc.usage = WGPUBufferUsage_CopyDst | WGPUBufferUsage_Vertex;
     vbuffer_desc.size = vbuffer_size;
     vbuffer_desc.mappedAtCreation = false;
     m_vertex_buffer = wgpuDeviceCreateBuffer(device, &vbuffer_desc);
