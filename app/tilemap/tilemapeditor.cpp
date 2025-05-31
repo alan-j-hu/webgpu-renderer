@@ -3,7 +3,7 @@
 
 #include "imgui.h"
 
-TilemapEditor::TilemapEditor(Renderer& renderer, TilesetEditor& editor)
+TilemapEditor::TilemapEditor(Renderer& renderer, TilesetPane& editor)
     : m_camera_selection(0),
       m_renderer(renderer),
       m_subwindow(renderer.device(), 500, 500),
@@ -20,7 +20,7 @@ TilemapEditor::TilemapEditor(Renderer& renderer, TilesetEditor& editor)
     m_grid = std::make_unique<RenderObject>(
         m_renderer.device(),
         m_grid_mesh,
-        m_tileset_editor->wireframe_material());
+        m_tileset_editor->editor().wireframe_material());
 
     m_camera.set_position(glm::vec3(8.0f, 8.0f, 10.0f));
     m_camera.set_target(glm::vec3(8.0f, 8.0f, 0.0f));

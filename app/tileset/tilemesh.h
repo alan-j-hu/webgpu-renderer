@@ -8,12 +8,12 @@
 #include <memory>
 #include <string>
 
-class TilesetEditor;
+class ModelInspector;
 
 class TileMesh
 {
 public:
-    TileMesh(TilesetEditor&,
+    TileMesh(ModelInspector&,
              std::vector<Vertex>,
              const std::vector<std::uint16_t>&);
     TileMesh(TileMesh&&) = default;
@@ -28,7 +28,7 @@ private:
     std::unique_ptr<Mesh> m_mesh;
     std::vector<Vertex> m_vertices;
 
-    TilesetEditor* m_tileset_editor;
+    ModelInspector* m_tileset_editor;
     std::unique_ptr<RenderObject> m_model;
 };
 

@@ -1,7 +1,7 @@
 #ifndef TILEMAPEDITOR_H
 #define TILEMAPEDITOR_H
 
-#include "../tileset/tileseteditor.h"
+#include "../tileset/tilesetpane.h"
 
 #include "noworry/mesh.h"
 #include "noworry/renderer.h"
@@ -15,7 +15,7 @@
 class TilemapEditor
 {
 public:
-    TilemapEditor(Renderer& renderer, TilesetEditor&);
+    TilemapEditor(Renderer& renderer, TilesetPane&);
 
     void render();
 
@@ -24,7 +24,7 @@ private:
 
     Renderer& m_renderer;
     RenderTarget m_subwindow;
-    TilesetEditor* m_tileset_editor;
+    TilesetPane* m_tileset_editor;
 
     Scene m_scene;
     OrthographicCamera m_ortho_camera;

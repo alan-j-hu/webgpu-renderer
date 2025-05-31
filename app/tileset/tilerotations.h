@@ -3,11 +3,13 @@
 
 #include "tilemesh.h"
 
+class ModelInspector;
+
 class TileRotations
 {
 public:
     TileRotations(
-        TilesetEditor&,
+        ModelInspector&,
         std::string,
         std::vector<Vertex>,
         std::vector<std::uint16_t>);
@@ -28,11 +30,11 @@ private:
     TileMesh m_rotated180;
     TileMesh m_rotated270;
 
-    TileMesh rotate(TilesetEditor&, int, int, int, int, int, int);
+    TileMesh rotate(ModelInspector&, int, int, int, int, int, int);
 
-    TileMesh rotate90(TilesetEditor& editor, int x, int y);
-    TileMesh rotate180(TilesetEditor& editor, int x, int y);
-    TileMesh rotate270(TilesetEditor& editor, int x, int y);
+    TileMesh rotate90(ModelInspector& editor, int x, int y);
+    TileMesh rotate180(ModelInspector& editor, int x, int y);
+    TileMesh rotate270(ModelInspector& editor, int x, int y);
 };
 
 #endif

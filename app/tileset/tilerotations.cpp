@@ -1,5 +1,5 @@
 #include "tilerotations.h"
-#include "tileseteditor.h"
+#include "modelinspector.h"
 
 #include <algorithm>
 #include <iterator>
@@ -7,7 +7,7 @@
 #include <glm/ext/matrix_transform.hpp>
 
 TileRotations::TileRotations(
-    TilesetEditor& editor,
+    ModelInspector& editor,
     std::string name,
     std::vector<Vertex> vertices,
     std::vector<std::uint16_t> indices)
@@ -21,7 +21,7 @@ TileRotations::TileRotations(
 }
 
 TileMesh TileRotations::rotate(
-    TilesetEditor& editor,
+    ModelInspector& editor,
     int a, int b, int c, int d, int x, int y)
 {
     std::vector<Vertex> new_vertices;
@@ -56,17 +56,17 @@ TileMesh TileRotations::rotate(
     return TileMesh(editor, std::move(new_vertices), m_indices);
 }
 
-TileMesh TileRotations::rotate90(TilesetEditor& editor, int x, int y)
+TileMesh TileRotations::rotate90(ModelInspector& editor, int x, int y)
 {
     return rotate(editor, 0, -1, 1, 0, y, 0);
 }
 
-TileMesh TileRotations::rotate180(TilesetEditor& editor, int x, int y)
+TileMesh TileRotations::rotate180(ModelInspector& editor, int x, int y)
 {
     return rotate(editor, -1, 0, 0, -1, x, y);
 }
 
-TileMesh TileRotations::rotate270(TilesetEditor& editor, int x, int y)
+TileMesh TileRotations::rotate270(ModelInspector& editor, int x, int y)
 {
     return rotate(editor, 0, 1, -1, 0, 0, x);
 }

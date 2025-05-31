@@ -1,4 +1,4 @@
-#include "tileseteditor.h"
+#include "modelinspector.h"
 #include "addnewtile.h"
 #include "../filedialog.h"
 
@@ -9,8 +9,10 @@
 #include <assimp/postprocess.h>
 #include "imgui.h"
 
-TilesetEditor::TilesetEditor(ModalStack& modals, Renderer& renderer)
-    : m_modals(modals),
+ModelInspector::ModelInspector(
+    std::string name, int flex, ModalStack& modals, Renderer& renderer)
+    : Pane(std::move(name), flex),
+      m_modals(modals),
       m_renderer(renderer),
       m_rotation(0),
       m_tile_preview(renderer.device(), 200, 200),
@@ -38,7 +40,7 @@ TilesetEditor::TilesetEditor(ModalStack& modals, Renderer& renderer)
     m_camera.set_target(glm::vec3(2.0f, 0.5f, 1.0f));
 }
 
-bool TilesetEditor::render_preview()
+bool ModelInspector::render_preview()
 {
     Frame frame(m_renderer, m_tile_preview, m_scene);
     frame.add_renderobject(*m_grid);
@@ -69,7 +71,7 @@ bool TilesetEditor::render_preview()
     return true;
 }
 
-void TilesetEditor::render()
+void ModelInspector::content()
 {
     namespace fs = std::filesystem;
 
@@ -122,7 +124,7 @@ void TilesetEditor::render()
     }
 }
 
-void TilesetEditor::load_meshes(std::filesystem::path& path)
+void ModelInspector::load_meshes(std::filesystem::path& path)
 {
     m_selected_tile = nullptr;
     m_mesh_map.clear();
@@ -142,7 +144,7 @@ void TilesetEditor::load_meshes(std::filesystem::path& path)
     visit_node(scene, scene->mRootNode);
 }
 
-void TilesetEditor::visit_node(const aiScene* scene, const aiNode* node)
+void ModelInspector::visit_node(const aiScene* scene, const aiNode* node)
 {
     if (node->mNumMeshes != 0) {
         TileRotations& mesh = load_mesh(
@@ -158,7 +160,7 @@ void TilesetEditor::visit_node(const aiScene* scene, const aiNode* node)
     }
 }
 
-TileRotations& TilesetEditor::load_mesh(const char* name, aiMesh* mesh)
+TileRotations& ModelInspector::load_mesh(const char* name, aiMesh* mesh)
 {
     std::vector<Vertex> vertices;
     const int vc = mesh->mNumVertices;

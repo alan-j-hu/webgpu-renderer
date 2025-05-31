@@ -9,7 +9,7 @@
 
 class TileMesh;
 class TileRotations;
-class TilesetEditor;
+class ModelInspector;
 
 class AddNewTile : public Modal
 {
@@ -20,12 +20,12 @@ public:
         BadMesh
     };
 
-    AddNewTile(TilesetEditor&, ModalStack&);
+    AddNewTile(ModelInspector&, ModalStack&);
 
     bool render() override;
 
 private:
-    TilesetEditor& m_tileset_editor;
+    ModelInspector& m_tileset_editor;
     ModalStack& m_modals;
     std::vector<std::filesystem::path> m_sink;
     int m_width;

@@ -1,5 +1,5 @@
 #include "tilemap/tilemapeditor.h"
-#include "tileset/tileseteditor.h"
+#include "tileset/tilesetpane.h"
 
 #include "noworry/application.h"
 #include "noworry/mesh.h"
@@ -27,7 +27,7 @@ public:
           m_subwindow(device(), 500, 500),
           m_renderer(device()),
           m_resources(m_renderer),
-          m_tileset_editor(m_modals, m_renderer),
+          m_tileset_editor(1, m_modals, m_renderer),
           m_tilemap_editor(m_renderer, m_tileset_editor)
     {
         init_imgui();
@@ -130,7 +130,7 @@ private:
     int m_selected = 0;
 
     ModalStack m_modals;
-    TilesetEditor m_tileset_editor;
+    TilesetPane m_tileset_editor;
     TilemapEditor m_tilemap_editor;
 
     void init_imgui()
@@ -169,9 +169,7 @@ private:
 
         draw_menubar();
 
-        draw_left_pane();
-        ImGui::SameLine();
-        draw_right_pane();
+        draw_main_pane();
 
         ImGui::End();
 
@@ -191,23 +189,20 @@ private:
         return true;
     };
 
-    void draw_left_pane()
+    void draw_main_pane()
     {
-        if (ImGui::BeginChild("Tilemap Editor", ImVec2(width() / 2, 0),
-                              ImGuiChildFlags_Borders, 0)) {
-
-            m_tilemap_editor.render();
-        }
-        ImGui::EndChild();
-    }
-
-    void draw_right_pane()
-    {
-        if (ImGui::BeginChild("Tileset Editor", ImVec2(width() / 2, 0),
-                              ImGuiChildFlags_Borders, 0)) {
-            m_tileset_editor.render();
-        }
-        ImGui::EndChild();
+        if (ImGui::BeginTabBar("Tabs")) {
+            if (ImGui::BeginTabItem("Tilemap Editor")) {
+                m_tilemap_editor.render();
+                ImGui::EndTabItem();
+            }
+            if (ImGui::BeginTabItem("Tileset Editor")) {
+                m_tileset_editor.resize(500, 500);
+                m_tileset_editor.render();
+                ImGui::EndTabItem();
+            }
+            ImGui::EndTabBar();
+          }
     }
 };
 

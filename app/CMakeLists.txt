@@ -12,12 +12,16 @@ add_executable(demo
   filedialog.cpp
   main.cpp
   modal.cpp
+  pane.cpp
+  tilemap/tileinstance.cpp
   tilemap/tilemapeditor.cpp
   tileset/addnewtile.cpp
+  tileset/modelinspector.cpp
+  tileset/tiledefinition.cpp
   tileset/tilemesh.cpp
   tileset/tilerotations.cpp
   tileset/tileset.cpp
-  tileset/tileseteditor.cpp
+  tileset/tilesetpane.cpp
   ${IMGUI_SRC})
 set_property(TARGET demo PROPERTY CXX_STANDARD 23)
 set_property(TARGET demo PROPERTY C_STANDARD 23)

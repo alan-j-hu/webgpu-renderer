@@ -1,10 +1,11 @@
-#ifndef TILESET_TILESETEDITOR_H
-#define TILESET_TILESETEDITOR_H
+#ifndef TILESET_MODELINSPECTOR_H
+#define TILESET_MODELINSPECTOR_H
 
 #include "tilemesh.h"
 #include "tilerotations.h"
 #include "tileset.h"
 #include "../modal.h"
+#include "../pane.h"
 #include "noworry/mesh.h"
 #include "noworry/renderer.h"
 #include "noworry/rendertarget.h"
@@ -20,10 +21,10 @@
 #include <assimp/mesh.h>
 #include <assimp/scene.h>
 
-class TilesetEditor
+class ModelInspector : public Pane
 {
 public:
-    TilesetEditor(ModalStack&, Renderer&);
+    ModelInspector(std::string name, int flex, ModalStack&, Renderer&);
 
     Renderer& renderer() { return m_renderer; }
 
@@ -42,7 +43,8 @@ public:
     const std::map<std::string_view, TileRotations*>& mesh_map() const
     { return m_mesh_map; }
 
-    void render();
+protected:
+    virtual void content() override;
 
 private:
     ModalStack& m_modals;

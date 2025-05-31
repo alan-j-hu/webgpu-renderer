@@ -1,10 +1,10 @@
 #include "tilemesh.h"
-#include "tileseteditor.h"
+#include "modelinspector.h"
 
 #include <utility>
 
 TileMesh::TileMesh(
-    TilesetEditor& editor,
+    ModelInspector& editor,
     std::vector<Vertex> vertices,
     const std::vector<std::uint16_t>& indices)
     : m_vertices(std::move(vertices))

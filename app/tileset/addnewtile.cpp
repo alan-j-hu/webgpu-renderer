@@ -2,7 +2,7 @@
 #include "tilemesh.h"
 #include "tilerotations.h"
 #include "tileset.h"
-#include "tileseteditor.h"
+#include "modelinspector.h"
 #include "../filedialog.h"
 #include <algorithm>
 #include <utility>
@@ -14,7 +14,7 @@
 
 namespace fs = std::filesystem;
 
-AddNewTile::AddNewTile(TilesetEditor& tileset_editor, ModalStack& modals)
+AddNewTile::AddNewTile(ModelInspector& tileset_editor, ModalStack& modals)
     : Modal("Add New Tile"),
       m_tileset_editor(tileset_editor),
       m_modals(modals),
