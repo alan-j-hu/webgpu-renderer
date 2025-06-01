@@ -3,13 +3,14 @@
 
 #include "tilemesh.h"
 
-class ModelInspector;
+class AppState;
 
+/// Contains the four rotated tile meshes for a given tine shape.
 class TileRotations
 {
 public:
     TileRotations(
-        ModelInspector&,
+        AppState&,
         std::string,
         std::vector<Vertex>,
         std::vector<std::uint16_t>);
@@ -30,11 +31,11 @@ private:
     TileMesh m_rotated180;
     TileMesh m_rotated270;
 
-    TileMesh rotate(ModelInspector&, int, int, int, int, int, int);
+    TileMesh rotate(AppState&, int, int, int, int, int, int);
 
-    TileMesh rotate90(ModelInspector& editor, int x, int y);
-    TileMesh rotate180(ModelInspector& editor, int x, int y);
-    TileMesh rotate270(ModelInspector& editor, int x, int y);
+    TileMesh rotate90(AppState& editor, int x, int y);
+    TileMesh rotate180(AppState& editor, int x, int y);
+    TileMesh rotate270(AppState& editor, int x, int y);
 };
 
 #endif

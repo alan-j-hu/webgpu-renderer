@@ -8,12 +8,13 @@
 #include <memory>
 #include <string>
 
-class ModelInspector;
+class AppState;
 
+/// Contains the GPU mesh for a tile shape, and a CPU copy of the vertices.
 class TileMesh
 {
 public:
-    TileMesh(ModelInspector&,
+    TileMesh(AppState&,
              std::vector<Vertex>,
              const std::vector<std::uint16_t>&);
     TileMesh(TileMesh&&) = default;
@@ -27,8 +28,6 @@ public:
 private:
     std::unique_ptr<Mesh> m_mesh;
     std::vector<Vertex> m_vertices;
-
-    ModelInspector* m_tileset_editor;
     std::unique_ptr<RenderObject> m_model;
 };
 

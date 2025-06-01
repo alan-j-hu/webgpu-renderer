@@ -1,3 +1,4 @@
+#include "appstate.h"
 #include "tilemap/tilemapeditor.h"
 #include "tileset/tilesetpane.h"
 
@@ -25,45 +26,13 @@ public:
     Main(int width, int height)
         : Application(width, height, WGPUTextureFormat_BGRA8Unorm),
           m_subwindow(device(), 500, 500),
-          m_renderer(device()),
-          m_resources(m_renderer),
-          m_tileset_editor(1, m_modals, m_renderer),
-          m_tilemap_editor(m_renderer, m_tileset_editor)
+          m_app_state(device()),
+          m_tileset_editor(1, m_app_state),
+          m_tilemap_editor(m_app_state)
     {
         init_imgui();
 
         m_subwindow.set_clear_color({0.5, 0.5, 0.5, 1});
-
-        auto& mesh = MeshBuilder()
-            .quad( // front
-                XYZUV(-20, 20, -20, 0, 0),
-                XYZUV(-20, -20, -20, 0, 1),
-                XYZUV(20, -20, -20, 1, 1),
-                XYZUV(20, 20, -20, 1, 0))
-            .quad( // right
-                XYZUV(20, 20, -20, 0, 0),
-                XYZUV(20, -20, -20, 0, 1),
-                XYZUV(20, -20, 20, 1, 1),
-                XYZUV(20, 20, 20, 1, 0))
-            .quad( // back
-                XYZUV(20, 20, 20, 0, 0),
-                XYZUV(20, -20, 20, 0, 1),
-                XYZUV(-20, -20, 20, 1, 1),
-                XYZUV(-20, 20, 20, 1, 0))
-            .quad( // left
-                XYZUV(-20, 20, 20, 0, 0),
-                XYZUV(-20, -20, 20, 0, 1),
-                XYZUV(-20, -20, -20, 1, 1),
-                XYZUV(-20, 20, -20, 1, 0))
-            .build(m_resources);
-
-        m_material = m_resources.load_texture_material("../assets/cat.png");
-        m_material2 = &m_resources.add_flat_material(1, 0, 0);
-
-        m_yaw = glm::pi<float>() * 0.25f;
-        m_model = std::make_unique<RenderObject>(
-            m_renderer.device(), mesh, *m_material);
-        m_model->set_translation(glm::vec3(0.0f, 0.0f, 50.0f));
     }
 
     virtual ~Main()
@@ -119,17 +88,8 @@ private:
 
     RenderTarget m_subwindow;
 
-    Renderer m_renderer;
-    ResourceTable m_resources;
+    AppState m_app_state;
 
-    std::shared_ptr<TextureMaterial> m_material;
-    Material* m_material2;
-
-    std::unique_ptr<RenderObject> m_model;
-    float m_yaw;
-    int m_selected = 0;
-
-    ModalStack m_modals;
     TilesetPane m_tileset_editor;
     TilemapEditor m_tilemap_editor;
 
@@ -160,7 +120,7 @@ private:
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
 
-        ImGui::BeginDisabled(m_modals.has_focus());
+        ImGui::BeginDisabled(m_app_state.modals().has_focus());
 
         ImGuiViewport* viewport = ImGui::GetMainViewport();
         ImGui::SetNextWindowPos(viewport->Pos);
@@ -175,7 +135,7 @@ private:
 
         ImGui::EndDisabled();
 
-        m_modals.render();
+        m_app_state.modals().render();
 
         ImGui::Render();
     }

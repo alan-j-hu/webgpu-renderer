@@ -1,7 +1,7 @@
 #ifndef TILEMAPEDITOR_H
 #define TILEMAPEDITOR_H
 
-#include "../tileset/tilesetpane.h"
+#include "../appstate.h"
 
 #include "noworry/mesh.h"
 #include "noworry/renderer.h"
@@ -12,19 +12,19 @@
 
 #include <memory>
 
+/// Level map editor.
 class TilemapEditor
 {
 public:
-    TilemapEditor(Renderer& renderer, TilesetPane&);
+    TilemapEditor(AppState&);
 
     void render();
 
 private:
     int m_camera_selection;
 
-    Renderer& m_renderer;
+    AppState& m_app_state;
     RenderTarget m_subwindow;
-    TilesetPane* m_tileset_editor;
 
     Scene m_scene;
     OrthographicCamera m_ortho_camera;

@@ -9,13 +9,13 @@ set(IMGUI_SRC
   ${IMGUI_DIR}/imgui_widgets.cpp)
 
 add_executable(demo
+  appstate.cpp
   filedialog.cpp
   main.cpp
   modal.cpp
   pane.cpp
   tilemap/tileinstance.cpp
   tilemap/tilemapeditor.cpp
-  tileset/addnewtile.cpp
   tileset/modelinspector.cpp
   tileset/tiledefinition.cpp
   tileset/tilemesh.cpp

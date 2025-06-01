@@ -3,14 +3,13 @@
 
 #include "imgui.h"
 
-TilemapEditor::TilemapEditor(Renderer& renderer, TilesetPane& editor)
+TilemapEditor::TilemapEditor(AppState& app_state)
     : m_camera_selection(0),
-      m_renderer(renderer),
-      m_subwindow(renderer.device(), 500, 500),
-      m_scene(renderer, m_camera),
-      m_tileset_editor(&editor),
+      m_app_state(app_state),
+      m_subwindow(app_state.renderer().device(), 500, 500),
+      m_scene(app_state.renderer(), m_camera),
       m_grid_mesh(
-          create_grid(renderer.device(),
+          create_grid(app_state.renderer().device(),
                       glm::vec3(0, 0, 0),
                       16,
                       16,
@@ -18,9 +17,9 @@ TilemapEditor::TilemapEditor(Renderer& renderer, TilesetPane& editor)
                       glm::vec3(0, 16, 0)))
 {
     m_grid = std::make_unique<RenderObject>(
-        m_renderer.device(),
+        m_app_state.renderer().device(),
         m_grid_mesh,
-        m_tileset_editor->editor().wireframe_material());
+        m_app_state.wireframe_material());
 
     m_camera.set_position(glm::vec3(8.0f, 8.0f, 10.0f));
     m_camera.set_target(glm::vec3(8.0f, 8.0f, 0.0f));
@@ -63,6 +62,6 @@ void TilemapEditor::render()
 
 void TilemapEditor::render_preview()
 {
-    Frame frame(m_renderer, m_subwindow, m_scene);
+    Frame frame(m_app_state.renderer(), m_subwindow, m_scene);
     frame.add_renderobject(*m_grid);
 }

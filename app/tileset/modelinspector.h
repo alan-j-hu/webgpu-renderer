@@ -4,6 +4,7 @@
 #include "tilemesh.h"
 #include "tilerotations.h"
 #include "tileset.h"
+#include "../appstate.h"
 #include "../modal.h"
 #include "../pane.h"
 #include "noworry/mesh.h"
@@ -21,18 +22,12 @@
 #include <assimp/mesh.h>
 #include <assimp/scene.h>
 
+/// Allows the loading and viewing of tile shapes from a 3D model
+/// library file.
 class ModelInspector : public Pane
 {
 public:
-    ModelInspector(std::string name, int flex, ModalStack&, Renderer&);
-
-    Renderer& renderer() { return m_renderer; }
-
-    ResourceTable& resources() { return m_resources; }
-
-    Material& default_material() { return *m_default_material; }
-
-    Material& wireframe_material() { return *m_wireframe_material; }
+    ModelInspector(std::string name, int flex, AppState&);
 
     Tileset& tileset() { return m_tileset; }
 
@@ -47,8 +42,7 @@ protected:
     virtual void content() override;
 
 private:
-    ModalStack& m_modals;
-    Renderer& m_renderer;
+    AppState& m_app_state;
     Tileset m_tileset;
     std::map<std::string_view, TileRotations*> m_mesh_map;
     std::vector<std::unique_ptr<TileRotations>> m_meshes;
@@ -62,9 +56,6 @@ private:
 
     Scene m_scene;
     PerspectiveCamera m_camera;
-    ResourceTable m_resources;
-    Material* m_default_material;
-    Material* m_wireframe_material;
 
     std::vector<std::filesystem::path> m_sink;
 

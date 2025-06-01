@@ -1,5 +1,4 @@
 #include "modelinspector.h"
-#include "addnewtile.h"
 #include "../filedialog.h"
 
 #include "noworry/grid.h"
@@ -9,17 +8,14 @@
 #include <assimp/postprocess.h>
 #include "imgui.h"
 
-ModelInspector::ModelInspector(
-    std::string name, int flex, ModalStack& modals, Renderer& renderer)
+ModelInspector::ModelInspector(std::string name, int flex, AppState& app_state)
     : Pane(std::move(name), flex),
-      m_modals(modals),
-      m_renderer(renderer),
+      m_app_state(app_state),
       m_rotation(0),
-      m_tile_preview(renderer.device(), 200, 200),
-      m_resources(m_renderer),
-      m_scene(m_renderer, m_camera),
+      m_tile_preview(m_app_state.renderer().device(), 200, 200),
+      m_scene(m_app_state.renderer(), m_camera),
       m_grid_mesh(
-          create_grid(renderer.device(),
+          create_grid(m_app_state.renderer().device(),
                       glm::vec3(0, 0, 0),
                       5,
                       5,
@@ -28,13 +24,10 @@ ModelInspector::ModelInspector(
 {
     m_tile_preview.set_clear_color({1, 1, 1, 1});
 
-    m_default_material = &m_resources.add_flat_material(0.5, 0.5, 0.5);
-    m_wireframe_material = &m_resources.add_wireframe_material(0.5, 0.5, 0.5);
-
     m_grid = std::make_unique<RenderObject>(
-        m_renderer.device(),
+        m_app_state.renderer().device(),
         m_grid_mesh,
-        *m_wireframe_material);
+        m_app_state.wireframe_material());
 
     m_camera.set_position(glm::vec3(2.0f, -0.5f, 2.0f));
     m_camera.set_target(glm::vec3(2.0f, 0.5f, 1.0f));
@@ -42,7 +35,7 @@ ModelInspector::ModelInspector(
 
 bool ModelInspector::render_preview()
 {
-    Frame frame(m_renderer, m_tile_preview, m_scene);
+    Frame frame(m_app_state.renderer(), m_tile_preview, m_scene);
     frame.add_renderobject(*m_grid);
     if (m_selected_tile != nullptr) {
         switch (m_rotation) {
@@ -76,12 +69,8 @@ void ModelInspector::content()
     namespace fs = std::filesystem;
 
     if (ImGui::Button("Choose Mesh File", ImVec2(0, 0))) {
-        m_modals.push(
+        m_app_state.modals().push(
             std::make_unique<FileDialog>(fs::current_path(), m_sink));
-    }
-
-    if (ImGui::Button("Add Tile", ImVec2(0, 0))) {
-        m_modals.push(std::make_unique<AddNewTile>(*this, m_modals));
     }
 
     if (ImGui::BeginListBox("##Meshes", ImVec2(-FLT_MIN, 0))) {
@@ -190,6 +179,7 @@ TileRotations& ModelInspector::load_mesh(const char* name, aiMesh* mesh)
     }
 
     m_meshes.push_back(
-        std::make_unique<TileRotations>(*this, name, vertices, indices));
+        std::make_unique<TileRotations>(
+            m_app_state, name, vertices, indices));
     return *m_meshes[m_meshes.size() - 1];
 }
