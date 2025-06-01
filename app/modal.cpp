@@ -7,11 +7,6 @@ Modal::Modal(std::string_view title)
 {
 }
 
-bool Modal::render()
-{
-    return false;
-}
-
 void ModalStack::push(std::unique_ptr<Modal> modal)
 {
     m_modals.push_back(std::move(modal));
@@ -29,21 +24,20 @@ void ModalStack::render()
     }
     ImGui::EndDisabled();
 
-    bool close = render_modal(*m_modals[last]);
+    const ModalResponse response = render_modal(*m_modals[last]);
 
-    if (close) {
+    if (response == ModalResponse::Close) {
         m_modals.pop_back();
     }
 }
 
-bool ModalStack::render_modal(Modal& modal)
+ModalResponse ModalStack::render_modal(Modal& modal)
 {
-    bool close = false;
     ImGui::SetNextWindowSize(ImVec2(0, 0));
     ImGui::Begin(modal.title().c_str());
 
-    close = modal.render();
+    const ModalResponse response = modal.render();
 
     ImGui::End();
-    return close;
+    return response;
 }

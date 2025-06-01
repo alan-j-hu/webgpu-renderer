@@ -5,13 +5,14 @@
 #include <filesystem>
 #include <vector>
 
+/// File selector modal.
 class FileDialog : public Modal
 {
 public:
     FileDialog(std::filesystem::path path,
                std::vector<std::filesystem::path>& sink);
 
-    virtual bool render() override;
+    virtual ModalResponse render() override;
 
 private:
     std::filesystem::path m_current_dir;

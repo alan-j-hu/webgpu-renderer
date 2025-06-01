@@ -4,6 +4,7 @@
 #include "../appstate.h"
 #include "../pane.h"
 #include "modelinspector.h"
+#include "tilelist.h"
 
 /// The sub-editor for editing the tileset.
 class TilesetPane : public HorizontalLayout
@@ -15,7 +16,7 @@ public:
 
 private:
     ModelInspector m_editor;
-    ModelInspector m_editor2;
+    TileList m_tile_list;
 };
 
 #endif

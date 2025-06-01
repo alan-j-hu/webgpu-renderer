@@ -14,9 +14,9 @@ FileDialog::FileDialog(fs::path path, std::vector<fs::path>& sink)
     iterate_dir();
 }
 
-bool FileDialog::render()
+ModalResponse FileDialog::render()
 {
-    bool close = false;
+    ModalResponse response = ModalResponse::KeepOpen;
     fs::path next_dir = m_current_dir;
     fs::path header;
     int n = 0;
@@ -51,7 +51,7 @@ bool FileDialog::render()
 
                 if (ImGui::IsMouseDoubleClicked(0)) {
                     m_sink.push_back(entry.path());
-                    close = true;
+                    response = ModalResponse::Close;
                 }
             }
         }
@@ -59,7 +59,7 @@ bool FileDialog::render()
     }
 
     if (ImGui::Button("Cancel", ImVec2(0, 0))) {
-        close = true;
+        response = ModalResponse::Close;
     }
 
     if (next_dir != m_current_dir) {
@@ -70,7 +70,7 @@ bool FileDialog::render()
         }
     }
 
-    return close;
+    return response;
 }
 
 void FileDialog::iterate_dir()

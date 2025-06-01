@@ -16,8 +16,10 @@ add_executable(demo
   pane.cpp
   tilemap/tileinstance.cpp
   tilemap/tilemapeditor.cpp
+  tileset/addtile.cpp
   tileset/modelinspector.cpp
   tileset/tiledefinition.cpp
+  tileset/tilelist.cpp
   tileset/tilemesh.cpp
   tileset/tilerotations.cpp
   tileset/tileset.cpp
