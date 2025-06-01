@@ -34,6 +34,8 @@ private:
 class ModalStack
 {
 public:
+    ModalStack();
+
     bool has_focus() { return m_modals.size() != 0; }
 
     void push(std::unique_ptr<Modal>);
@@ -42,6 +44,7 @@ public:
 
 private:
     std::vector<std::unique_ptr<Modal>> m_modals;
+    bool m_should_pop;
 
     ModalResponse render_modal(Modal&);
 };

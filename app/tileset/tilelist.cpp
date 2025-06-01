@@ -11,6 +11,6 @@ TileList::TileList(std::string name, int flex, AppState& state)
 void TileList::content()
 {
     if (ImGui::Button("Add New Tile")) {
-        m_app_state->modals().push(std::make_unique<AddTile>());
+        m_app_state->modals().push(std::make_unique<AddTile>(*m_app_state));
     }
 }

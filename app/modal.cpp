@@ -7,6 +7,11 @@ Modal::Modal(std::string_view title)
 {
 }
 
+ModalStack::ModalStack()
+    : m_should_pop(false)
+{
+}
+
 void ModalStack::push(std::unique_ptr<Modal> modal)
 {
     m_modals.push_back(std::move(modal));
@@ -14,6 +19,11 @@ void ModalStack::push(std::unique_ptr<Modal> modal)
 
 void ModalStack::render()
 {
+    if (m_should_pop) {
+        m_should_pop = false;
+        m_modals.pop_back();
+    }
+
     int last = m_modals.size() - 1;
     if (last < 0) {
         return;
@@ -26,8 +36,9 @@ void ModalStack::render()
 
     const ModalResponse response = render_modal(*m_modals[last]);
 
+    // Pop on the next frame to let ImGui process the draw commands first
     if (response == ModalResponse::Close) {
-        m_modals.pop_back();
+        m_should_pop = true;
     }
 }
 
