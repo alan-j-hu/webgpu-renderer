@@ -2,8 +2,19 @@
 #define APPSTATE_H
 
 #include "modal.h"
+#include "tileset/tilemesh.h"
+#include "tileset/tilerotations.h"
+
 #include "noworry/renderer.h"
 #include "noworry/resourcetable.h"
+
+#include <filesystem>
+#include <map>
+#include <string_view>
+#include <vector>
+
+#include <assimp/mesh.h>
+#include <assimp/scene.h>
 #include <webgpu/webgpu.h>
 
 /// Helper class containing data used by multiple sub-editors.
@@ -16,16 +27,29 @@ public:
     ModalStack& modals() { return m_modals; }
     ResourceTable& resources() { return m_resources; }
 
+    const std::map<std::string_view, TileRotations*>& mesh_map() const
+    {
+        return m_mesh_map;
+    }
+
     Material& default_material() { return *m_default_material; }
     Material& wireframe_material() { return *m_wireframe_material; }
+
+    void load_meshes(std::filesystem::path& path);
 
 private:
     Renderer m_renderer;
     ModalStack m_modals;
     ResourceTable m_resources;
 
+    std::map<std::string_view, TileRotations*> m_mesh_map;
+    std::vector<std::unique_ptr<TileRotations>> m_meshes;
+
     Material* m_default_material;
     Material* m_wireframe_material;
+
+    void visit_node(const aiScene* scene, const aiNode* node);
+    TileRotations& load_mesh(const char* name, aiMesh* mesh);
 };
 
 #endif

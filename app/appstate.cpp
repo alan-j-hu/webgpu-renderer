@@ -1,4 +1,8 @@
 #include "appstate.h"
+#include <utility>
+#include <assimp/Importer.hpp>
+#include <assimp/scene.h>
+#include <assimp/postprocess.h>
 
 AppState::AppState(WGPUDevice device)
     : m_renderer(device),
@@ -6,4 +10,73 @@ AppState::AppState(WGPUDevice device)
 {
     m_default_material = &m_resources.add_flat_material(0.5, 0.5, 0.5);
     m_wireframe_material = &m_resources.add_wireframe_material(0.5, 0.5, 0.5);
+}
+
+void AppState::load_meshes(std::filesystem::path& path)
+{
+    m_mesh_map.clear();
+    m_meshes.clear();
+    Assimp::Importer importer;
+
+    const aiScene* scene = importer.ReadFile(
+        path.string(),
+        aiProcess_CalcTangentSpace      |
+        aiProcess_Triangulate           |
+        aiProcess_JoinIdenticalVertices |
+        aiProcess_SortByPType);
+    if (scene == nullptr) {
+        return;
+    }
+
+    visit_node(scene, scene->mRootNode);
+}
+
+void AppState::visit_node(const aiScene* scene, const aiNode* node)
+{
+    if (node->mNumMeshes != 0) {
+        TileRotations& mesh = load_mesh(
+            node->mName.C_Str(),
+            scene->mMeshes[node->mMeshes[0]]);
+        m_mesh_map.emplace(mesh.name(), &mesh);
+    }
+
+    const unsigned int count = node->mNumChildren;
+    aiNode** const children = node->mChildren;
+    for (int i = 0; i < count; ++i) {
+        visit_node(scene, children[i]);
+    }
+}
+
+TileRotations& AppState::load_mesh(const char* name, aiMesh* mesh)
+{
+    std::vector<Vertex> vertices;
+    const int vc = mesh->mNumVertices;
+    vertices.reserve(vc);
+    for (int i = 0; i < vc; ++i) {
+        Vertex v;
+        v.x = mesh->mVertices[i].x;
+        v.y = mesh->mVertices[i].y;
+        v.z = mesh->mVertices[i].z;
+        v.u = mesh->mTextureCoords[0][i].x;
+        v.v = mesh->mTextureCoords[0][i].y;
+        vertices.push_back(v);
+    }
+
+    std::vector<std::uint16_t> indices;
+    const int fc = mesh->mNumFaces;
+    indices.reserve(3 * fc);
+    for (int i = 0; i < fc; ++i) {
+        indices.push_back(mesh->mFaces[i].mIndices[0]);
+        indices.push_back(mesh->mFaces[i].mIndices[1]);
+        indices.push_back(mesh->mFaces[i].mIndices[2]);
+    }
+
+    // padding
+    if (indices.size() % 2 == 1) {
+        indices.push_back(0);
+    }
+
+    m_meshes.push_back(
+        std::make_unique<TileRotations>(*this, name, vertices, indices));
+    return *m_meshes[m_meshes.size() - 1];
 }
