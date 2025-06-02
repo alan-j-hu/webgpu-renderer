@@ -1,6 +1,7 @@
 #ifndef TILESET_MODELINSPECTOR_H
 #define TILESET_MODELINSPECTOR_H
 
+#include "rotationdropdown.h"
 #include "tilerotations.h"
 #include "tileset.h"
 #include "../appstate.h"
@@ -35,9 +36,10 @@ protected:
 private:
     AppState& m_app_state;
     Tileset m_tileset;
+    RotationDropdown m_rotation_dropdown;
 
     TileRotations* m_selected_tile = nullptr;
-    int m_rotation;
+    RotationTag m_rotation;
 
     RenderTarget m_tile_preview;
     Mesh m_grid_mesh;

@@ -7,7 +7,8 @@
 ModelInspector::ModelInspector(std::string name, int flex, AppState& app_state)
     : Pane(std::move(name), flex),
       m_app_state(app_state),
-      m_rotation(0),
+      m_rotation(RotationTag::Rotate0),
+      m_rotation_dropdown(m_rotation),
       m_tile_preview(m_app_state.renderer().device(), 200, 200),
       m_scene(m_app_state.renderer(), m_camera),
       m_grid_mesh(
@@ -35,22 +36,22 @@ bool ModelInspector::render_preview()
     frame.add_renderobject(*m_grid);
     if (m_selected_tile != nullptr) {
         switch (m_rotation) {
-        case 0: {
+        case RotationTag::Rotate0: {
             frame.add_renderobject(
                 m_selected_tile->rotated0().renderobject());
         }
         break;
-        case 1: {
+        case RotationTag::Rotate90: {
             frame.add_renderobject(
                 m_selected_tile->rotated90().renderobject());
         }
         break;
-        case 2: {
+        case RotationTag::Rotate180: {
             frame.add_renderobject(
                 m_selected_tile->rotated180().renderobject());
         }
         break;
-        case 3: {
+        case RotationTag::Rotate270: {
             frame.add_renderobject(
                 m_selected_tile->rotated270().renderobject());
         }
@@ -79,25 +80,7 @@ void ModelInspector::content()
         ImGui::EndListBox();
     }
 
-    const char* items[] = {
-        "0",
-        "90",
-        "180",
-        "270"
-    };
-
-    if (ImGui::BeginCombo("##rotation", items[m_rotation])) {
-        for (int i = 0; i < IM_ARRAYSIZE(items); ++i) {
-            bool is_selected = i == m_rotation;
-            if (ImGui::Selectable(items[i], is_selected)) {
-                m_rotation = i;
-            }
-            if (is_selected) {
-                ImGui::SetItemDefaultFocus();
-            }
-        }
-        ImGui::EndCombo();
-    }
+    m_rotation_dropdown.render();
 
     render_preview();
     ImGui::Image((ImTextureID)(intptr_t)m_tile_preview.texture().view(),

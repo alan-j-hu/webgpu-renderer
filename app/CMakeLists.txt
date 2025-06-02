@@ -18,6 +18,7 @@ add_executable(demo
   tilemap/tilemapeditor.cpp
   tileset/addtile.cpp
   tileset/modelinspector.cpp
+  tileset/rotationdropdown.cpp
   tileset/tiledefinition.cpp
   tileset/tilelist.cpp
   tileset/tilemesh.cpp
