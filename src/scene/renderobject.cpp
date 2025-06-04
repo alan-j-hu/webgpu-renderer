@@ -1,10 +1,11 @@
 #include "noworry/material/material.h"
 #include "noworry/scene/renderobject.h"
 #include "noworry/mesh.h"
+#include "noworry/renderer.h"
 #include <cstring>
 #include <glm/ext/matrix_transform.hpp>
 
-RenderObject::RenderObject(WGPUDevice device, const Mesh& mesh, Material& mat)
+RenderObject::RenderObject(Renderer renderer, const Mesh& mesh, Material& mat)
     : m_mesh(mesh)
 {
     m_model.transform = glm::identity<glm::mat4>();
@@ -12,11 +13,13 @@ RenderObject::RenderObject(WGPUDevice device, const Mesh& mesh, Material& mat)
     WGPUBufferDescriptor buffer_desc = { 0 };
     buffer_desc.nextInChain = nullptr;
     buffer_desc.usage = WGPUBufferUsage_CopyDst | WGPUBufferUsage_Uniform;
-    buffer_desc.size = sizeof(ModelData);
+    buffer_desc.size = sizeof(ModelUniforms);
     buffer_desc.mappedAtCreation = false;
-    m_buffer = wgpuDeviceCreateBuffer(device, &buffer_desc);
+    m_buffer = wgpuDeviceCreateBuffer(renderer.device(), &buffer_desc);
 
-    m_bind_group = mat.effect().create_model_group(device, m_buffer);
+    m_bind_group =
+        renderer.uniform_layout().create_model_group(renderer.device(),
+                                                     m_buffer);
 
     m_material = &mat;
 

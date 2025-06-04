@@ -1,40 +1,9 @@
 #include "noworry/material/mesheffect.h"
 #include "noworry/material/material.h"
-#include "noworry/material/uniformlayout.h"
 #include "noworry/scene/renderobject.h"
+#include "noworry/layout.h"
 #include "noworry/mesh.h"
-
-const std::array<WGPUVertexAttribute, 5>& Vertex::attributes()
-{
-    static std::array<WGPUVertexAttribute, 5> attributes;
-    static bool initialized = false;
-
-    if (!initialized) {
-        attributes[0].shaderLocation = 0;
-        attributes[0].format = WGPUVertexFormat_Float32;
-        attributes[0].offset = offsetof(Vertex, x);
-
-        attributes[1].shaderLocation = 1;
-        attributes[1].format = WGPUVertexFormat_Float32;
-        attributes[1].offset = offsetof(Vertex, y);
-
-        attributes[2].shaderLocation = 2;
-        attributes[2].format = WGPUVertexFormat_Float32;
-        attributes[2].offset = offsetof(Vertex, z);
-
-        attributes[3].shaderLocation = 3;
-        attributes[3].format = WGPUVertexFormat_Float32;
-        attributes[3].offset = offsetof(Vertex, u);
-
-        attributes[4].shaderLocation = 4;
-        attributes[4].format = WGPUVertexFormat_Float32;
-        attributes[4].offset = offsetof(Vertex, v);
-
-        initialized = true;
-    }
-
-    return attributes;
-}
+#include "noworry/renderer.h"
 
 MeshEffect::MeshEffect(WGPUDevice device, UniformLayout& ul)
     : m_pipeline(nullptr), m_pipeline_layout(nullptr),
@@ -83,20 +52,6 @@ fn vs_main(v: Vertex) -> FragmentInput {
     vertex_desc.nextInChain = &vertex_wgsl_desc.chain;
     m_vertex_shader =
         wgpuDeviceCreateShaderModule(device, &vertex_desc);
-
-    WGPUBindGroupLayoutEntry model_layout_entries[2] = { 0 };
-    model_layout_entries[0].binding = 0;
-    model_layout_entries[0].visibility = WGPUShaderStage_Vertex;
-    model_layout_entries[0].buffer.type = WGPUBufferBindingType_Uniform;
-    model_layout_entries[0].buffer.minBindingSize = sizeof(ModelData);
-
-    WGPUBindGroupLayoutDescriptor model_layout_desc = { 0 };
-    model_layout_desc.label = {"ModelLayout", WGPU_STRLEN};
-    model_layout_desc.entryCount = 1;
-    model_layout_desc.entries = model_layout_entries;
-
-    m_model_layout =
-        wgpuDeviceCreateBindGroupLayout(device, &model_layout_desc);
 }
 
 MeshEffect::~MeshEffect()
@@ -107,26 +62,7 @@ MeshEffect::~MeshEffect()
     if (m_pipeline_layout != nullptr) {
         wgpuPipelineLayoutRelease(m_pipeline_layout);
     }
-    wgpuBindGroupLayoutRelease(m_model_layout);
     wgpuShaderModuleRelease(m_vertex_shader);
-}
-
-WGPUBindGroup MeshEffect::create_model_group(
-    WGPUDevice device,
-    WGPUBuffer transform)
-{
-    WGPUBindGroupEntry entries[1] = { 0 };
-    entries[0].binding = 0;
-    entries[0].buffer = transform;
-    entries[0].size = sizeof(ModelData);
-
-    WGPUBindGroupDescriptor bind_group_desc = { 0 };
-    bind_group_desc.label = {"ModelBindGroup", WGPU_STRLEN};
-    bind_group_desc.layout = model_layout();
-    bind_group_desc.entryCount = 1;
-    bind_group_desc.entries = entries;
-
-    return wgpuDeviceCreateBindGroup(device, &bind_group_desc);
 }
 
 WGPUPipelineLayout MeshEffect::pipeline_layout()
@@ -138,9 +74,9 @@ WGPUPipelineLayout MeshEffect::pipeline_layout()
     }
 
     WGPUBindGroupLayout layouts[3] = {
-        m_ul->layout(),
+        m_ul->global_layout(),
         material_layout(),
-        model_layout()
+        m_ul->model_layout()
     };
 
     WGPUPipelineLayoutDescriptor pipeline_layout_desc = { 0 };

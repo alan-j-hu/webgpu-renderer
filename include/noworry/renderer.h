@@ -1,12 +1,12 @@
 #ifndef RENDERER_H
 #define RENDERER_H
 
+#include "layout.h"
 #include "mesh.h"
 #include "texture.h"
 #include "material/flatmesheffect.h"
 #include "material/mesheffect.h"
 #include "material/material.h"
-#include "material/uniformlayout.h"
 
 #include <memory>
 #include <vector>

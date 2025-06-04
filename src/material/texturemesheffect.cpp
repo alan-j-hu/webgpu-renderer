@@ -1,5 +1,5 @@
 #include "noworry/material/texturemesheffect.h"
-#include "noworry/material/uniformlayout.h"
+#include "noworry/layout.h"
 
 TextureMeshEffect::TextureMeshEffect(WGPUDevice device, UniformLayout& ul)
     : MeshEffect(device, ul)

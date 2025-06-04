@@ -1,17 +1,19 @@
 #ifndef RENDEROBJECT_H
 #define RENDEROBJECT_H
 
+#include "../layout.h"
 #include "../material/mesheffect.h"
 #include <glm/mat4x4.hpp>
 #include <glm/vec3.hpp>
 
 struct Material;
 struct Mesh;
+struct Renderer;
 
 class RenderObject
 {
 public:
-    RenderObject(WGPUDevice, const Mesh&, Material&);
+    RenderObject(Renderer, const Mesh&, Material&);
     virtual ~RenderObject();
 
     const Mesh& mesh() const { return m_mesh; }
@@ -27,7 +29,7 @@ public:
     void enqueue(WGPUDevice device);
 
 private:
-    ModelData m_model;
+    ModelUniforms m_model;
     const Mesh& m_mesh;
     Material* m_material;
     WGPUBuffer m_buffer;

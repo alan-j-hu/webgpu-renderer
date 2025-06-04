@@ -1,8 +1,8 @@
 #ifndef MESH_H
 #define MESH_H
 
+#include "layout.h"
 #include "material/material.h"
-#include "material/mesheffect.h"
 #include <cstddef>
 #include <webgpu/webgpu.h>
 

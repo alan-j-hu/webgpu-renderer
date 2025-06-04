@@ -2,11 +2,11 @@
 #define SCENE_H
 
 #include "renderobject.h"
+#include "../layout.h"
 #include "../mesh.h"
 #include "../renderer.h"
 #include "../camera/camera.h"
 #include "../material/material.h"
-#include "../material/uniformlayout.h"
 #include <memory>
 #include <vector>
 
@@ -31,7 +31,7 @@ private:
     bool m_moved = false;
     Renderer* m_renderer;
 
-    Uniforms m_uniforms;
+    GlobalUniforms m_uniforms;
     WGPUBuffer m_buffer;
     WGPUBindGroup m_bind_group;
 

@@ -1,5 +1,5 @@
 #include "noworry/material/flatmesheffect.h"
-#include "noworry/material/uniformlayout.h"
+#include "noworry/layout.h"
 
 FlatMeshEffect::FlatMeshEffect(WGPUDevice device, UniformLayout& ul)
     : MeshEffect(device, ul)

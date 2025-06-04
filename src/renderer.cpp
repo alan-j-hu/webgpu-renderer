@@ -1,7 +1,6 @@
 #include "noworry/renderer.h"
 #include "noworry/rendertarget.h"
 #include "noworry/material/texturemesheffect.h"
-#include "noworry/material/uniformlayout.h"
 #include "noworry/material/wireframemesheffect.h"
 #include "noworry/scene/scene.h"
 #include <utility>

@@ -1,5 +1,5 @@
 #include "noworry/camera/orthographiccamera.h"
-#include "noworry/material/uniformlayout.h"
+#include "noworry/layout.h"
 #include <glm/ext/matrix_clip_space.hpp>
 #include <glm/ext/matrix_transform.hpp>
 

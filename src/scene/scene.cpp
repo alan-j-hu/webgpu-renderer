@@ -1,5 +1,6 @@
 #include "noworry/scene/scene.h"
 #include "noworry/material/texturemesheffect.h"
+#include "noworry/layout.h"
 
 Scene::Scene(Renderer& renderer, Camera& camera)
     : m_camera(&camera)
@@ -12,7 +13,7 @@ Scene::Scene(Renderer& renderer, Camera& camera)
     m_buffer = wgpuDeviceCreateBuffer(renderer.device(), &buffer_desc);
 
     m_bind_group = renderer
-        .uniform_layout().create_bind_group(renderer.device(), m_buffer);
+        .uniform_layout().create_global_group(renderer.device(), m_buffer);
 }
 
 Scene::Scene(Scene&& other)
@@ -60,5 +61,5 @@ void Scene::update(Renderer& renderer)
     m_camera->update_matrix(&m_uniforms.camera);
     WGPUQueue queue = wgpuDeviceGetQueue(renderer.device());
     wgpuQueueWriteBuffer(
-        queue, m_buffer, 0, &m_uniforms, sizeof(Uniforms));
+        queue, m_buffer, 0, &m_uniforms, sizeof(GlobalUniforms));
 }

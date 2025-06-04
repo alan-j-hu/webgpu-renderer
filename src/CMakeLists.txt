@@ -2,6 +2,7 @@ add_library(noworry
   application.cpp
   grid.cpp
   init_wgpu.cpp
+  layout.cpp
   mesh.cpp
   meshbuilder.cpp
   renderer.cpp
@@ -17,7 +18,6 @@ add_library(noworry
   material/mesheffect.cpp
   material/texturematerial.cpp
   material/texturemesheffect.cpp
-  material/uniformlayout.cpp
   scene/renderobject.cpp
   scene/scene.cpp)
 target_include_directories(noworry PRIVATE ../include)
