@@ -1,5 +1,6 @@
 #include "noworry/renderer.h"
 #include "noworry/rendertarget.h"
+#include "noworry/transform.h"
 #include "noworry/material/texturemesheffect.h"
 #include "noworry/material/wireframemesheffect.h"
 #include "noworry/scene/scene.h"
@@ -12,9 +13,9 @@ Frame::Frame(Renderer& renderer, RenderTarget& target, Scene& scene)
     m_scene = &scene;
 }
 
-Frame& Frame::add_renderobject(RenderObject& object)
+Frame& Frame::add(Transform& transform, const Mesh& mesh, Material& material)
 {
-    object.enqueue(m_renderer->device());
+    material.effect().enqueue(transform, mesh, material);
     return *this;
 }
 
@@ -105,6 +106,6 @@ void Renderer::render(RenderTarget& target, Scene& scene)
 void Renderer::do_render(WGPURenderPassEncoder encoder)
 {
     for (auto& effect : m_mesh_effects) {
-        effect->draw(encoder);
+        effect->draw(*this, encoder);
     }
 }

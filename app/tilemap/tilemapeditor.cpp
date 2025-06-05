@@ -8,6 +8,7 @@ TilemapEditor::TilemapEditor(AppState& app_state)
       m_app_state(app_state),
       m_subwindow(app_state.renderer().device(), 500, 500),
       m_scene(app_state.renderer(), m_camera),
+      m_transform(app_state.renderer()),
       m_grid_mesh(
           create_grid(app_state.renderer().device(),
                       glm::vec3(0, 0, 0),
@@ -16,10 +17,6 @@ TilemapEditor::TilemapEditor(AppState& app_state)
                       glm::vec3(16, 0, 0),
                       glm::vec3(0, 16, 0)))
 {
-    m_grid = std::make_unique<RenderObject>(
-        m_app_state.renderer().device(),
-        m_grid_mesh,
-        m_app_state.wireframe_material());
 
     m_camera.set_position(glm::vec3(8.0f, 8.0f, 10.0f));
     m_camera.set_target(glm::vec3(8.0f, 8.0f, 0.0f));
@@ -63,5 +60,5 @@ void TilemapEditor::render()
 void TilemapEditor::render_preview()
 {
     Frame frame(m_app_state.renderer(), m_subwindow, m_scene);
-    frame.add_renderobject(*m_grid);
+    frame.add(m_transform, m_grid_mesh, m_app_state.wireframe_material());
 }

@@ -6,6 +6,7 @@
 #include "noworry/mesh.h"
 #include "noworry/renderer.h"
 #include "noworry/rendertarget.h"
+#include "noworry/transform.h"
 #include "noworry/camera/orthographiccamera.h"
 #include "noworry/camera/perspectivecamera.h"
 #include "noworry/scene/scene.h"
@@ -27,11 +28,11 @@ private:
     RenderTarget m_subwindow;
 
     Scene m_scene;
+    Transform m_transform;
     OrthographicCamera m_ortho_camera;
     PerspectiveCamera m_camera;
 
     Mesh m_grid_mesh;
-    std::unique_ptr<RenderObject> m_grid;
 
     void render_preview();
 };

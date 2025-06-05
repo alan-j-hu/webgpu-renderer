@@ -6,6 +6,7 @@
 #include "../modal.h"
 #include "noworry/rendertarget.h"
 #include "noworry/texture.h"
+#include "noworry/transform.h"
 #include "noworry/camera/perspectivecamera.h"
 #include "noworry/scene/scene.h"
 #include <filesystem>
@@ -32,6 +33,7 @@ private:
     RenderTarget m_preview;
     PerspectiveCamera m_camera;
     Scene m_scene;
+    Transform m_transform;
 };
 
 #endif

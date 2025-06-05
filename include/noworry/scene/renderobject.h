@@ -2,7 +2,7 @@
 #define RENDEROBJECT_H
 
 #include "../layout.h"
-#include "../material/mesheffect.h"
+#include "../transform.h"
 #include <glm/mat4x4.hpp>
 #include <glm/vec3.hpp>
 
@@ -10,35 +10,23 @@ struct Material;
 struct Mesh;
 struct Renderer;
 
+/// Tells the renderer to draw the given mesh with the given material,
+/// at the given transform. This class needs a better name.
+///
+/// A new RenderObject is generally created for each frame.
 class RenderObject
 {
 public:
-    RenderObject(Renderer, const Mesh&, Material&);
-    virtual ~RenderObject();
+    RenderObject(Transform&, const Mesh&, Material&);
 
-    const Mesh& mesh() const { return m_mesh; }
+    Transform& transform() { return *m_transform; }
+    const Mesh& mesh() const { return *m_mesh; }
     Material& material() { return *m_material; }
-    WGPUBindGroup bind_group() { return m_bind_group; }
-
-    void set_material(Material& material);
-
-    void set_translation(const glm::vec3& translation);
-    void set_yaw(float yaw);
-    void set_scale(float scale);
-
-    void enqueue(WGPUDevice device);
 
 private:
-    ModelUniforms m_model;
-    const Mesh& m_mesh;
+    Transform* m_transform;
+    const Mesh* m_mesh;
     Material* m_material;
-    WGPUBuffer m_buffer;
-    WGPUBindGroup m_bind_group;
-    glm::vec3 m_translation;
-    float m_yaw;
-    float m_scale;
-
-    void update_matrix();
 };
 
 #endif

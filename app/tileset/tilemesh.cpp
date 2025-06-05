@@ -13,7 +13,4 @@ TileMesh::TileMesh(
         app_state.renderer().device(),
         m_vertices.data(), m_vertices.size(),
         indices.data(), indices.size());
-
-    m_model = std::make_unique<RenderObject>(
-        app_state.renderer().device(), *m_mesh, app_state.default_material());
 }

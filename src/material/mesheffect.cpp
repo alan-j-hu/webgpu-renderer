@@ -1,6 +1,5 @@
 #include "noworry/material/mesheffect.h"
 #include "noworry/material/material.h"
-#include "noworry/scene/renderobject.h"
 #include "noworry/layout.h"
 #include "noworry/mesh.h"
 #include "noworry/renderer.h"
@@ -150,31 +149,32 @@ WGPURenderPipeline MeshEffect::pipeline()
     return m_pipeline;
 }
 
-void MeshEffect::enqueue(RenderObject& model)
+void MeshEffect::enqueue(
+    Transform& transform, const Mesh& mesh, Material& material)
 {
-    m_queue.push_back(&model);
+    m_queue.emplace_back(transform, mesh, material);
 }
 
-void MeshEffect::draw(WGPURenderPassEncoder encoder)
+void MeshEffect::draw(Renderer& renderer, WGPURenderPassEncoder encoder)
 {
     wgpuRenderPassEncoderSetPipeline(encoder, pipeline());
     for (auto model : m_queue) {
-        int count = (model->mesh().index_count() / 3) * 3;
+        int count = (model.mesh().index_count() / 3) * 3;
         wgpuRenderPassEncoderSetBindGroup(
-            encoder, 1, model->material().bind_group(), 0, nullptr);
+            encoder, 1, model.material().bind_group(), 0, nullptr);
         wgpuRenderPassEncoderSetBindGroup(
-            encoder, 2, model->bind_group(), 0, nullptr);
+            encoder, 2, model.transform().bind_group(renderer), 0, nullptr);
 
         wgpuRenderPassEncoderSetVertexBuffer(
             encoder,
             0,
-            model->mesh().vertex_buffer(),
+            model.mesh().vertex_buffer(),
             0,
-            wgpuBufferGetSize(model->mesh().vertex_buffer()));
+            wgpuBufferGetSize(model.mesh().vertex_buffer()));
 
         wgpuRenderPassEncoderSetIndexBuffer(
             encoder,
-            model->mesh().index_buffer(),
+            model.mesh().index_buffer(),
             WGPUIndexFormat_Uint16,
             0,
             count * sizeof(std::uint16_t));

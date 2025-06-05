@@ -11,6 +11,7 @@
 #include "noworry/renderer.h"
 #include "noworry/rendertarget.h"
 #include "noworry/resourcetable.h"
+#include "noworry/transform.h"
 #include "noworry/camera/perspectivecamera.h"
 #include "noworry/scene/scene.h"
 
@@ -28,13 +29,11 @@ public:
 
     Mesh& grid_mesh() { return m_grid_mesh; }
 
-    const RenderObject& grid() const { return *m_grid; }
-
 protected:
     virtual void content() override;
 
 private:
-    AppState& m_app_state;
+    AppState* m_app_state;
     Tileset m_tileset;
     RotationDropdown m_rotation_dropdown;
 
@@ -42,8 +41,8 @@ private:
     RotationTag m_rotation;
 
     RenderTarget m_tile_preview;
+    Transform m_transform;
     Mesh m_grid_mesh;
-    std::unique_ptr<RenderObject> m_grid;
 
     Scene m_scene;
     PerspectiveCamera m_camera;

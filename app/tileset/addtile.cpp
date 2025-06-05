@@ -11,6 +11,7 @@ AddTile::AddTile(AppState& app_state)
       m_preview(app_state.renderer().device(), 200, 200),
       m_selected_mesh(nullptr),
       m_scene(app_state.renderer(), m_camera),
+      m_transform(app_state.renderer()),
       m_rotation(RotationTag::Rotate0),
       m_rotation_dropdown(m_rotation)
 {
@@ -28,7 +29,9 @@ ModalResponse AddTile::render()
         Frame frame(m_app_state->renderer(), m_preview, m_scene);
 
         if (m_selected_mesh != nullptr) {
-            frame.add_renderobject(m_selected_mesh->rotated0().renderobject());
+            frame.add(m_transform,
+                      m_selected_mesh->rotated0().mesh(),
+                      m_app_state->default_material());
         }
     }
 

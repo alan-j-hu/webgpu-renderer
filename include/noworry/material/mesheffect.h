@@ -1,13 +1,14 @@
 #ifndef MESH_EFFECT_H
 #define MESH_EFFECT_H
 
+#include "../scene/renderobject.h"
 #include <vector>
 #include <webgpu/webgpu.h>
 
 struct Renderer;
-struct RenderObject;
 struct UniformLayout;
 
+/// Base class for all effects for meshes. Defines the vertex shader.
 class MeshEffect
 {
 public:
@@ -24,9 +25,11 @@ public:
     virtual WGPUShaderModule fragment_shader() = 0;
     virtual WGPUBindGroupLayout material_layout() = 0;
 
-    void enqueue(RenderObject& model);
+    /// Enqueues a (transform, mesh, material) triple for drawing.
+    void enqueue(Transform&, const Mesh&, Material&);
 
-    void draw(WGPURenderPassEncoder encoder);
+    /// Draws enqueued data.
+    void draw(Renderer& renderer, WGPURenderPassEncoder encoder);
 
     virtual WGPUPrimitiveTopology topology() = 0;
     WGPUPipelineLayout pipeline_layout();
@@ -39,7 +42,7 @@ private:
 
     WGPUPipelineLayout m_pipeline_layout;
     WGPURenderPipeline m_pipeline;
-    std::vector<RenderObject*> m_queue;
+    std::vector<RenderObject> m_queue;
 
     void create_pipeline();
 };

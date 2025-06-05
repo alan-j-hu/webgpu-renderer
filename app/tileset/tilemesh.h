@@ -21,14 +21,12 @@ public:
     TileMesh& operator=(TileMesh&&) = default;
 
     const Mesh& mesh() const { return *m_mesh; }
-    RenderObject& renderobject() { return *m_model; }
 
     const std::vector<Vertex>& vertices() const { return m_vertices; }
 
 private:
     std::unique_ptr<Mesh> m_mesh;
     std::vector<Vertex> m_vertices;
-    std::unique_ptr<RenderObject> m_model;
 };
 
 #endif

@@ -14,16 +14,20 @@
 class Camera;
 class RenderObject;
 class RenderTarget;
-class Scene;
 class Renderer;
+class Scene;
+class Transform;
 
+/// Builds a single frame. Create a new Frame object for each render frame.
 class Frame
 {
 public:
     Frame(Renderer& renderer, RenderTarget& target, Scene& scene);
+
+    /// The destructor submits frame data to the renderer.
     ~Frame();
 
-    Frame& add_renderobject(RenderObject&);
+    Frame& add(Transform&, const Mesh&, Material&);
 
 private:
     Renderer* m_renderer;
@@ -31,6 +35,9 @@ private:
     Scene* m_scene;
 };
 
+/// Renderer. The same renderer can be used for multiple scenes and
+/// render targets, so one Renderer object should generally exist in the
+/// entire program.
 class Renderer
 {
 public:
