@@ -1,6 +1,7 @@
 #ifndef TILELIST_H
 #define TILELIST_H
 
+#include "tiledefinitioneditor.h"
 #include "../appstate.h"
 #include "../pane.h"
 
@@ -15,6 +16,8 @@ protected:
 
 private:
     AppState* m_app_state;
+    TileDefinitionEditor m_editor;
+    int m_selected;
 };
 
 #endif

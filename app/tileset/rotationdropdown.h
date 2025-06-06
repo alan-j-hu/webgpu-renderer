@@ -10,17 +10,8 @@ enum class RotationTag
 };
 
 /// UI for drawing a combo box for selecting from the four rotations.
-class RotationDropdown
-{
-public:
-    RotationDropdown(RotationTag&);
+void rotation_dropdown(RotationTag&);
 
-    void render();
-
-private:
-    RotationTag* m_rotation;
-
-    int to_int(RotationTag);
-};
+int rotation_tag_to_int(RotationTag);
 
 #endif

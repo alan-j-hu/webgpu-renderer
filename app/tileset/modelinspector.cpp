@@ -1,4 +1,5 @@
 #include "modelinspector.h"
+#include "rotationdropdown.h"
 #include "../filedialog.h"
 
 #include "noworry/grid.h"
@@ -8,7 +9,6 @@ ModelInspector::ModelInspector(std::string name, int flex, AppState& app_state)
     : Pane(std::move(name), flex),
       m_app_state(&app_state),
       m_rotation(RotationTag::Rotate0),
-      m_rotation_dropdown(m_rotation),
       m_tile_preview(m_app_state->renderer().device(), 200, 200),
       m_scene(m_app_state->renderer(), m_camera),
       m_transform(m_app_state->renderer()),
@@ -84,7 +84,7 @@ void ModelInspector::content()
         ImGui::EndListBox();
     }
 
-    m_rotation_dropdown.render();
+    rotation_dropdown(m_rotation);
 
     render_preview();
     ImGui::Image((ImTextureID)(intptr_t)m_tile_preview.texture().view(),

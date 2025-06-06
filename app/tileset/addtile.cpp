@@ -6,7 +6,7 @@
 AddTile::AddTile(AppState& app_state)
     : Modal("Add Tile"),
       m_app_state(&app_state),
-      m_edit(app_state, m_definition)
+      m_edit(app_state)
 {
 }
 
@@ -14,7 +14,7 @@ ModalResponse AddTile::render()
 {
     ModalResponse response = ModalResponse::KeepOpen;
 
-    m_edit.render();
+    m_edit.render(m_definition);
 
     if (ImGui::Button("Add Tile")) {
         response = ModalResponse::Close;

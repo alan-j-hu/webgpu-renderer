@@ -2,7 +2,6 @@
 #define TILEDEFINITIONEDITOR_H
 
 #include "tiledefinition.h"
-#include "rotationdropdown.h"
 #include "../appstate.h"
 #include "noworry/rendertarget.h"
 #include "noworry/transform.h"
@@ -17,25 +16,22 @@
 class TileDefinitionEditor
 {
 public:
-    TileDefinitionEditor(AppState&, TileDefinition&);
+    TileDefinitionEditor(AppState&);
 
-    void render();
+    void render(TileDefinition& definition);
 
 private:
     AppState* m_app_state;
-    TileDefinition* m_definition;
     std::vector<std::filesystem::path> m_sink;
-
-    RotationDropdown m_rotation_dropdown;
 
     RenderTarget m_preview;
     PerspectiveCamera m_camera;
     Scene m_scene;
     Transform m_transform;
 
-    void draw_frame();
+    void draw_frame(TileDefinition& definition);
 
-    Material& get_material();
+    Material& get_material(TileDefinition& definition);
 };
 
 #endif
