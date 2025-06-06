@@ -20,6 +20,7 @@ add_executable(demo
   tileset/modelinspector.cpp
   tileset/rotationdropdown.cpp
   tileset/tiledefinition.cpp
+  tileset/tiledefinitioneditor.cpp
   tileset/tilelist.cpp
   tileset/tilemesh.cpp
   tileset/tilerotations.cpp

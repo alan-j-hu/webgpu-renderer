@@ -1,17 +1,22 @@
 #ifndef TILESET_TILEDEFINITION_H
 #define TILESET_TILEDEFINITION_H
 
-#include "tilemesh.h"
+#include "rotationdropdown.h"
+#include "tilerotations.h"
+#include "noworry/material/texturematerial.h"
+#include <memory>
 
-class TileDefinition
+struct TileDefinition
 {
-public:
-    TileDefinition(const TileMesh&);
+    TileRotations* selected_mesh;
+    RotationTag rotation;
+    std::shared_ptr<TextureMaterial> material;
 
-    const TileMesh& tilemesh() const { return *m_tilemesh; }
-
-private:
-    const TileMesh* m_tilemesh;
+    TileDefinition();
+    TileDefinition(const TileDefinition&) = default;
+    TileDefinition& operator=(const TileDefinition&) = default;
+    TileDefinition(TileDefinition&&) = default;
+    TileDefinition& operator=(TileDefinition&&) = default;
 };
 
 #endif

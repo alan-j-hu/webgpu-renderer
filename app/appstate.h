@@ -4,6 +4,7 @@
 #include "modal.h"
 #include "tileset/tilemesh.h"
 #include "tileset/tilerotations.h"
+#include "tileset/tileset.h"
 
 #include "noworry/renderer.h"
 #include "noworry/resourcetable.h"
@@ -35,6 +36,8 @@ public:
     Material& default_material() { return *m_default_material; }
     Material& wireframe_material() { return *m_wireframe_material; }
 
+    Tileset& tileset() { return m_tileset; }
+
     void load_meshes(std::filesystem::path& path);
 
 private:
@@ -47,6 +50,8 @@ private:
 
     Material* m_default_material;
     Material* m_wireframe_material;
+
+    Tileset m_tileset;
 
     void visit_node(const aiScene* scene, const aiNode* node);
     TileRotations& load_mesh(const char* name, aiMesh* mesh);

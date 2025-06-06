@@ -25,8 +25,6 @@ class ModelInspector : public Pane
 public:
     ModelInspector(std::string name, int flex, AppState&);
 
-    Tileset& tileset() { return m_tileset; }
-
     Mesh& grid_mesh() { return m_grid_mesh; }
 
 protected:
@@ -34,7 +32,6 @@ protected:
 
 private:
     AppState* m_app_state;
-    Tileset m_tileset;
     RotationDropdown m_rotation_dropdown;
 
     TileRotations* m_selected_tile = nullptr;
