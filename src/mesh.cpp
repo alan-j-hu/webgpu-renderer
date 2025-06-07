@@ -1,13 +1,16 @@
 #include "noworry/mesh.h"
 
 Mesh::Mesh(WGPUDevice device,
-    Vertex* vertices, std::size_t vertex_count,
-    const std::uint16_t* indices, std::size_t index_count)
+           Vertex* vertices, std::size_t vertex_count,
+           const std::uint16_t* indices, std::size_t padded_index_count,
+           std::size_t logical_index_count)
 {
     m_vertex_count = vertex_count;
-    m_index_count = index_count;
+    m_padded_index_count = padded_index_count;
+    m_logical_index_count = logical_index_count;
     const std::uint64_t vbuffer_size = vertex_count * sizeof(Vertex);
-    const std::uint64_t ibuffer_size = index_count * sizeof(std::uint16_t);
+    const std::uint64_t ibuffer_size =
+        padded_index_count * sizeof(std::uint16_t);
 
     WGPUQueue queue = wgpuDeviceGetQueue(device);
     WGPUBufferDescriptor vbuffer_desc = { 0 };
@@ -30,12 +33,14 @@ Mesh::Mesh(WGPUDevice device,
 Mesh::Mesh(Mesh&& other)
 {
     m_vertex_count = other.m_vertex_count;
-    m_index_count = other.m_index_count;
+    m_padded_index_count = other.m_padded_index_count;
+    m_logical_index_count = other.m_logical_index_count;
     m_vertex_buffer = other.m_vertex_buffer;
     m_index_buffer = other.m_index_buffer;
 
     other.m_vertex_count = 0;
-    other.m_index_count = 0;
+    other.m_padded_index_count = 0;
+    other.m_logical_index_count = 0;
     other.m_vertex_buffer = nullptr;
     other.m_index_buffer = nullptr;
 }
@@ -46,12 +51,14 @@ Mesh& Mesh::operator=(Mesh&& other)
     wgpuBufferRelease(m_index_buffer);
 
     m_vertex_count = other.m_vertex_count;
-    m_index_count = other.m_index_count;
+    m_padded_index_count = other.m_padded_index_count;
+    m_logical_index_count = other.m_logical_index_count;
     m_vertex_buffer = other.m_vertex_buffer;
     m_index_buffer = other.m_index_buffer;
 
     other.m_vertex_count = 0;
-    other.m_index_count = 0;
+    other.m_padded_index_count = 0;
+    other.m_logical_index_count = 0;
     other.m_vertex_buffer = nullptr;
     other.m_index_buffer = nullptr;
 

@@ -159,7 +159,7 @@ void MeshEffect::draw(Renderer& renderer, WGPURenderPassEncoder encoder)
 {
     wgpuRenderPassEncoderSetPipeline(encoder, pipeline());
     for (auto model : m_queue) {
-        int count = (model.mesh().index_count() / 3) * 3;
+        int count = model.mesh().index_count();
         wgpuRenderPassEncoderSetBindGroup(
             encoder, 1, model.material().bind_group(), 0, nullptr);
         wgpuRenderPassEncoderSetBindGroup(

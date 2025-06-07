@@ -4,7 +4,6 @@ add_library(noworry
   init_wgpu.cpp
   layout.cpp
   mesh.cpp
-  meshbuilder.cpp
   renderer.cpp
   rendertarget.cpp
   resourcetable.cpp

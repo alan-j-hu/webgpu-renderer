@@ -32,12 +32,6 @@ public:
 
     TextureMaterial& add_texture_material(std::shared_ptr<Texture>);
 
-    Mesh& add_mesh(
-        Vertex* vertices,
-        std::size_t vertex_count,
-        std::uint16_t* indices,
-        std::size_t index_count);
-
 private:
     WGPUDevice m_device;
     Renderer* m_renderer;

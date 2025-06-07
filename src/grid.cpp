@@ -51,5 +51,6 @@ Mesh create_grid(
     return
         Mesh(device,
              vertices.data(), vertices.size(),
-             indices.data(), indices.size());
+             indices.data(), indices.size(),
+             indices.size());
 }

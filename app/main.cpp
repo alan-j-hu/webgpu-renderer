@@ -4,7 +4,6 @@
 
 #include "noworry/application.h"
 #include "noworry/mesh.h"
-#include "noworry/meshbuilder.h"
 #include "noworry/renderer.h"
 #include "noworry/rendertarget.h"
 #include "noworry/resourcetable.h"
