@@ -20,7 +20,7 @@ ModelInspector::ModelInspector(std::string name, int flex, AppState& app_state)
                       glm::vec3(5, 0, 0),
                       glm::vec3(0, 5, 0)))
 {
-    m_tile_preview.set_clear_color({1, 1, 1, 1});
+    m_tile_preview.set_clear_color(app_state.background_color());
 
     m_camera.set_position(glm::vec3(2.0f, -0.5f, 2.0f));
     m_camera.set_target(glm::vec3(2.0f, 0.5f, 1.0f));
@@ -69,19 +69,22 @@ void ModelInspector::content()
 {
     namespace fs = std::filesystem;
 
-    if (ImGui::Button("Choose Mesh File", ImVec2(0, 0))) {
-        m_app_state->modals().push(
-            std::make_unique<FileDialog>(fs::current_path(), m_sink));
-    }
-
-    if (ImGui::BeginListBox("##Meshes", ImVec2(-FLT_MIN, 0))) {
-        for (auto& pair : m_app_state->mesh_map()) {
-            bool selected = pair.second == m_selected_tile;
-            if (ImGui::Selectable(pair.second->name().c_str(), selected, 0)) {
-                m_selected_tile = pair.second;
-            }
+    auto& mesh_map = m_app_state->mesh_map();
+    if (mesh_map.size() == 0) {
+        if (ImGui::Button("Choose Mesh File", ImVec2(0, 0))) {
+            m_app_state->modals().push(
+                std::make_unique<FileDialog>(fs::current_path(), m_sink));
         }
-        ImGui::EndListBox();
+    } else {
+        if (ImGui::BeginListBox("##Meshes", ImVec2(-FLT_MIN, 0))) {
+            for (auto& pair : mesh_map) {
+                bool selected = pair.second == m_selected_tile;
+                if (ImGui::Selectable(pair.second->name().c_str(), selected)) {
+                    m_selected_tile = pair.second;
+                }
+            }
+            ImGui::EndListBox();
+        }
     }
 
     rotation_dropdown(m_rotation);

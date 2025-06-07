@@ -4,19 +4,17 @@
 #include <glm/ext/matrix_transform.hpp>
 
 OrthographicCamera::OrthographicCamera()
-    : m_left(0),
-      m_right(16),
-      m_bottom(0),
-      m_top(16),
+    : m_left(-1),
+      m_right(17),
+      m_bottom(-1),
+      m_top(17),
       m_near(0),
       m_far(100)
 {
+    init();
 }
 
-void OrthographicCamera::update_matrix(CameraData* data)
+glm::mat4 OrthographicCamera::proj() const
 {
-    glm::mat4 proj = glm::orthoRH_ZO(
-      m_left, m_right, m_bottom, m_top, m_near, m_far);
-    glm::mat4 view = glm::lookAtRH(position(), target(), up());
-    data->viewproj = proj * view;
+    return glm::orthoRH_ZO(m_left, m_right, m_bottom, m_top, m_near, m_far);
 }

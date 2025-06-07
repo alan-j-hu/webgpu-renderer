@@ -1,36 +1,64 @@
 #include "noworry/camera/abstractcamera.h"
+#include "noworry/layout.h"
 #include <cmath>
 #include <glm/geometric.hpp>
 #include <glm/vector_relational.hpp>
 #include <glm/gtc/epsilon.hpp>
+#include <glm/ext/matrix_clip_space.hpp>
 #include <glm/ext/matrix_transform.hpp>
+
+void AbstractCamera::init()
+{
+    update_lookat();
+    update_viewproj();
+}
 
 void AbstractCamera::set_position(const glm::vec3& position)
 {
     m_position = position;
     update_lookat();
+    update_viewproj();
 }
 
 void AbstractCamera::set_target(const glm::vec3& target)
 {
     m_target = target;
     update_lookat();
+    update_viewproj();
 }
 
-
-glm::vec3 AbstractCamera::position()
+glm::vec3 AbstractCamera::position() const
 {
     return m_position;
 }
 
-glm::vec3 AbstractCamera::target()
+glm::vec3 AbstractCamera::target() const
 {
     return m_target;
 }
 
-glm::vec3 AbstractCamera::up()
+glm::vec3 AbstractCamera::up() const
 {
     return m_up;
+}
+
+void AbstractCamera::update_matrix(CameraData* data)
+{
+    data->viewproj = m_viewproj;
+}
+
+glm::vec3 AbstractCamera::unproject(glm::vec3 ndc)
+{
+    glm::vec4 world = m_inv_viewproj * glm::vec4(ndc, 1);
+    world /= world.w;
+    return world;
+}
+
+void AbstractCamera::update_viewproj()
+{
+    glm::mat4 view = glm::lookAtRH(position(), target(), up());
+    m_viewproj = proj() * view;
+    m_inv_viewproj = inverse(m_viewproj);
 }
 
 void AbstractCamera::update_lookat()

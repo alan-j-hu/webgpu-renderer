@@ -9,9 +9,8 @@ class PerspectiveCamera : public AbstractCamera
 public:
     PerspectiveCamera();
 
-    virtual void update_matrix(CameraData*) override;
-
-private:
+protected:
+    virtual glm::mat4 proj() const override;
 };
 
 #endif

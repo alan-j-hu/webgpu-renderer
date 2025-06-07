@@ -12,7 +12,7 @@ TileDefinitionEditor::TileDefinitionEditor(AppState& app_state)
       m_scene(app_state.renderer(), m_camera),
       m_transform(app_state.renderer())
 {
-    m_preview.set_clear_color({1, 1, 1, 1});
+    m_preview.set_clear_color(app_state.background_color());
 
     m_camera.set_position(glm::vec3(2.0f, -0.5f, 2.0f));
     m_camera.set_target(glm::vec3(2.0f, 0.5f, 1.0f));

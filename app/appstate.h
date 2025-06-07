@@ -24,6 +24,8 @@ class AppState
 public:
     AppState(WGPUDevice);
 
+    WGPUColor background_color() { return m_background_color; }
+
     Renderer& renderer() { return m_renderer; }
     ModalStack& modals() { return m_modals; }
     ResourceTable& resources() { return m_resources; }
@@ -41,6 +43,7 @@ public:
     void load_meshes(std::filesystem::path& path);
 
 private:
+    WGPUColor m_background_color;
     Renderer m_renderer;
     ModalStack m_modals;
     ResourceTable m_resources;

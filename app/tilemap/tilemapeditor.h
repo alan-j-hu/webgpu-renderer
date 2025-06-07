@@ -1,6 +1,7 @@
 #ifndef TILEMAPEDITOR_H
 #define TILEMAPEDITOR_H
 
+#include "tilelayer.h"
 #include "../appstate.h"
 
 #include "noworry/mesh.h"
@@ -12,6 +13,7 @@
 #include "noworry/scene/scene.h"
 
 #include <memory>
+#include <vector>
 
 /// Level map editor.
 class TilemapEditor
@@ -25,7 +27,12 @@ private:
     int m_camera_selection;
 
     AppState& m_app_state;
+    std::vector<std::unique_ptr<TileLayer>> m_layers;
+    TileLayer* m_selected_layer;
+
     RenderTarget m_subwindow;
+    float m_mouse_rel_x;
+    float m_mouse_rel_y;
 
     Scene m_scene;
     Transform m_transform;
@@ -35,6 +42,8 @@ private:
     Mesh m_grid_mesh;
 
     void render_preview();
+
+    void unproject();
 };
 
 #endif
