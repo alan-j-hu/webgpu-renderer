@@ -15,6 +15,7 @@ add_executable(demo
   modal.cpp
   pane.cpp
   tilemap/tileinstance.cpp
+  tilemap/tilelayer.cpp
   tilemap/tilemapeditor.cpp
   tileset/addtile.cpp
   tileset/modelinspector.cpp

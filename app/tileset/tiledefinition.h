@@ -17,6 +17,8 @@ struct TileDefinition
     TileDefinition& operator=(const TileDefinition&) = default;
     TileDefinition(TileDefinition&&) = default;
     TileDefinition& operator=(TileDefinition&&) = default;
+
+    TileMesh& tile_mesh() { return selected_mesh->rotated(rotation); }
 };
 
 #endif

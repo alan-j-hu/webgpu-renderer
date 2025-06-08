@@ -20,6 +20,16 @@ TileRotations::TileRotations(
 {
 }
 
+TileMesh& TileRotations::rotated(RotationTag tag)
+{
+    switch (tag) {
+    case RotationTag::Rotate0: return m_original;
+    case RotationTag::Rotate90: return m_rotated90;
+    case RotationTag::Rotate180: return m_rotated180;
+    default: return m_rotated270;
+    }
+}
+
 TileMesh TileRotations::rotate(
     AppState& app_state,
     int a, int b, int c, int d, int x, int y)

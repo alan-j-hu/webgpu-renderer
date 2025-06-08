@@ -1,8 +1,6 @@
 #include "tileinstance.h"
 
-TileInstance::TileInstance(
-    Position position, TileDefinition& definition)
-    : m_position(std::move(position)),
-      m_definition(&definition)
+TileInstance::TileInstance(AppState& state, TileDefinition& definition, int z)
+    : m_transform(state.renderer()), m_definition(&definition), m_z(z)
 {
 }

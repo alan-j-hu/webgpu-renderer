@@ -1,6 +1,7 @@
 #ifndef TILESET_TILEROTATIONS_H
 #define TILESET_TILEROTATIONS_H
 
+#include "rotationdropdown.h"
 #include "tilemesh.h"
 
 class AppState;
@@ -21,6 +22,8 @@ public:
     TileMesh& rotated90() { return m_rotated90; }
     TileMesh& rotated180() { return m_rotated180; }
     TileMesh& rotated270() { return m_rotated270; }
+
+    TileMesh& rotated(RotationTag tag);
 
 private:
     std::string m_name;

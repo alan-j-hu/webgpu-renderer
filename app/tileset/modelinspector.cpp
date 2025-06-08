@@ -31,36 +31,10 @@ bool ModelInspector::render_preview()
     Frame frame(m_app_state->renderer(), m_tile_preview, m_scene);
     frame.add(m_transform, m_grid_mesh, m_app_state->wireframe_material());
     if (m_selected_tile != nullptr) {
-        switch (m_rotation) {
-        case RotationTag::Rotate0: {
-            frame.add(
-                m_transform,
-                m_selected_tile->rotated0().mesh(),
-                m_app_state->default_material());
-        }
-        break;
-        case RotationTag::Rotate90: {
-            frame.add(
-                m_transform,
-                m_selected_tile->rotated90().mesh(),
-                m_app_state->default_material());
-        }
-        break;
-        case RotationTag::Rotate180: {
-            frame.add(
-                m_transform,
-                m_selected_tile->rotated180().mesh(),
-                m_app_state->default_material());
-        }
-        break;
-        case RotationTag::Rotate270: {
-            frame.add(
-                m_transform,
-                m_selected_tile->rotated270().mesh(),
-                m_app_state->default_material());
-        }
-        break;
-        }
+        frame.add(
+            m_transform,
+            m_selected_tile->rotated(m_rotation).mesh(),
+            m_app_state->default_material());
     }
     return true;
 }

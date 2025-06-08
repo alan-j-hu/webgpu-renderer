@@ -71,27 +71,8 @@ void TileDefinitionEditor::draw_frame(TileDefinition& definition)
     Frame frame(m_app_state->renderer(), m_preview, m_scene);
 
     if (definition.selected_mesh != nullptr) {
-        switch (definition.rotation) {
-        case RotationTag::Rotate0:
-            frame.add(m_transform,
-                      definition.selected_mesh->rotated0().mesh(),
-                      get_material(definition));
-            break;
-        case RotationTag::Rotate90:
-            frame.add(m_transform,
-                      definition.selected_mesh->rotated90().mesh(),
-                      get_material(definition));
-            break;
-        case RotationTag::Rotate180:
-            frame.add(m_transform,
-                      definition.selected_mesh->rotated180().mesh(),
-                      get_material(definition));
-            break;
-        default:
-            frame.add(m_transform,
-                      definition.selected_mesh->rotated270().mesh(),
-                      get_material(definition));
-            break;
-        }
+        frame.add(m_transform,
+                  definition.tile_mesh().mesh(),
+                  get_material(definition));
     }
 }

@@ -92,6 +92,9 @@ void TilemapEditor::render_preview()
 {
     Frame frame(m_app_state.renderer(), m_subwindow, m_scene);
     frame.add(m_transform, m_grid_mesh, m_app_state.wireframe_material());
+    for (auto& layer : m_layers) {
+        layer->render(frame);
+    }
 }
 
 void TilemapEditor::unproject()
