@@ -5,6 +5,7 @@
 Transform::Transform()
 {
     m_translation = glm::vec3(0.0f, 0.0f, 0.0f);
+    m_yaw = 0.0f;
     m_scale = glm::vec3(1.0f, 1.0f, 1.0f);
 }
 

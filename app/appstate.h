@@ -37,6 +37,7 @@ public:
 
     Material& default_material() { return *m_default_material; }
     Material& wireframe_material() { return *m_wireframe_material; }
+    Mesh& small_grid_mesh() { return m_small_grid_mesh; }
 
     Tileset& tileset() { return m_tileset; }
 
@@ -53,6 +54,7 @@ private:
 
     Material* m_default_material;
     Material* m_wireframe_material;
+    Mesh m_small_grid_mesh;
 
     Tileset m_tileset;
 

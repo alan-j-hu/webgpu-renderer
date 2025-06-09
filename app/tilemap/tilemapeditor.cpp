@@ -20,7 +20,7 @@ TilemapEditor::TilemapEditor(AppState& app_state)
 {
     m_subwindow.set_clear_color(app_state.background_color());
 
-    m_camera.set_position(glm::vec3(8.0f, 8.0f, 10.0f));
+    m_camera.set_position(glm::vec3(8.0f, -1.0f, 10.0f));
     m_camera.set_target(glm::vec3(8.0f, 8.0f, 0.0f));
 
     m_ortho_camera.set_position(glm::vec3(0.0f, 0.0f, 10.0f));

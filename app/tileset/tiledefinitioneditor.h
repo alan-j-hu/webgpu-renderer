@@ -27,7 +27,6 @@ private:
     RenderTarget m_preview;
     PerspectiveCamera m_camera;
     Scene m_scene;
-    Transform m_transform;
 
     void draw_frame(TileDefinition& definition);
 

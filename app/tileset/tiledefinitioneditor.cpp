@@ -72,8 +72,13 @@ void TileDefinitionEditor::draw_frame(TileDefinition& definition)
 {
     Frame frame(m_app_state->renderer(), m_preview, m_scene);
 
+    Transform transform;
+    frame.add(transform,
+              m_app_state->small_grid_mesh(),
+              m_app_state->wireframe_material());
+
     if (definition.selected_mesh != nullptr) {
-        frame.add(m_transform,
+        frame.add(transform,
                   definition.tile_mesh().mesh(),
                   get_material(definition));
     }

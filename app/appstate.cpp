@@ -1,4 +1,6 @@
 #include "appstate.h"
+#include "noworry/grid.h"
+
 #include <utility>
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
@@ -6,7 +8,14 @@
 
 AppState::AppState(WGPUDevice device)
     : m_renderer(device),
-      m_resources(m_renderer)
+      m_resources(m_renderer),
+      m_small_grid_mesh(
+          create_grid(device,
+                      glm::vec3(0, 0, 0),
+                      5,
+                      5,
+                      glm::vec3(5, 0, 0),
+                      glm::vec3(0, 5, 0)))
 {
     m_background_color = {0.0f, 0.5f, 0.5f, 1.0f};
     m_default_material = &m_resources.add_flat_material(0.5, 0.5, 0.5);

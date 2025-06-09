@@ -1,4 +1,5 @@
 #include "tilelayer.h"
+#include "noworry/transform.h"
 
 TileLayer::TileLayer()
     : m_tiles(16 * 16, std::nullopt)
@@ -22,8 +23,9 @@ void TileLayer::render(Frame& frame)
         if (tile) {
             int x = i % 16;
             int y = i / 16;
-            //tile->transform().set_translation(glm::vec3(x, y, 0));
-            frame.add(tile->transform(),
+            Transform transform;
+            transform.set_translation(glm::vec3(x, y, 0));
+            frame.add(transform,
                       tile->definition().tile_mesh().mesh(),
                       *tile->definition().material);
         }

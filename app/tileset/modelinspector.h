@@ -24,8 +24,6 @@ class ModelInspector : public Pane
 public:
     ModelInspector(std::string name, int flex, AppState&);
 
-    Mesh& grid_mesh() { return m_grid_mesh; }
-
 protected:
     virtual void content() override;
 
@@ -36,8 +34,6 @@ private:
     RotationTag m_rotation;
 
     RenderTarget m_tile_preview;
-    Transform m_transform;
-    Mesh m_grid_mesh;
 
     Scene m_scene;
     PerspectiveCamera m_camera;

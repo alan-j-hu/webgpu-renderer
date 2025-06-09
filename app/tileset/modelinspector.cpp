@@ -10,14 +10,7 @@ ModelInspector::ModelInspector(std::string name, int flex, AppState& app_state)
       m_app_state(&app_state),
       m_rotation(RotationTag::Rotate0),
       m_tile_preview(m_app_state->renderer().device(), 200, 200),
-      m_scene(m_app_state->renderer(), m_camera),
-      m_grid_mesh(
-          create_grid(m_app_state->renderer().device(),
-                      glm::vec3(0, 0, 0),
-                      5,
-                      5,
-                      glm::vec3(5, 0, 0),
-                      glm::vec3(0, 5, 0)))
+      m_scene(m_app_state->renderer(), m_camera)
 {
     m_tile_preview.set_clear_color(app_state.background_color());
 
@@ -27,11 +20,15 @@ ModelInspector::ModelInspector(std::string name, int flex, AppState& app_state)
 
 bool ModelInspector::render_preview()
 {
+    Transform transform;
+
     Frame frame(m_app_state->renderer(), m_tile_preview, m_scene);
-    frame.add(m_transform, m_grid_mesh, m_app_state->wireframe_material());
+    frame.add(transform,
+              m_app_state->small_grid_mesh(),
+              m_app_state->wireframe_material());
     if (m_selected_tile != nullptr) {
         frame.add(
-            m_transform,
+            transform,
             m_selected_tile->rotated(m_rotation).mesh(),
             m_app_state->default_material());
     }
