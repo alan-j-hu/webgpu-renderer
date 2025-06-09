@@ -3,16 +3,27 @@
 
 #include <cstddef>
 #include <filesystem>
+#include <optional>
 #include <webgpu/webgpu.h>
 
+/// A 2D texture stored in GPU memory.
 class Texture
 {
 public:
     Texture(WGPUDevice device, int w, int h);
     Texture(WGPUDevice device, int w, int h,
             WGPUTextureFormat format, WGPUTextureUsage usage);
-    Texture(WGPUDevice device, unsigned char* buffer, std::size_t size);
-    Texture(WGPUDevice device, const std::filesystem::path& path);
+
+    /// Loads an image file from memory.
+    static std::optional<Texture> from_memory(
+        WGPUDevice device,
+        unsigned char* buffer,
+        std::size_t size);
+
+    /// Loads an image file from the path.
+    static std::optional<Texture> from_path(
+        WGPUDevice device,
+        const std::filesystem::path& path);
 
     Texture(const Texture&) = delete;
     Texture& operator=(const Texture&) = delete;

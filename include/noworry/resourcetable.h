@@ -12,6 +12,11 @@
 #include <unordered_map>
 #include <vector>
 
+/// A cache for loading and storing textures and materials. If a file has
+/// already been loaded and is in use, it will not be loaded again.
+///
+/// This class keeps weak_ptrs to its resources, so it will unload resources
+/// which are no longer in use.
 class ResourceTable
 {
 public:
@@ -21,9 +26,10 @@ public:
     ResourceTable(ResourceTable&&) = default;
     ResourceTable& operator=(ResourceTable&&) = default;
 
-    std::shared_ptr<Texture> load_texture(const std::filesystem::path& path);
+    std::optional<std::shared_ptr<Texture>>
+    load_texture(const std::filesystem::path& path);
 
-    std::shared_ptr<TextureMaterial>
+    std::optional<std::shared_ptr<TextureMaterial>>
     load_texture_material(const std::filesystem::path& path);
 
     FlatMaterial& add_flat_material(float, float, float);

@@ -42,8 +42,11 @@ void TileDefinitionEditor::render(TileDefinition& definition)
     }
 
     if (m_sink.size() > 0) {
-        definition.material =
+        auto optional =
             m_app_state->resources().load_texture_material(m_sink[0]);
+        if (optional) {
+            definition.material = optional.value();
+        }
         m_sink.clear();
     }
 

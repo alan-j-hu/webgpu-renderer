@@ -6,7 +6,7 @@ ResourceTable::ResourceTable(Renderer& renderer)
 {
 }
 
-std::shared_ptr<Texture>
+std::optional<std::shared_ptr<Texture>>
 ResourceTable::load_texture(const std::filesystem::path& path)
 {
     auto it = m_textures.find(path);
@@ -16,13 +16,19 @@ ResourceTable::load_texture(const std::filesystem::path& path)
         }
     }
 
-    auto texture = std::make_shared<Texture>(m_renderer->device(), path);
-    std::weak_ptr<Texture> handle = texture;
+    auto optional = Texture::from_path(m_renderer->device(), path);
+    if (!optional) {
+        return std::nullopt;
+    }
+
+    auto ptr = std::make_shared<Texture>(std::move(optional.value()));
+    std::weak_ptr<Texture> handle = ptr;
     m_textures.emplace(path, std::move(handle));
-    return texture;
+
+    return std::optional(std::move(ptr));
 }
 
-std::shared_ptr<TextureMaterial>
+std::optional<std::shared_ptr<TextureMaterial>>
 ResourceTable::load_texture_material(const std::filesystem::path& path)
 {
     auto it = m_texture_materials.find(path);
@@ -32,15 +38,20 @@ ResourceTable::load_texture_material(const std::filesystem::path& path)
         }
     }
 
-    auto texture = load_texture(path);
+    auto optional = load_texture(path);
+    if (!optional) {
+        return std::nullopt;
+    }
+
     auto material = std::make_shared<TextureMaterial>(
         m_mat_id++,
         m_renderer->device(),
         *m_renderer->mesh_effect<TextureMeshEffect>(),
-        std::move(texture),
+        std::move(optional.value()),
         m_renderer->default_sampler());
     std::weak_ptr<TextureMaterial> handle = material;
     m_texture_materials.emplace(path, std::move(handle));
+
     return material;
 }
 
