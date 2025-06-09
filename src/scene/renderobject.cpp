@@ -4,7 +4,17 @@
 #include "noworry/renderer.h"
 
 RenderObject::RenderObject(
-    Transform& transform, const Mesh& mesh, Material& material)
-    : m_transform(&transform), m_mesh(&mesh), m_material(&material)
+    Renderer& renderer,
+    Transform& transform,
+    const Mesh& mesh,
+    Material& material)
+    : m_mesh(&mesh), m_material(&material)
 {
+    m_model_group = &renderer.alloc_group();
+    m_model_group->copy(renderer, transform);
+}
+
+WGPUBindGroup RenderObject::bind_group()
+{
+    return m_model_group->bind_group();
 }

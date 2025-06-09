@@ -8,6 +8,7 @@
 
 struct Material;
 struct Mesh;
+struct ModelGroup;
 struct Renderer;
 
 /// Tells the renderer to draw the given mesh with the given material,
@@ -17,14 +18,14 @@ struct Renderer;
 class RenderObject
 {
 public:
-    RenderObject(Transform&, const Mesh&, Material&);
+    RenderObject(Renderer&, Transform&, const Mesh&, Material&);
 
-    Transform& transform() { return *m_transform; }
     const Mesh& mesh() const { return *m_mesh; }
     Material& material() { return *m_material; }
+    WGPUBindGroup bind_group();
 
 private:
-    Transform* m_transform;
+    ModelGroup* m_model_group;
     const Mesh* m_mesh;
     Material* m_material;
 };

@@ -26,7 +26,7 @@ public:
     virtual WGPUBindGroupLayout material_layout() = 0;
 
     /// Enqueues a (transform, mesh, material) triple for drawing.
-    void enqueue(Transform&, const Mesh&, Material&);
+    void enqueue(Renderer&, Transform&, const Mesh&, Material&);
 
     /// Draws enqueued data.
     void draw(Renderer& renderer, WGPURenderPassEncoder encoder);

@@ -9,8 +9,7 @@ namespace fs = std::filesystem;
 TileDefinitionEditor::TileDefinitionEditor(AppState& app_state)
     : m_app_state(&app_state),
       m_preview(app_state.renderer().device(), 200, 200),
-      m_scene(app_state.renderer(), m_camera),
-      m_transform(app_state.renderer())
+      m_scene(app_state.renderer(), m_camera)
 {
     m_preview.set_clear_color(app_state.background_color());
 

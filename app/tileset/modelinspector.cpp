@@ -11,7 +11,6 @@ ModelInspector::ModelInspector(std::string name, int flex, AppState& app_state)
       m_rotation(RotationTag::Rotate0),
       m_tile_preview(m_app_state->renderer().device(), 200, 200),
       m_scene(m_app_state->renderer(), m_camera),
-      m_transform(m_app_state->renderer()),
       m_grid_mesh(
           create_grid(m_app_state->renderer().device(),
                       glm::vec3(0, 0, 0),

@@ -29,6 +29,7 @@ private:
     AppState& m_app_state;
     std::vector<std::unique_ptr<TileLayer>> m_layers;
     TileLayer* m_selected_layer;
+    TileDefinition* m_selected_tile;
 
     RenderTarget m_subwindow;
     float m_mouse_rel_x;

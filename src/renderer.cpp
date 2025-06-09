@@ -15,7 +15,7 @@ Frame::Frame(Renderer& renderer, RenderTarget& target, Scene& scene)
 
 Frame& Frame::add(Transform& transform, const Mesh& mesh, Material& material)
 {
-    material.effect().enqueue(transform, mesh, material);
+    material.effect().enqueue(*m_renderer, transform, mesh, material);
     return *this;
 }
 
@@ -25,16 +25,75 @@ Frame::~Frame()
     m_renderer->render(*m_target, *m_scene);
 }
 
+ModelGroup::ModelGroup(Renderer& renderer)
+{
+    WGPUBufferDescriptor buffer_desc = { 0 };
+    buffer_desc.nextInChain = nullptr;
+    buffer_desc.usage = WGPUBufferUsage_CopyDst | WGPUBufferUsage_Uniform;
+    buffer_desc.size = sizeof(ModelUniforms);
+    buffer_desc.mappedAtCreation = false;
+    m_buffer = wgpuDeviceCreateBuffer(renderer.device(), &buffer_desc);
+
+    m_bind_group =
+        renderer.uniform_layout().create_model_group(renderer.device(),
+                                                     m_buffer);
+}
+
+ModelGroup::ModelGroup(ModelGroup&& other)
+{
+    m_buffer = other.m_buffer;
+    m_bind_group = other.m_bind_group;
+    other.m_buffer = nullptr;
+    other.m_bind_group = nullptr;
+}
+
+ModelGroup& ModelGroup::operator=(ModelGroup&& other)
+{
+    if (m_buffer != nullptr) {
+        wgpuBufferRelease(m_buffer);
+    }
+    if (m_bind_group != nullptr) {
+        wgpuBindGroupRelease(m_bind_group);
+    }
+
+    m_buffer = other.m_buffer;
+    m_bind_group = other.m_bind_group;
+    other.m_buffer = nullptr;
+    other.m_bind_group = nullptr;
+
+    return *this;
+}
+
+ModelGroup::~ModelGroup()
+{
+    if (m_buffer != nullptr) {
+        wgpuBufferRelease(m_buffer);
+    }
+    if (m_bind_group != nullptr) {
+        wgpuBindGroupRelease(m_bind_group);
+    }
+}
+
+void ModelGroup::copy(Renderer& renderer, Transform& transform)
+{
+    ModelUniforms uniforms {};
+    transform.update_matrix(uniforms);
+
+    WGPUQueue queue = wgpuDeviceGetQueue(renderer.device());
+    wgpuQueueWriteBuffer(queue, m_buffer, 0, &uniforms, sizeof(float[16]));
+}
+
 Renderer::Renderer(WGPUDevice device)
     : m_device(device),
-      m_uniform_layout(device)
+      m_uniform_layout(device),
+      m_next_group(0)
 {
     m_mesh_effects.emplace_back(
-        std::make_unique<FlatMeshEffect>(device, m_uniform_layout));
+        std::make_unique<FlatMeshEffect>(m_device, m_uniform_layout));
     m_mesh_effects.emplace_back(
-        std::make_unique<TextureMeshEffect>(device, m_uniform_layout));
+        std::make_unique<TextureMeshEffect>(m_device, m_uniform_layout));
     m_mesh_effects.emplace_back(
-        std::make_unique<WireframeMeshEffect>(device, m_uniform_layout));
+        std::make_unique<WireframeMeshEffect>(m_device, m_uniform_layout));
 
     WGPUSamplerDescriptor sampler_desc = { 0 };
     sampler_desc.addressModeU = WGPUAddressMode_ClampToEdge;
@@ -53,6 +112,14 @@ Renderer::Renderer(WGPUDevice device)
 Renderer::~Renderer()
 {
     wgpuSamplerRelease(m_sampler);
+}
+
+ModelGroup& Renderer::alloc_group()
+{
+    while (m_next_group >= m_model_groups.size()) {
+        m_model_groups.push_back(std::make_unique<ModelGroup>(*this));
+    }
+    return *m_model_groups[m_next_group++];
 }
 
 void Renderer::render(RenderTarget& target, Scene& scene)
@@ -101,6 +168,8 @@ void Renderer::render(RenderTarget& target, Scene& scene)
     wgpuRenderPassEncoderRelease(pass);
     wgpuCommandEncoderRelease(encoder);
     wgpuCommandBufferRelease(command_buffer);
+
+    m_next_group = 0;
 }
 
 void Renderer::do_render(WGPURenderPassEncoder encoder)

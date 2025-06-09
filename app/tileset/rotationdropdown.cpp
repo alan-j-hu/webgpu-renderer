@@ -14,10 +14,10 @@ static int to_int(RotationTag rotation)
 void rotation_dropdown(RotationTag& rotation)
 {
     const char* names[] = {
-      "90",
-      "180",
-      "270",
-      "360"
+      "0 degrees",
+      "90 degrees",
+      "180 degrees",
+      "270 degrees"
     };
 
     RotationTag enums[] = {

@@ -9,6 +9,8 @@
 class TileLayer
 {
 public:
+    TileLayer();
+
     const std::optional<TileInstance>& at(int x, int y) const;
     std::optional<TileInstance>& at(int x, int y);
 

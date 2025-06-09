@@ -7,9 +7,9 @@ TilemapEditor::TilemapEditor(AppState& app_state)
     : m_camera_selection(0),
       m_app_state(app_state),
       m_selected_layer {nullptr},
+      m_selected_tile {nullptr},
       m_subwindow(app_state.renderer().device(), 500, 500),
       m_scene(app_state.renderer(), m_camera),
-      m_transform(app_state.renderer()),
       m_grid_mesh(
           create_grid(app_state.renderer().device(),
                       glm::vec3(0, 0, 0),
@@ -69,6 +69,18 @@ void TilemapEditor::render()
     ImGui::SameLine();
 
     if (ImGui::BeginChild("Side Pane", ImVec2(200, 200))) {
+        Tileset& tileset = m_app_state.tileset();
+        if (ImGui::BeginListBox("Tiles ##Tiles", ImVec2(-FLT_MIN, 0))) {
+            for (int i = 0; i < tileset.tile_count(); ++i) {
+                TileDefinition& defn = tileset.tile_at(i);
+                if (ImGui::Selectable(std::to_string(i).c_str(),
+                                      &defn == m_selected_tile)) {
+                    m_selected_tile = &defn;
+                }
+            }
+            ImGui::EndListBox();
+        }
+
         if (ImGui::Button("Add Layer")) {
             m_layers.push_back(std::make_unique<TileLayer>());
         }
@@ -106,4 +118,16 @@ void TilemapEditor::unproject()
     pos.y = 2 * pos.y - 1;
     auto world = m_ortho_camera.unproject(glm::vec3(pos, 1));
     ImGui::Text("%f, %f\n%f, %f", pos.x, pos.y, world.x, world.y);
+
+    if (ImGui::IsMouseDown(0)) {
+        if (world.x >= 0 && world.x < 16 && world.y >= 0 && world.y < 16) {
+            int x = (int) world.x;
+            int y = (int) world.y;
+
+            if (m_selected_layer != nullptr && m_selected_tile != nullptr) {
+                m_selected_layer->at(x, y) =
+                    TileInstance(m_app_state, *m_selected_tile, 0);
+            }
+        }
+    }
 }

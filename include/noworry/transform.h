@@ -11,23 +11,17 @@ struct Renderer;
 class Transform
 {
 public:
-    Transform(Renderer&);
+    Transform();
     ~Transform();
-
-    WGPUBindGroup bind_group(Renderer& renderer);
 
     const glm::vec3& translation() { return m_translation; }
     void set_translation(const glm::vec3& v) { m_translation = v; }
+    void update_matrix(ModelUniforms& model);
 
 private:
-    ModelUniforms m_model;
-    WGPUBuffer m_buffer;
-    WGPUBindGroup m_bind_group;
     glm::vec3 m_translation;
     float m_yaw;
     glm::vec3 m_scale;
-
-    void update_matrix(Renderer& renderer);
 };
 
 #endif

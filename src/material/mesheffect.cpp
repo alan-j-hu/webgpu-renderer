@@ -150,9 +150,10 @@ WGPURenderPipeline MeshEffect::pipeline()
 }
 
 void MeshEffect::enqueue(
+    Renderer& renderer,
     Transform& transform, const Mesh& mesh, Material& material)
 {
-    m_queue.emplace_back(transform, mesh, material);
+    m_queue.emplace_back(renderer, transform, mesh, material);
 }
 
 void MeshEffect::draw(Renderer& renderer, WGPURenderPassEncoder encoder)
@@ -163,7 +164,7 @@ void MeshEffect::draw(Renderer& renderer, WGPURenderPassEncoder encoder)
         wgpuRenderPassEncoderSetBindGroup(
             encoder, 1, model.material().bind_group(), 0, nullptr);
         wgpuRenderPassEncoderSetBindGroup(
-            encoder, 2, model.transform().bind_group(renderer), 0, nullptr);
+            encoder, 2, model.bind_group(), 0, nullptr);
 
         wgpuRenderPassEncoderSetVertexBuffer(
             encoder,
