@@ -22,8 +22,15 @@ FetchContent_Declare(
 
 FetchContent_MakeAvailable(glm)
 
+FetchContent_Declare(
+  dawn
+  GIT_REPOSITORY https://dawn.googlesource.com/dawn
+  GIT_TAG 991810463a797d6e770127e604cdd3d8b8ff6e43
+  GIT_SUBMODULES "")
+
 set(DAWN_FETCH_DEPENDENCIES ON)
-add_subdirectory(third_party/dawn EXCLUDE_FROM_ALL)
+
+FetchContent_MakeAvailable(dawn)
 
 add_subdirectory(src)
 add_subdirectory(app)
