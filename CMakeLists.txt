@@ -6,7 +6,7 @@ include(FetchContent)
 FetchContent_Declare(
         Assimp
         GIT_REPOSITORY "https://github.com/assimp/assimp.git"
-        GIT_TAG "v5.4.1")
+        GIT_TAG "v6.0.2")
 set(BUILD_SHARED_LIBS OFF)
 set(ASSIMP_BUILD_TESTS OFF)
 set(ASSIMP_INJECT_DEBUG_POSTFIX OFF)
