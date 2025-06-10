@@ -1,6 +1,6 @@
 # WebGPU Renderer
 
-![Screencap](webgpu-screenshot.png)
+![Screenshot](editor-screenshot.png)
 
 To build:
 
