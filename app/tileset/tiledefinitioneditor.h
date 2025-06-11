@@ -18,7 +18,7 @@ class TileDefinitionEditor
 public:
     TileDefinitionEditor(AppState&);
 
-    void render(TileDefinition& definition);
+    std::optional<TileDef> render(const TileDef& definition);
 
 private:
     AppState* m_app_state;
@@ -28,9 +28,7 @@ private:
     PerspectiveCamera m_camera;
     Scene m_scene;
 
-    void draw_frame(TileDefinition& definition);
-
-    Material& get_material(TileDefinition& definition);
+    void draw_frame(const TileDef&, TileRotations* rotations, Material*);
 };
 
 #endif

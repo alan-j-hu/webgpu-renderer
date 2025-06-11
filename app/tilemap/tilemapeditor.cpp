@@ -6,8 +6,8 @@
 TilemapEditor::TilemapEditor(AppState& app_state)
     : m_camera_selection(0),
       m_app_state(app_state),
-      m_selected_layer {nullptr},
-      m_selected_tile {nullptr},
+      m_selected_layer {-1},
+      m_selected_tile {-1},
       m_subwindow(app_state.renderer().device(), 500, 500),
       m_scene(app_state.renderer(), m_camera),
       m_grid_mesh(
@@ -30,7 +30,7 @@ TilemapEditor::TilemapEditor(AppState& app_state)
 void TilemapEditor::render()
 {
     render_preview();
-
+    auto project = m_app_state.project();
 
     if (ImGui::BeginChild("Map", ImVec2(500, 700))) {
         const char* items[] = {
@@ -69,27 +69,30 @@ void TilemapEditor::render()
     ImGui::SameLine();
 
     if (ImGui::BeginChild("Side Pane", ImVec2(200, 200))) {
-        Tileset& tileset = m_app_state.tileset();
         if (ImGui::BeginListBox("Tiles ##Tiles", ImVec2(-FLT_MIN, 0))) {
-            for (int i = 0; i < tileset.tile_count(); ++i) {
-                TileDefinition& defn = tileset.tile_at(i);
+            for (int i = 0; i < project.tile_defs.size(); ++i) {
+                const TileDef& defn = project.tile_defs.at(i);
                 if (ImGui::Selectable(std::to_string(i).c_str(),
-                                      &defn == m_selected_tile)) {
-                    m_selected_tile = &defn;
+                                      i == m_selected_tile)) {
+                    m_selected_tile = i;
                 }
             }
             ImGui::EndListBox();
         }
 
         if (ImGui::Button("Add Layer")) {
-            m_layers.push_back(std::make_unique<TileLayer>());
+            Layer layer;
+
+            project.layers =
+                project.layers.push_back(layer);
+            m_app_state.set_project(project);
         }
         if (ImGui::BeginListBox("##Meshes", ImVec2(-FLT_MIN, 0))) {
-            for (int i = 0; i < m_layers.size(); ++i) {
-                TileLayer* layer = m_layers[i].get();
-                bool selected = layer == m_selected_layer;
+            for (int i = 0; i < project.layers.size(); ++i) {
+                const Layer& layer = project.layers.at(i);
+                bool selected = i == m_selected_layer;
                 if (ImGui::Selectable(std::to_string(i).c_str(), selected)) {
-                    m_selected_layer = layer;
+                    m_selected_layer = i;
                 }
             }
           ImGui::EndListBox();
@@ -104,13 +107,38 @@ void TilemapEditor::render_preview()
 {
     Frame frame(m_app_state.renderer(), m_subwindow, m_scene);
     frame.add(m_transform, m_grid_mesh, m_app_state.wireframe_material());
-    for (auto& layer : m_layers) {
-        layer->render(frame);
+
+    auto& project = m_app_state.project();
+    for (auto& layer : project.layers) {
+        for (int i = 0; i < 16; ++i) {
+            for (int j = 0; j < 16; ++j) {
+                auto& opt = layer.at(i, j);
+                if (opt) {
+                  auto& inst = opt.value();
+                  auto& def = project.tile_defs.at(inst.def);
+
+                  if (def.mesh) {
+                      auto it = m_app_state.mesh_map().find(*def.mesh.value());
+                      if (it == m_app_state.mesh_map().end()) {
+                          continue;
+                      }
+
+                      Transform transform;
+                      transform.set_translation(glm::vec3(i, j, inst.z));
+                      frame.add(transform,
+                                it->second->rotated(def.rotation).mesh(),
+                                *def.texture.value().material);
+                  }
+                }
+            }
+        }
     }
 }
 
 void TilemapEditor::unproject()
 {
+    auto& project = m_app_state.project();
+
     glm::vec2 pos =
         glm::vec2(m_mouse_rel_x / m_subwindow.width(),
                   m_mouse_rel_y / m_subwindow.height());
@@ -124,9 +152,16 @@ void TilemapEditor::unproject()
             int x = (int) world.x;
             int y = (int) world.y;
 
-            if (m_selected_layer != nullptr && m_selected_tile != nullptr) {
-                m_selected_layer->at(x, y) =
-                    TileInstance(m_app_state, *m_selected_tile, 0);
+            if (m_selected_layer != -1 && m_selected_tile != -1) {
+                auto& layer = project.layers.at(m_selected_layer);
+                TileInst inst;
+                inst.def = m_selected_tile;
+                inst.z = 0;
+                auto new_layer = layer.set(x, y, inst);
+                auto new_project = project;
+                new_project.layers =
+                    new_project.layers.set(m_selected_layer, new_layer);
+                m_app_state.set_project(new_project);
             }
         }
     }

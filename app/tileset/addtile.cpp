@@ -2,6 +2,7 @@
 #include "../filedialog.h"
 #include "noworry/resourcetable.h"
 #include "imgui.h"
+#include <iostream>
 
 AddTile::AddTile(AppState& app_state)
     : Modal("Add Tile"),
@@ -14,11 +15,16 @@ ModalResponse AddTile::render()
 {
     ModalResponse response = ModalResponse::KeepOpen;
 
-    m_edit.render(m_definition);
+    auto optional = m_edit.render(m_definition);
+    if (optional) {
+        m_definition = optional.value();
+    }
 
     if (ImGui::Button("Add Tile")) {
         response = ModalResponse::Close;
-        m_app_state->tileset().add_tile(m_definition);
+        auto project = m_app_state->project();
+        project.tile_defs = project.tile_defs.push_back(m_definition);
+        m_app_state->set_project(project);
     }
     ImGui::SameLine();
     if (ImGui::Button("Cancel")) {

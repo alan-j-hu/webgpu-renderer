@@ -35,4 +35,4 @@ target_include_directories(demo PRIVATE
   ../include
   ${IMGUI_DIR}
   ${IMGUI_DIR}/backends)
-target_link_libraries(demo assimp noworry)
+target_link_libraries(demo assimp immer noworry)

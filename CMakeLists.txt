@@ -23,11 +23,21 @@ FetchContent_Declare(
 FetchContent_MakeAvailable(glm)
 
 FetchContent_Declare(
+  immer
+  GIT_REPOSITORY https://github.com/arximboldi/immer
+  GIT_TAG df6ef46d97e1fe81f397015b9aeb32505cef653b)
+set(immer_BUILD_TESTS OFF)
+set(immer_BUILD_PERSIST_TESTS OFF)
+set(immer_BUILD_EXAMPLES OFF)
+set(immer_BUILD_DOCS OFF)
+
+FetchContent_MakeAvailable(immer)
+
+FetchContent_Declare(
   dawn
   GIT_REPOSITORY https://dawn.googlesource.com/dawn
   GIT_TAG 991810463a797d6e770127e604cdd3d8b8ff6e43
   GIT_SUBMODULES "")
-
 set(DAWN_FETCH_DEPENDENCIES ON)
 
 FetchContent_MakeAvailable(dawn)

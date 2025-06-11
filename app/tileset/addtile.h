@@ -16,7 +16,7 @@ public:
 
 private:
     AppState* m_app_state;
-    TileDefinition m_definition;
+    TileDef m_definition;
     TileDefinitionEditor m_edit;
 };
 
