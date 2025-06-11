@@ -5,7 +5,6 @@
 #include "tileset/rotationdropdown.h"
 #include "tileset/tilemesh.h"
 #include "tileset/tilerotations.h"
-#include "tileset/tileset.h"
 
 #include "noworry/renderer.h"
 #include "noworry/resourcetable.h"
@@ -90,7 +89,6 @@ public:
     Material& wireframe_material() { return *m_wireframe_material; }
     Mesh& small_grid_mesh() { return m_small_grid_mesh; }
 
-    Tileset& tileset() { return m_tileset; }
     const Project& project() const { return m_project; }
     void set_project(Project project) { m_project = project; }
 
@@ -109,7 +107,6 @@ private:
     Material* m_wireframe_material;
     Mesh m_small_grid_mesh;
 
-    Tileset m_tileset;
     Project m_project;
 
     void visit_node(const aiScene* scene, const aiNode* node);

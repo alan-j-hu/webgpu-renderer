@@ -1,7 +1,6 @@
 #ifndef ADDTILE_H
 #define ADDTILE_H
 
-#include "tiledefinition.h"
 #include "tiledefinitioneditor.h"
 #include "../appstate.h"
 #include "../modal.h"

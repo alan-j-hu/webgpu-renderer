@@ -14,18 +14,14 @@ add_executable(demo
   main.cpp
   modal.cpp
   pane.cpp
-  tilemap/tileinstance.cpp
-  tilemap/tilelayer.cpp
   tilemap/tilemapeditor.cpp
   tileset/addtile.cpp
   tileset/modelinspector.cpp
   tileset/rotationdropdown.cpp
-  tileset/tiledefinition.cpp
   tileset/tiledefinitioneditor.cpp
   tileset/tilelist.cpp
   tileset/tilemesh.cpp
   tileset/tilerotations.cpp
-  tileset/tileset.cpp
   tileset/tilesetpane.cpp
   ${IMGUI_SRC})
 set_property(TARGET demo PROPERTY CXX_STANDARD 23)

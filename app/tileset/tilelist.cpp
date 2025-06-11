@@ -16,7 +16,6 @@ void TileList::content()
         m_app_state->modals().push(std::make_unique<AddTile>(*m_app_state));
     }
 
-    Tileset& tileset = m_app_state->tileset();
     auto& project = m_app_state->project();
     if (ImGui::BeginListBox("##Tiles", ImVec2(-FLT_MIN, 0))) {
         for (int i = 0; i < project.tile_defs.size(); ++i) {

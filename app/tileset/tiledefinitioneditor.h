@@ -1,7 +1,6 @@
 #ifndef TILEDEFINITIONEDITOR_H
 #define TILEDEFINITIONEDITOR_H
 
-#include "tiledefinition.h"
 #include "../appstate.h"
 #include "noworry/rendertarget.h"
 #include "noworry/transform.h"

@@ -2,7 +2,6 @@
 #define TILESET_MODELINSPECTOR_H
 
 #include "tilerotations.h"
-#include "tileset.h"
 #include "../appstate.h"
 #include "../modal.h"
 #include "../pane.h"

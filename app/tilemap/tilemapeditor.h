@@ -1,7 +1,6 @@
 #ifndef TILEMAPEDITOR_H
 #define TILEMAPEDITOR_H
 
-#include "tilelayer.h"
 #include "../appstate.h"
 
 #include "noworry/mesh.h"
@@ -27,7 +26,6 @@ private:
     int m_camera_selection;
 
     AppState& m_app_state;
-    std::vector<std::unique_ptr<TileLayer>> m_layers;
     int m_selected_layer;
     int m_selected_tile;
 
