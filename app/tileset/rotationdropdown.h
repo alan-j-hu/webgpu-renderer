@@ -1,13 +1,7 @@
 #ifndef ROTATIONDROPDOWN_H
 #define ROTATIONDROPDOWN_H
 
-enum class RotationTag
-{
-    Rotate0,
-    Rotate90,
-    Rotate180,
-    Rotate270
-};
+#include "../reducer.h"
 
 /// UI for drawing a combo box for selecting from the four rotations.
 void rotation_dropdown(RotationTag&);

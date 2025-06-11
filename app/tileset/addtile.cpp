@@ -22,9 +22,10 @@ ModalResponse AddTile::render()
 
     if (ImGui::Button("Add Tile")) {
         response = ModalResponse::Close;
-        auto project = m_app_state->project();
-        project.tile_defs = project.tile_defs.push_back(m_definition);
-        m_app_state->set_project(project);
+        auto& project = m_app_state->project();
+        m_app_state->set_project(project.map_tile_defs([&](auto tile_defs) {
+            return tile_defs.push_back(m_definition);
+        }));
     }
     ImGui::SameLine();
     if (ImGui::Button("Cancel")) {

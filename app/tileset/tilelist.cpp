@@ -18,7 +18,7 @@ void TileList::content()
 
     auto& project = m_app_state->project();
     if (ImGui::BeginListBox("##Tiles", ImVec2(-FLT_MIN, 0))) {
-        for (int i = 0; i < project.tile_defs.size(); ++i) {
+        for (int i = 0; i < project.tile_defs().size(); ++i) {
             if (ImGui::Selectable(std::to_string(i).c_str(),
                                   i == m_selected)) {
                 m_selected = i;
@@ -28,12 +28,11 @@ void TileList::content()
     }
 
     if (m_selected != -1) {
-        auto optional = m_editor.render(project.tile_defs.at(m_selected));
+        auto optional = m_editor.render(project.tile_defs().at(m_selected));
         if (optional) {
-            auto new_project = project;
-            new_project.tile_defs =
-                new_project.tile_defs.set(m_selected, optional.value());
-            m_app_state->set_project(new_project);
+            m_app_state->set_project(project.map_tile_defs([&](auto tiles) {
+                return tiles.set(m_selected, optional.value());
+            }));
         }
     }
 }

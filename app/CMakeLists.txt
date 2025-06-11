@@ -14,6 +14,7 @@ add_executable(demo
   main.cpp
   modal.cpp
   pane.cpp
+  reducer.cpp
   tilemap/tilemapeditor.cpp
   tileset/addtile.cpp
   tileset/modelinspector.cpp
