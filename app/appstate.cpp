@@ -36,10 +36,7 @@ ResolvedTile AppState::resolve_tile(const TileDef& def)
     ResolvedTile resolved;
 
     if (def.mesh) {
-        auto it = m_mesh_map.find(*def.mesh.value());
-        if (it != m_mesh_map.end()) {
-            resolved.mesh = &it->second->rotated(def.rotation);
-        }
+        resolved.mesh = &def.mesh.value()->rotated(def.rotation);
     }
 
     if (def.texture) {
@@ -49,18 +46,23 @@ ResolvedTile AppState::resolve_tile(const TileDef& def)
     return resolved;
 }
 
+void AppState::push_command(std::unique_ptr<Command> command)
+{
+    command->redo(m_project);
+    m_history.push_back(std::move(command));
+}
+
 void AppState::refresh_thumbnails()
 {
-    auto& tile_defs = m_project.tile_defs();
-    int i = 0;
-    for (auto& def : tile_defs) {
-        if (i >= m_thumbnail_cache.size()) {
-            m_thumbnail_cache.emplace_back(m_renderer.device(), 64, 64);
-        }
-        RenderTarget& target = m_thumbnail_cache[i];
+    while (m_thumbnail_cache.size() < m_project.tiledef_count()) {
+        m_thumbnail_cache.emplace_back(m_renderer.device(), 64, 64);
+    }
+    for (int i = 0; i < m_project.tiledef_count(); ++i) {
+        RenderTarget& target = m_thumbnail_cache.at(i);
         {
             Frame frame(m_renderer, target, m_thumbnail_scene);
-            ResolvedTile resolved = resolve_tile(def);
+            auto def = m_project.tiledef_at(i);
+            ResolvedTile resolved = resolve_tile(*def);
 
             if (resolved.mesh == nullptr) {
                 continue;
@@ -72,7 +74,6 @@ void AppState::refresh_thumbnails()
             Transform transform;
             frame.add(transform, resolved.mesh->mesh(), material);
         }
-        ++i;
     }
 }
 

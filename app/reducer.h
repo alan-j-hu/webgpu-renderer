@@ -7,7 +7,9 @@
 #include <memory>
 #include <optional>
 #include <string>
-#include <immer/vector.hpp>
+#include <vector>
+
+class TileRotations;
 
 enum class RotationTag
 {
@@ -28,7 +30,7 @@ struct TextureRef
 /// TileInsts.
 struct TileDef
 {
-    std::optional<std::shared_ptr<std::string>> mesh;
+    std::optional<TileRotations*> mesh;
     RotationTag rotation;
     std::optional<TextureRef> texture;
 };
@@ -36,8 +38,15 @@ struct TileDef
 /// A TileInst instances a tile definition on the map.
 struct TileInst
 {
-    int def;
-    short z;
+public:
+    TileInst(std::shared_ptr<TileDef>, int);
+
+    const TileDef& def() const { return *m_def; }
+    int z() const { return m_z; }
+
+private:
+    std::shared_ptr<TileDef> m_def;
+    short m_z;
 };
 
 /// A Layer is a square grid of TileInsts.
@@ -48,37 +57,31 @@ public:
 
     const std::optional<TileInst>& at(int x, int y) const;
 
-    Layer set(int x, int y, std::optional<TileInst> option) const;
+    void set(int x, int y, std::optional<TileInst> option);
 
 private:
-    immer::vector<std::optional<TileInst>> m_tiles;
+    std::vector<std::optional<TileInst>> m_tiles;
 };
 
 /// A top-level Project.
 struct Project
 {
-    const immer::vector<TileDef>& tile_defs() const { return m_tile_defs; }
-    const immer::vector<Layer>& layers() const { return m_layers; }
+    std::size_t tiledef_count() const;
+    std::shared_ptr<TileDef> tiledef_at(int idx) const;
 
-    Project with_tile_defs(immer::vector<TileDef>) const;
+    void add_tiledef(TileDef tiledef);
+    void remove_tiledef(int idx);
 
-    template<class F>
-    Project map_tile_defs(F f) const
-    {
-        return with_tile_defs(f(m_tile_defs));
-    }
+    std::size_t layer_count() const;
+    Layer& layer_at(int idx);
+    const std::vector<Layer>& layers() const { return m_layers; }
 
-    Project with_layers(immer::vector<Layer>) const;
-
-    template<class F>
-    Project map_layers(F f) const
-    {
-        return with_layers(f(m_layers));
-    }
+    void add_layer();
+    void remove_layer(int idx);
 
 private:
-    immer::vector<TileDef> m_tile_defs;
-    immer::vector<Layer> m_layers;
+    std::vector<std::shared_ptr<TileDef>> m_tile_defs;
+    std::vector<Layer> m_layers;
 };
 
 #endif

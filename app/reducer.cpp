@@ -1,9 +1,15 @@
 #include "reducer.h"
+#include <utility>
+
+TileInst::TileInst(std::shared_ptr<TileDef> def, int z)
+    : m_def(std::move(def)), m_z(z)
+{
+}
 
 Layer::Layer()
 {
     for (int i = 0; i < 16 * 16; ++i) {
-        m_tiles = m_tiles.push_back(std::nullopt);
+        m_tiles.push_back(std::nullopt);
     }
 }
 
@@ -12,23 +18,53 @@ const std::optional<TileInst>& Layer::at(int x, int y) const
     return m_tiles.at(y * 16 + x);
 }
 
-Layer Layer::set(int x, int y, std::optional<TileInst> option) const
+void Layer::set(int x, int y, std::optional<TileInst> option)
 {
-    Layer new_layer = *this;
-    new_layer.m_tiles = m_tiles.set(y * 16 + x, option);
-    return new_layer;
+    m_tiles[y * 16 + x] = std::move(option);
 }
 
-Project Project::with_tile_defs(immer::vector<TileDef> tile_defs) const
+std::size_t Project::tiledef_count() const
 {
-    Project new_project = *this;
-    new_project.m_tile_defs = tile_defs;
-    return new_project;
+    return m_tile_defs.size();
 }
 
-Project Project::with_layers(immer::vector<Layer> layers) const
+std::shared_ptr<TileDef> Project::tiledef_at(int idx) const
 {
-    Project new_project = *this;
-    new_project.m_layers = layers;
-    return new_project;
+    return m_tile_defs.at(idx);
+}
+
+void Project::add_tiledef(TileDef tiledef)
+{
+    m_tile_defs.push_back(std::make_shared<TileDef>(tiledef));
+}
+
+std::size_t Project::layer_count() const
+{
+    return m_layers.size();
+}
+
+Layer& Project::layer_at(int idx)
+{
+    return m_layers.at(idx);
+}
+
+void Project::remove_tiledef(int idx)
+{
+    if (idx < 0 || idx >= m_tile_defs.size()) {
+        return;
+    }
+    m_tile_defs.erase(m_tile_defs.begin() + idx);
+}
+
+void Project::add_layer()
+{
+    m_layers.emplace_back();
+}
+
+void Project::remove_layer(int idx)
+{
+    if (idx < 0 || idx >= m_layers.size()) {
+        return;
+    }
+    m_layers.erase(m_layers.begin() + idx);
 }

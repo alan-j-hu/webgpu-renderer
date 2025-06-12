@@ -16,6 +16,11 @@ add_executable(demo
   pane.cpp
   reducer.cpp
   tilepicker.cpp
+  commands/command.cpp
+  commands/createlayercommand.cpp
+  commands/createtilecommand.cpp
+  commands/placetilecommand.cpp
+  commands/updatetilecommand.cpp
   tilemap/tilemapeditor.cpp
   tileset/addtile.cpp
   tileset/modelinspector.cpp
@@ -33,4 +38,4 @@ target_include_directories(demo PRIVATE
   ../include
   ${IMGUI_DIR}
   ${IMGUI_DIR}/backends)
-target_link_libraries(demo assimp immer noworry)
+target_link_libraries(demo assimp noworry)

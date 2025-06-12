@@ -1,5 +1,6 @@
 #include "tilelist.h"
 #include "addtile.h"
+#include "../commands/updatetilecommand.h"
 #include <utility>
 #include "imgui.h"
 
@@ -22,11 +23,12 @@ void TileList::content()
     m_tile_picker.render(m_selected);
 
     if (m_selected != -1) {
-        auto optional = m_editor.render(project.tile_defs().at(m_selected));
+        auto optional = m_editor.render(*project.tiledef_at(m_selected));
         if (optional) {
-            m_app_state->set_project(project.map_tile_defs([&](auto tiles) {
-                return tiles.set(m_selected, optional.value());
-            }));
+            m_app_state->push_command(std::make_unique<UpdateTileCommand>(
+                m_selected,
+                optional.value())
+            );
         }
     }
 }

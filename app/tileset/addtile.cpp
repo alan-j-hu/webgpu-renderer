@@ -1,8 +1,9 @@
 #include "addtile.h"
 #include "../filedialog.h"
+#include "../commands/createtilecommand.h"
 #include "noworry/resourcetable.h"
 #include "imgui.h"
-#include <iostream>
+#include <utility>
 
 AddTile::AddTile(AppState& app_state)
     : Modal("Add Tile"),
@@ -22,10 +23,10 @@ ModalResponse AddTile::render()
 
     if (ImGui::Button("Add Tile")) {
         response = ModalResponse::Close;
-        auto& project = m_app_state->project();
-        m_app_state->set_project(project.map_tile_defs([&](auto tile_defs) {
-            return tile_defs.push_back(m_definition);
-        }));
+        m_app_state->push_command(
+            std::make_unique<CreateTileCommand>(m_definition)
+        );
+        //m_app_state->refresh_thumbnails();
     }
     ImGui::SameLine();
     if (ImGui::Button("Cancel")) {

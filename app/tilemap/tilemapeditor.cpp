@@ -1,4 +1,6 @@
 #include "tilemapeditor.h"
+#include "../commands/createlayercommand.h"
+#include "../commands/placetilecommand.h"
 #include "noworry/grid.h"
 
 #include "imgui.h"
@@ -73,10 +75,7 @@ void TilemapEditor::render()
         m_tile_picker.render(m_selected_tile);
 
         if (ImGui::Button("Add Layer")) {
-            m_app_state.set_project(project.map_layers([](auto& layers) {
-                Layer layer;
-                return layers.push_back(layer);
-            }));
+            m_app_state.push_command(std::make_unique<CreateLayerCommand>());
         }
         if (ImGui::BeginListBox("##Meshes", ImVec2(-FLT_MIN, 0))) {
             for (int i = 0; i < project.layers().size(); ++i) {
@@ -109,8 +108,7 @@ void TilemapEditor::render_preview()
                 }
 
                 auto& inst = opt.value();
-                auto& def = project.tile_defs().at(inst.def);
-                ResolvedTile resolved = m_app_state.resolve_tile(def);
+                ResolvedTile resolved = m_app_state.resolve_tile(inst.def());
                 if (resolved.mesh == nullptr) {
                     continue;
                 }
@@ -119,7 +117,7 @@ void TilemapEditor::render_preview()
                   : *resolved.material;
 
                 Transform transform;
-                transform.set_translation(glm::vec3(i, j, inst.z));
+                transform.set_translation(glm::vec3(i, j, inst.z()));
                 frame.add(transform, resolved.mesh->mesh(), material);
             }
         }
@@ -144,13 +142,10 @@ void TilemapEditor::unproject()
             int y = (int) world.y;
 
             if (m_selected_layer != -1 && m_selected_tile != -1) {
-                m_app_state.set_project(project.map_layers([&](auto layers) {
-                    auto& layer = project.layers().at(m_selected_layer);
-                    TileInst inst;
-                    inst.def = m_selected_tile;
-                    inst.z = 0;
-                    return layers.set(m_selected_layer, layer.set(x, y, inst));
-                }));
+                m_app_state.push_command(std::make_unique<PlaceTileCommand>(
+                    m_selected_layer, x, y, 0,
+                    project.tiledef_at(m_selected_tile)
+                ));
             }
         }
     }

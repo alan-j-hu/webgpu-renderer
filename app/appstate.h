@@ -3,6 +3,7 @@
 
 #include "modal.h"
 #include "reducer.h"
+#include "commands/command.h"
 #include "tileset/rotationdropdown.h"
 #include "tileset/tilemesh.h"
 #include "tileset/tilerotations.h"
@@ -25,7 +26,7 @@
 /// The mesh and material of a tile definition.
 struct ResolvedTile
 {
-    TileMesh* mesh = nullptr;
+    const TileMesh* mesh = nullptr;
     TextureMaterial* material = nullptr;
 };
 
@@ -54,17 +55,20 @@ public:
     ResolvedTile resolve_tile(const TileDef& def);
 
     const Project& project() const { return m_project; }
-    void set_project(Project project) { m_project = project; }
+
+    void push_command(std::unique_ptr<Command>);
 
     WGPUTextureView tile_thumbnail(int i)
     {
-        return m_thumbnail_cache[i].texture().view();
+        return m_thumbnail_cache.at(i).texture().view();
     }
     void refresh_thumbnails();
 
     void load_meshes(std::filesystem::path& path);
 
 private:
+    std::vector<std::unique_ptr<Command>> m_history;
+
     WGPUColor m_background_color;
     Renderer m_renderer;
     ModalStack m_modals;

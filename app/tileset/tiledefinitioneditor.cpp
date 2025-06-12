@@ -27,15 +27,14 @@ TileDefinitionEditor::render(const TileDef& definition)
 
     const char* label = "Choose Mesh";
     if (definition.mesh) {
-        label = definition.mesh.value()->c_str();
+        label = definition.mesh.value()->name().c_str();
     }
 
     if (ImGui::BeginCombo("Shape", label)) {
         for (auto& pair : m_app_state->mesh_map()) {
             if (ImGui::Selectable(pair.second->name().c_str(), false)) {
                 changed = true;
-                new_definition.mesh =
-                    std::make_shared<std::string>(pair.second->name());
+                new_definition.mesh = pair.second;
             }
         }
         ImGui::EndCombo();
