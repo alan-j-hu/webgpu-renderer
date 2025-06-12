@@ -9,27 +9,27 @@ set(IMGUI_SRC
   ${IMGUI_DIR}/imgui_widgets.cpp)
 
 add_executable(demo
-  appstate.cpp
-  filedialog.cpp
+  AppState.cpp
+  FileDialog.cpp
   main.cpp
-  modal.cpp
-  pane.cpp
-  reducer.cpp
-  tilepicker.cpp
-  commands/command.cpp
-  commands/createlayercommand.cpp
-  commands/createtilecommand.cpp
-  commands/placetilecommand.cpp
-  commands/updatetilecommand.cpp
-  tilemap/tilemapeditor.cpp
-  tileset/addtile.cpp
-  tileset/modelinspector.cpp
-  tileset/rotationdropdown.cpp
-  tileset/tiledefinitioneditor.cpp
-  tileset/tilelist.cpp
-  tileset/tilemesh.cpp
-  tileset/tilerotations.cpp
-  tileset/tilesetpane.cpp
+  Modal.cpp
+  Pane.cpp
+  Reducer.cpp
+  TilePicker.cpp
+  Commands/Command.cpp
+  Commands/CreateLayerCommand.cpp
+  Commands/CreateTileCommand.cpp
+  Commands/PlaceTileCommand.cpp
+  Commands/UpdateTileCommand.cpp
+  Tilemap/TilemapEditor.cpp
+  Tileset/AddTile.cpp
+  Tileset/ModelInspector.cpp
+  Tileset/RotationDropdown.cpp
+  Tileset/TileDefinitionEditor.cpp
+  Tileset/TileList.cpp
+  Tileset/TileMesh.cpp
+  Tileset/TileRotations.cpp
+  Tileset/TilesetPane.cpp
   ${IMGUI_SRC})
 set_property(TARGET demo PROPERTY CXX_STANDARD 23)
 set_property(TARGET demo PROPERTY C_STANDARD 23)

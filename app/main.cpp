@@ -1,6 +1,6 @@
-#include "appstate.h"
-#include "tilemap/tilemapeditor.h"
-#include "tileset/tilesetpane.h"
+#include "AppState.h"
+#include "Tilemap/TilemapEditor.h"
+#include "Tileset/TilesetPane.h"
 
 #include "noworry/application.h"
 #include "noworry/mesh.h"
