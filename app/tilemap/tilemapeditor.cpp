@@ -112,23 +112,23 @@ void TilemapEditor::render_preview()
         for (int i = 0; i < 16; ++i) {
             for (int j = 0; j < 16; ++j) {
                 auto& opt = layer.at(i, j);
-                if (opt) {
-                  auto& inst = opt.value();
-                  auto& def = project.tile_defs().at(inst.def);
-
-                  if (def.mesh) {
-                      auto it = m_app_state.mesh_map().find(*def.mesh.value());
-                      if (it == m_app_state.mesh_map().end()) {
-                          continue;
-                      }
-
-                      Transform transform;
-                      transform.set_translation(glm::vec3(i, j, inst.z));
-                      frame.add(transform,
-                                it->second->rotated(def.rotation).mesh(),
-                                *def.texture.value().material);
-                  }
+                if (!opt) {
+                    continue;
                 }
+
+                auto& inst = opt.value();
+                auto& def = project.tile_defs().at(inst.def);
+                ResolvedTile resolved = m_app_state.resolve_tile(def);
+                if (resolved.mesh == nullptr) {
+                    continue;
+                }
+                Material& material = resolved.material == nullptr
+                  ? m_app_state.default_material()
+                  : *resolved.material;
+
+                Transform transform;
+                transform.set_translation(glm::vec3(i, j, inst.z));
+                frame.add(transform, resolved.mesh->mesh(), material);
             }
         }
     }

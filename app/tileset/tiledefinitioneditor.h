@@ -27,7 +27,7 @@ private:
     PerspectiveCamera m_camera;
     Scene m_scene;
 
-    void draw_frame(const TileDef&, TileRotations* rotations, Material*);
+    void draw_frame(const ResolvedTile& resolved);
 };
 
 #endif

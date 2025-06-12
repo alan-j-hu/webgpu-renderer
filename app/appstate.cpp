@@ -22,6 +22,24 @@ AppState::AppState(WGPUDevice device)
     m_wireframe_material = &m_resources.add_wireframe_material(1, 1, 1);
 }
 
+ResolvedTile AppState::resolve_tile(const TileDef& def)
+{
+    ResolvedTile resolved;
+
+    if (def.mesh) {
+        auto it = m_mesh_map.find(*def.mesh.value());
+        if (it != m_mesh_map.end()) {
+            resolved.mesh = &it->second->rotated(def.rotation);
+        }
+    }
+
+    if (def.texture) {
+        resolved.material = def.texture.value().material.get();
+    }
+
+    return resolved;
+}
+
 void AppState::load_meshes(std::filesystem::path& path)
 {
     m_mesh_map.clear();
