@@ -2,6 +2,7 @@
 #define TILEMAPEDITOR_H
 
 #include "../appstate.h"
+#include "../tilepicker.h"
 
 #include "noworry/mesh.h"
 #include "noworry/renderer.h"
@@ -26,6 +27,8 @@ private:
     int m_camera_selection;
 
     AppState& m_app_state;
+    TilePicker m_tile_picker;
+
     int m_selected_layer;
     int m_selected_tile;
 

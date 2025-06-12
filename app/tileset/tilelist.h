@@ -3,6 +3,7 @@
 
 #include "tiledefinitioneditor.h"
 #include "../appstate.h"
+#include "../tilepicker.h"
 #include "../pane.h"
 
 /// Edits the list of tiles.
@@ -16,6 +17,7 @@ protected:
 
 private:
     AppState* m_app_state;
+    TilePicker m_tile_picker;
     TileDefinitionEditor m_editor;
     int m_selected;
 };

@@ -16,7 +16,8 @@ TilemapEditor::TilemapEditor(AppState& app_state)
                       16,
                       16,
                       glm::vec3(16, 0, 0),
-                      glm::vec3(0, 16, 0)))
+                      glm::vec3(0, 16, 0))),
+      m_tile_picker(app_state)
 {
     m_subwindow.set_clear_color(app_state.background_color());
 
@@ -69,16 +70,7 @@ void TilemapEditor::render()
     ImGui::SameLine();
 
     if (ImGui::BeginChild("Side Pane", ImVec2(200, 200))) {
-        if (ImGui::BeginListBox("Tiles ##Tiles", ImVec2(-FLT_MIN, 0))) {
-            for (int i = 0; i < project.tile_defs().size(); ++i) {
-                const TileDef& defn = project.tile_defs().at(i);
-                if (ImGui::Selectable(std::to_string(i).c_str(),
-                                      i == m_selected_tile)) {
-                    m_selected_tile = i;
-                }
-            }
-            ImGui::EndListBox();
-        }
+        m_tile_picker.render(m_selected_tile);
 
         if (ImGui::Button("Add Layer")) {
             m_app_state.set_project(project.map_layers([](auto& layers) {

@@ -8,7 +8,10 @@
 #include "tileset/tilerotations.h"
 
 #include "noworry/renderer.h"
+#include "noworry/rendertarget.h"
 #include "noworry/resourcetable.h"
+#include "noworry/camera/orthographiccamera.h"
+#include "noworry/scene/scene.h"
 
 #include <filesystem>
 #include <map>
@@ -53,6 +56,12 @@ public:
     const Project& project() const { return m_project; }
     void set_project(Project project) { m_project = project; }
 
+    WGPUTextureView tile_thumbnail(int i)
+    {
+        return m_thumbnail_cache[i].texture().view();
+    }
+    void refresh_thumbnails();
+
     void load_meshes(std::filesystem::path& path);
 
 private:
@@ -69,6 +78,10 @@ private:
     Mesh m_small_grid_mesh;
 
     Project m_project;
+
+    Scene m_thumbnail_scene;
+    OrthographicCamera m_thumbnail_camera;
+    std::vector<RenderTarget> m_thumbnail_cache;
 
     void visit_node(const aiScene* scene, const aiNode* node);
     TileRotations& load_mesh(const char* name, aiMesh* mesh);

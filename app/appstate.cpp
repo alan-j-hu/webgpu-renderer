@@ -15,11 +15,20 @@ AppState::AppState(WGPUDevice device)
                       5,
                       5,
                       glm::vec3(5, 0, 0),
-                      glm::vec3(0, 5, 0)))
+                      glm::vec3(0, 5, 0))),
+      m_thumbnail_camera(),
+      m_thumbnail_scene(m_renderer, m_thumbnail_camera)
 {
     m_background_color = {0.0f, 0.5f, 0.5f, 1.0f};
     m_default_material = &m_resources.add_flat_material(0.5, 0.5, 0.5);
     m_wireframe_material = &m_resources.add_wireframe_material(1, 1, 1);
+
+    m_thumbnail_camera.set_top(1);
+    m_thumbnail_camera.set_bottom(0);
+    m_thumbnail_camera.set_left(0);
+    m_thumbnail_camera.set_right(1);
+    m_thumbnail_camera.set_position(glm::vec3(0, 0, 1));
+    m_thumbnail_camera.set_target(glm::vec3(0, 0, 0));
 }
 
 ResolvedTile AppState::resolve_tile(const TileDef& def)
@@ -38,6 +47,33 @@ ResolvedTile AppState::resolve_tile(const TileDef& def)
     }
 
     return resolved;
+}
+
+void AppState::refresh_thumbnails()
+{
+    auto& tile_defs = m_project.tile_defs();
+    int i = 0;
+    for (auto& def : tile_defs) {
+        if (i >= m_thumbnail_cache.size()) {
+            m_thumbnail_cache.emplace_back(m_renderer.device(), 64, 64);
+        }
+        RenderTarget& target = m_thumbnail_cache[i];
+        {
+            Frame frame(m_renderer, target, m_thumbnail_scene);
+            ResolvedTile resolved = resolve_tile(def);
+
+            if (resolved.mesh == nullptr) {
+                continue;
+            }
+            Material& material = resolved.material == nullptr
+                ? default_material()
+                : *resolved.material;
+
+            Transform transform;
+            frame.add(transform, resolved.mesh->mesh(), material);
+        }
+        ++i;
+    }
 }
 
 void AppState::load_meshes(std::filesystem::path& path)
