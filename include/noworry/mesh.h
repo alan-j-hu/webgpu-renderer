@@ -1,8 +1,7 @@
 #ifndef MESH_H
 #define MESH_H
 
-#include "layout.h"
-#include "material/material.h"
+#include "Pipeline/MeshVertexShader.h"
 #include <cstddef>
 #include <webgpu/webgpu.h>
 
@@ -11,12 +10,14 @@ struct Mesh
 {
 public:
     /// @param device              - the device
+    /// @param topology            - the interpretation of the vertex order
     /// @param vertices            - the vertex buffer
     /// @param vertex_count        - the number of vertices
     /// @param indices             - the index buffer
     /// @param padded_index_count  - the padded length of the index buffer
     /// @param logical_index_count - the number of indices used by the mesh
     Mesh(WGPUDevice device,
+         WGPUPrimitiveTopology topology,
          Vertex* vertices, std::size_t vertex_count,
          const std::uint16_t* indices, std::size_t padded_index_count,
          std::size_t logical_index_count);
@@ -31,6 +32,7 @@ public:
     WGPUBuffer index_buffer() const { return m_index_buffer; }
     std::size_t vertex_count() const { return m_vertex_count; }
     std::size_t index_count() const { return m_logical_index_count; }
+    WGPUPrimitiveTopology topology() const { return m_topology; }
 
 private:
     WGPUBuffer m_vertex_buffer;
@@ -38,6 +40,7 @@ private:
     std::size_t m_vertex_count;
     std::size_t m_padded_index_count;
     std::size_t m_logical_index_count;
+    WGPUPrimitiveTopology m_topology;
 };
 
 #endif

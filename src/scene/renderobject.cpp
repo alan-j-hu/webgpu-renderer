@@ -1,4 +1,4 @@
-#include "noworry/material/material.h"
+#include "noworry/Material/Material.h"
 #include "noworry/scene/renderobject.h"
 #include "noworry/mesh.h"
 #include "noworry/renderer.h"

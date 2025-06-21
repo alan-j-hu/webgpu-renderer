@@ -2,11 +2,10 @@
 #define SCENE_H
 
 #include "renderobject.h"
-#include "../layout.h"
+#include "../Pipeline/MeshVertexShader.h"
 #include "../mesh.h"
 #include "../renderer.h"
 #include "../camera/camera.h"
-#include "../material/material.h"
 #include <memory>
 #include <vector>
 

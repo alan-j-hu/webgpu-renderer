@@ -50,6 +50,7 @@ Mesh create_grid(
 
     return
         Mesh(device,
+             WGPUPrimitiveTopology_LineList,
              vertices.data(), vertices.size(),
              indices.data(), indices.size(),
              indices.size());

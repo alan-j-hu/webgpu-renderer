@@ -1,7 +1,6 @@
 #ifndef RENDEROBJECT_H
 #define RENDEROBJECT_H
 
-#include "../layout.h"
 #include "../transform.h"
 #include <glm/mat4x4.hpp>
 #include <glm/vec3.hpp>

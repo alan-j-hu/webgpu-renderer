@@ -5,7 +5,7 @@
 #include "noworry/rendertarget.h"
 #include "noworry/transform.h"
 #include "noworry/camera/perspectivecamera.h"
-#include "noworry/material/texturematerial.h"
+#include "noworry/Material/TextureMaterial.h"
 #include "noworry/scene/scene.h"
 #include <filesystem>
 #include <memory>

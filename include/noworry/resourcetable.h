@@ -4,9 +4,9 @@
 #include "mesh.h"
 #include "texture.h"
 #include "renderer.h"
-#include "material/material.h"
-#include "material/flatmaterial.h"
-#include "material/texturematerial.h"
+#include "Material/Material.h"
+#include "Material/FlatMaterial.h"
+#include "Material/TextureMaterial.h"
 #include <filesystem>
 #include <memory>
 #include <unordered_map>

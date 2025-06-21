@@ -1,5 +1,5 @@
 #include "noworry/resourcetable.h"
-#include "noworry/material/wireframemesheffect.h"
+#include "noworry/Material/Effect.h"
 
 ResourceTable::ResourceTable(Renderer& renderer)
     : m_renderer(&renderer)
@@ -46,7 +46,7 @@ ResourceTable::load_texture_material(const std::filesystem::path& path)
     auto material = std::make_shared<TextureMaterial>(
         m_mat_id++,
         m_renderer->device(),
-        *m_renderer->mesh_effect<TextureMeshEffect>(),
+        *m_renderer->effect<TextureEffect>(),
         std::move(optional.value()),
         m_renderer->default_sampler());
     std::weak_ptr<TextureMaterial> handle = material;
@@ -60,7 +60,7 @@ FlatMaterial& ResourceTable::add_flat_material(float r, float g, float b)
     auto ptr = std::make_unique<FlatMaterial>(
         m_mat_id++,
         m_renderer->device(),
-        *m_renderer->mesh_effect<FlatMeshEffect>(),
+        *m_renderer->effect<FlatEffect>(),
         r, g, b);
     FlatMaterial& mat = *ptr;
     m_materials.emplace_back(std::move(ptr));
@@ -72,7 +72,7 @@ FlatMaterial& ResourceTable::add_wireframe_material(float r, float g, float b)
     auto ptr = std::make_unique<FlatMaterial>(
         m_mat_id++,
         m_renderer->device(),
-        *m_renderer->mesh_effect<WireframeMeshEffect>(),
+        *m_renderer->effect<FlatEffect>(),
         r, g, b);
     FlatMaterial& mat = *ptr;
     m_materials.emplace_back(std::move(ptr));
@@ -86,7 +86,7 @@ TextureMaterial& ResourceTable::add_texture_material(
     auto ptr = std::make_unique<TextureMaterial>(
         m_mat_id++,
         m_renderer->device(),
-        *m_renderer->mesh_effect<TextureMeshEffect>(),
+        *m_renderer->effect<TextureEffect>(),
         std::move(texture),
         m_renderer->default_sampler());
     TextureMaterial& mat = *ptr;

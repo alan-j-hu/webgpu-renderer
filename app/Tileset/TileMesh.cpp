@@ -11,6 +11,7 @@ TileMesh::TileMesh(
 {
     m_mesh = std::make_unique<Mesh>(
         app_state.renderer().device(),
+        WGPUPrimitiveTopology_TriangleList,
         m_vertices.data(), m_vertices.size(),
         indices.data(), indices.size(),
         (indices.size() / 3) * 3);

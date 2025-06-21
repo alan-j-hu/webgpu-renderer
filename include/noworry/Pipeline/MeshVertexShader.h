@@ -1,5 +1,5 @@
-#ifndef LAYOUT_H
-#define LAYOUT_H
+#ifndef MESHVERTEXSHADER
+#define MESHVERTEXSHADER
 
 #include <array>
 #include <glm/mat4x4.hpp>
@@ -28,19 +28,21 @@ struct ModelUniforms
     glm::mat4 transform;
 };
 
-class UniformLayout
+class MeshVertexShader
 {
 public:
-    UniformLayout(WGPUDevice device);
-    ~UniformLayout();
+    MeshVertexShader(WGPUDevice);
+    virtual ~MeshVertexShader();
 
+    WGPUShaderModule vertex_shader() { return m_vertex_shader; }
     WGPUBindGroupLayout global_layout() { return m_global_layout; }
     WGPUBindGroupLayout model_layout() { return m_model_layout; }
 
-    WGPUBindGroup create_global_group(WGPUDevice, WGPUBuffer buffer);
-    WGPUBindGroup create_model_group(WGPUDevice, WGPUBuffer transform);
+    WGPUBindGroup create_global_group(WGPUDevice, WGPUBuffer transform) const;
+    WGPUBindGroup create_model_group(WGPUDevice, WGPUBuffer transform) const;
 
 private:
+    WGPUShaderModule m_vertex_shader;
     WGPUBindGroupLayout m_global_layout;
     WGPUBindGroupLayout m_model_layout;
 };

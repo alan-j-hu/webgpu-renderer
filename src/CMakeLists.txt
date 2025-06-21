@@ -2,7 +2,6 @@ add_library(noworry
   application.cpp
   grid.cpp
   init_wgpu.cpp
-  layout.cpp
   mesh.cpp
   renderer.cpp
   rendertarget.cpp
@@ -13,11 +12,12 @@ add_library(noworry
   camera/abstractcamera.cpp
   camera/orthographiccamera.cpp
   camera/perspectivecamera.cpp
-  material/flatmaterial.cpp
-  material/flatmesheffect.cpp
-  material/mesheffect.cpp
-  material/texturematerial.cpp
-  material/texturemesheffect.cpp
+  Pipeline/MeshVertexShader.cpp
+  Pipeline/PipelineFactory.cpp
+  Material/FlatMaterial.cpp
+  Material/FlatEffect.cpp
+  Material/TextureMaterial.cpp
+  Material/TextureEffect.cpp
   scene/renderobject.cpp
   scene/scene.cpp)
 target_include_directories(noworry PRIVATE ../include)

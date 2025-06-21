@@ -1,8 +1,8 @@
 #include "noworry/renderer.h"
 #include "noworry/rendertarget.h"
 #include "noworry/transform.h"
-#include "noworry/material/texturemesheffect.h"
-#include "noworry/material/wireframemesheffect.h"
+#include "noworry/Material/FlatEffect.h"
+#include "noworry/Material/TextureEffect.h"
 #include "noworry/scene/scene.h"
 #include <utility>
 
@@ -15,7 +15,9 @@ Frame::Frame(Renderer& renderer, RenderTarget& target, Scene& scene)
 
 Frame& Frame::add(Transform& transform, const Mesh& mesh, Material& material)
 {
-    material.effect().enqueue(*m_renderer, transform, mesh, material);
+    RenderObject ro(*m_renderer, transform, mesh, material);
+    m_renderer->pipeline_factory().enqueue(*m_renderer, ro);
+    //material.effect().enqueue(*m_renderer, transform, mesh, material);
     return *this;
 }
 
@@ -35,8 +37,8 @@ ModelGroup::ModelGroup(Renderer& renderer)
     m_buffer = wgpuDeviceCreateBuffer(renderer.device(), &buffer_desc);
 
     m_bind_group =
-        renderer.uniform_layout().create_model_group(renderer.device(),
-                                                     m_buffer);
+        renderer.mesh_vertex_shader().create_model_group(renderer.device(),
+                                                         m_buffer);
 }
 
 ModelGroup::ModelGroup(ModelGroup&& other)
@@ -85,15 +87,11 @@ void ModelGroup::copy(Renderer& renderer, Transform& transform)
 
 Renderer::Renderer(WGPUDevice device)
     : m_device(device),
-      m_uniform_layout(device),
+      m_mesh_vertex_shader(device),
       m_next_group(0)
 {
-    m_mesh_effects.emplace_back(
-        std::make_unique<FlatMeshEffect>(m_device, m_uniform_layout));
-    m_mesh_effects.emplace_back(
-        std::make_unique<TextureMeshEffect>(m_device, m_uniform_layout));
-    m_mesh_effects.emplace_back(
-        std::make_unique<WireframeMeshEffect>(m_device, m_uniform_layout));
+    m_effects.emplace_back(std::make_unique<FlatEffect>(m_device));
+    m_effects.emplace_back(std::make_unique<TextureEffect>(m_device));
 
     WGPUSamplerDescriptor sampler_desc = { 0 };
     sampler_desc.addressModeU = WGPUAddressMode_ClampToEdge;
@@ -174,7 +172,5 @@ void Renderer::render(RenderTarget& target, Scene& scene)
 
 void Renderer::do_render(WGPURenderPassEncoder encoder)
 {
-    for (auto& effect : m_mesh_effects) {
-        effect->draw(*this, encoder);
-    }
+    m_pipeline_factory.draw(encoder);
 }

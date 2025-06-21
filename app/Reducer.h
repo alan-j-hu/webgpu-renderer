@@ -1,7 +1,7 @@
 #ifndef REDUCER_H
 #define REDUCER_H
 
-#include "noworry/material/texturematerial.h"
+#include "noworry/Material/TextureMaterial.h"
 
 #include <filesystem>
 #include <memory>

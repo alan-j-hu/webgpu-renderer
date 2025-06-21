@@ -1,10 +1,12 @@
 #include "noworry/mesh.h"
 
 Mesh::Mesh(WGPUDevice device,
+           WGPUPrimitiveTopology topology,
            Vertex* vertices, std::size_t vertex_count,
            const std::uint16_t* indices, std::size_t padded_index_count,
            std::size_t logical_index_count)
 {
+    m_topology = topology;
     m_vertex_count = vertex_count;
     m_padded_index_count = padded_index_count;
     m_logical_index_count = logical_index_count;
@@ -32,6 +34,7 @@ Mesh::Mesh(WGPUDevice device,
 
 Mesh::Mesh(Mesh&& other)
 {
+    m_topology = other.m_topology;
     m_vertex_count = other.m_vertex_count;
     m_padded_index_count = other.m_padded_index_count;
     m_logical_index_count = other.m_logical_index_count;
@@ -50,6 +53,7 @@ Mesh& Mesh::operator=(Mesh&& other)
     wgpuBufferRelease(m_vertex_buffer);
     wgpuBufferRelease(m_index_buffer);
 
+    m_topology = other.m_topology;
     m_vertex_count = other.m_vertex_count;
     m_padded_index_count = other.m_padded_index_count;
     m_logical_index_count = other.m_logical_index_count;

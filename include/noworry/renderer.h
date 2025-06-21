@@ -1,12 +1,13 @@
 #ifndef RENDERER_H
 #define RENDERER_H
 
-#include "layout.h"
 #include "mesh.h"
 #include "texture.h"
-#include "material/flatmesheffect.h"
-#include "material/mesheffect.h"
-#include "material/material.h"
+#include "Material/Effect.h"
+#include "Material/FlatEffect.h"
+#include "Material/Material.h"
+#include "Pipeline/MeshVertexShader.h"
+#include "Pipeline/PipelineFactory.h"
 
 #include <memory>
 #include <vector>
@@ -71,9 +72,9 @@ public:
     WGPUDevice& device() { return m_device; }
 
     template<class T>
-    T* mesh_effect()
+    T* effect()
     {
-        for (auto& effect : m_mesh_effects) {
+        for (auto& effect : m_effects) {
             if (auto casted = dynamic_cast<T*>(effect.get())) {
                 if (typeid(*casted) == typeid(T)) {
                     return casted;
@@ -85,7 +86,17 @@ public:
 
     WGPUSampler default_sampler() { return m_sampler; }
 
-    UniformLayout& uniform_layout() { return m_uniform_layout; }
+    const MeshVertexShader& mesh_vertex_shader() const
+    {
+        return m_mesh_vertex_shader;
+    }
+
+    MeshVertexShader& mesh_vertex_shader()
+    {
+        return m_mesh_vertex_shader;
+    }
+
+    PipelineFactory& pipeline_factory() { return m_pipeline_factory; }
 
     ModelGroup& alloc_group();
 
@@ -93,9 +104,10 @@ public:
 
 private:
     WGPUDevice m_device;
-    UniformLayout m_uniform_layout;
     WGPUSampler m_sampler;
-    std::vector<std::unique_ptr<MeshEffect>> m_mesh_effects;
+    MeshVertexShader m_mesh_vertex_shader;
+    PipelineFactory m_pipeline_factory;
+    std::vector<std::unique_ptr<Effect>> m_effects;
     std::vector<std::unique_ptr<ModelGroup>> m_model_groups;
     int m_next_group;
 

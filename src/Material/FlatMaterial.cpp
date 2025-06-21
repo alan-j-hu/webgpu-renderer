@@ -1,10 +1,10 @@
-#include "noworry/material/flatmaterial.h"
+#include "noworry/Material/FlatMaterial.h"
 #include <glm/vec3.hpp>
 
 FlatMaterial::FlatMaterial(
     int id,
     WGPUDevice device,
-    FlatMeshEffect& effect,
+    FlatEffect& effect,
     float r, float g, float b)
 {
     WGPUBufferDescriptor buffer_desc = { 0 };
@@ -24,4 +24,3 @@ FlatMaterial::FlatMaterial(
     m_bind_group = effect
         .create_material_group(device, m_buffer);
 }
-

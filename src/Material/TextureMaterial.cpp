@@ -1,10 +1,10 @@
-#include "noworry/material/texturematerial.h"
+#include "noworry/Material/TextureMaterial.h"
 #include <utility>
 
 TextureMaterial::TextureMaterial(
     int id,
     WGPUDevice device,
-    TextureMeshEffect& effect,
+    TextureEffect& effect,
     std::shared_ptr<const Texture> texture,
     WGPUSampler sampler)
 {
