@@ -7,6 +7,8 @@
 #include "noworry/mesh.h"
 #include "noworry/renderer.h"
 #include "noworry/rendertarget.h"
+#include "noworry/Draw2D/SpriteBatch.h"
+#include "noworry/Draw2D/Spritesheet.h"
 #include "noworry/transform.h"
 #include "noworry/camera/orthographiccamera.h"
 #include "noworry/camera/perspectivecamera.h"
@@ -27,12 +29,16 @@ private:
     int m_camera_selection;
 
     AppState& m_app_state;
+    // Must initialize RenderTarget before spritesheet
+    RenderTarget m_subwindow_2d;
+    RenderTarget m_subwindow_3d;
+    SpriteBatch m_sprite_batch;
+    Spritesheet m_spritesheet;
     TilePicker m_tile_picker;
 
     int m_selected_layer;
     int m_selected_tile;
 
-    RenderTarget m_subwindow;
     float m_mouse_rel_x;
     float m_mouse_rel_y;
 

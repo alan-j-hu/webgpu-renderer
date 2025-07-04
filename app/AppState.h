@@ -3,12 +3,14 @@
 
 #include "Modal.h"
 #include "Reducer.h"
+#include "TileThumbnail.h"
 #include "Commands/Command.h"
 #include "Tileset/RotationDropdown.h"
 #include "Tileset/TileMesh.h"
 #include "Tileset/TileRotations.h"
 
 #include "noworry/renderer.h"
+#include "noworry/Draw2D/Renderer2D.h"
 #include "noworry/rendertarget.h"
 #include "noworry/resourcetable.h"
 #include "noworry/camera/orthographiccamera.h"
@@ -39,6 +41,7 @@ public:
     WGPUColor background_color() { return m_background_color; }
 
     Renderer& renderer() { return m_renderer; }
+    Renderer2D& renderer_2d() { return m_renderer_2d; }
     ModalStack& modals() { return m_modals; }
     ResourceTable& resources() { return m_resources; }
 
@@ -58,9 +61,9 @@ public:
 
     void push_command(std::unique_ptr<Command>);
 
-    WGPUTextureView tile_thumbnail(int i)
+    TileThumbnail& tile_thumbnail(int i)
     {
-        return m_thumbnail_cache.at(i).texture().view();
+        return m_thumbnail_cache.at(i);
     }
     void refresh_thumbnails();
 
@@ -71,6 +74,7 @@ private:
 
     WGPUColor m_background_color;
     Renderer m_renderer;
+    Renderer2D m_renderer_2d;
     ModalStack m_modals;
     ResourceTable m_resources;
 
@@ -85,7 +89,7 @@ private:
 
     Scene m_thumbnail_scene;
     OrthographicCamera m_thumbnail_camera;
-    std::vector<RenderTarget> m_thumbnail_cache;
+    std::vector<TileThumbnail> m_thumbnail_cache;
 
     void visit_node(const aiScene* scene, const aiNode* node);
     TileRotations& load_mesh(const char* name, aiMesh* mesh);

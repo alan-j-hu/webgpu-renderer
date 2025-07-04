@@ -16,6 +16,7 @@ add_executable(demo
   Pane.cpp
   Reducer.cpp
   TilePicker.cpp
+  TileThumbnail.cpp
   Commands/Command.cpp
   Commands/CreateLayerCommand.cpp
   Commands/CreateTileCommand.cpp
