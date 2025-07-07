@@ -1,12 +1,15 @@
 #include "noworry/Draw2D/SpritePipeline.h"
 #include <array>
 #include <utility>
+#include <glm/mat4x4.hpp>
 
 SpritePipeline::SpritePipeline(WGPUDevice device)
 {
     const char* code = R"(
-@group(0) @binding(0) var the_texture: texture_2d<f32>;
-@group(0) @binding(1) var the_sampler: sampler;
+@group(0) @binding(0) var<uniform> viewproj: mat4x4f;
+
+@group(1) @binding(0) var the_texture: texture_2d<f32>;
+@group(1) @binding(1) var the_sampler: sampler;
 
 struct Vertex {
   @location(0) x: f32,
@@ -23,7 +26,7 @@ struct FragmentInput {
 @vertex
 fn vs_main(v: Vertex) -> FragmentInput {
   var out: FragmentInput;
-  out.pos = vec4(v.x, v.y, 0, 1);
+  out.pos = viewproj * vec4(v.x, v.y, 0, 1);
   out.tex_coords = vec2(v.u, v.v);
   return out;
 }
@@ -45,6 +48,24 @@ fn fs_main(input: FragmentInput) -> @location(0) vec4f {
         wgpuDeviceCreateShaderModule(device, &shader_desc);
 
     // Bind group layout
+    WGPUBufferBindingLayout buffer_layout = { 0 };
+    buffer_layout.type = WGPUBufferBindingType_Uniform;
+    buffer_layout.hasDynamicOffset = false;
+    buffer_layout.minBindingSize = sizeof(glm::mat4);
+
+    WGPUBindGroupLayoutEntry global_layout_entries[1] = { 0 };
+    global_layout_entries[0].binding = 0;
+    global_layout_entries[0].visibility = WGPUShaderStage_Vertex;
+    global_layout_entries[0].buffer = buffer_layout;
+
+    WGPUBindGroupLayoutDescriptor global_layout_desc = { 0 };
+    global_layout_desc.label = {"SpriteGlobalBindGroupLayout", WGPU_STRLEN};
+    global_layout_desc.entryCount = 1;
+    global_layout_desc.entries = global_layout_entries;
+
+    m_global_bg_layout =
+        wgpuDeviceCreateBindGroupLayout(device, &global_layout_desc);
+
     WGPUTextureBindingLayout texture_layout = { 0 };
     texture_layout.sampleType = WGPUTextureSampleType_Float;
     texture_layout.viewDimension = WGPUTextureViewDimension_2D;
@@ -69,9 +90,14 @@ fn fs_main(input: FragmentInput) -> @location(0) vec4f {
     m_bg_layout = wgpuDeviceCreateBindGroupLayout(device, &bg_layout_desc);
 
     // Pipeline layout
+    WGPUBindGroupLayout bg_layouts[2] = {
+        m_global_bg_layout,
+        m_bg_layout,
+    };
+
     WGPUPipelineLayoutDescriptor pipeline_layout_desc = { 0 };
-    pipeline_layout_desc.bindGroupLayoutCount = 1;
-    pipeline_layout_desc.bindGroupLayouts = &m_bg_layout;
+    pipeline_layout_desc.bindGroupLayoutCount = 2;
+    pipeline_layout_desc.bindGroupLayouts = bg_layouts;
 
     m_pipeline_layout =
         wgpuDeviceCreatePipelineLayout(device, &pipeline_layout_desc);
@@ -143,19 +169,51 @@ fn fs_main(input: FragmentInput) -> @location(0) vec4f {
 
 SpritePipeline::SpritePipeline(SpritePipeline&& other)
 {
-    move(std::move(other));
+    *this = std::move(other);
 }
 
 SpritePipeline& SpritePipeline::operator=(SpritePipeline&& other)
 {
-    cleanup();
-    move(std::move(other));
+    std::swap(m_global_bg_layout, other.m_global_bg_layout);
+    std::swap(m_bg_layout, other.m_bg_layout);
+    std::swap(m_pipeline_layout, other.m_pipeline_layout);
+    std::swap(m_pipeline, other.m_pipeline);
+
     return *this;
 }
 
 SpritePipeline::~SpritePipeline()
 {
-    cleanup();
+    if (m_pipeline != nullptr) {
+        wgpuRenderPipelineRelease(m_pipeline);
+    }
+    if (m_pipeline_layout != nullptr) {
+        wgpuPipelineLayoutRelease(m_pipeline_layout);
+    }
+    if (m_bg_layout != nullptr) {
+        wgpuBindGroupLayoutRelease(m_bg_layout);
+    }
+    if (m_global_bg_layout != nullptr) {
+        wgpuBindGroupLayoutRelease(m_global_bg_layout);
+    }
+}
+
+WGPUBindGroup SpritePipeline::create_global_bind_group(
+    WGPUDevice device,
+    WGPUBuffer buffer) const
+{
+    WGPUBindGroupEntry entries[1] = { 0 };
+    entries[0].binding = 0;
+    entries[0].buffer = buffer;
+    entries[0].size = sizeof(glm::mat4);
+
+    WGPUBindGroupDescriptor bind_group_desc = { 0 };
+    bind_group_desc.label = {"SpriteGlobalBindGroup", WGPU_STRLEN};
+    bind_group_desc.layout = m_global_bg_layout;
+    bind_group_desc.entryCount = 1;
+    bind_group_desc.entries = entries;
+
+    return wgpuDeviceCreateBindGroup(device, &bind_group_desc);
 }
 
 WGPUBindGroup SpritePipeline::create_bind_group(
@@ -177,28 +235,4 @@ WGPUBindGroup SpritePipeline::create_bind_group(
     bind_group_desc.entries = entries;
 
     return wgpuDeviceCreateBindGroup(device, &bind_group_desc);
-}
-
-void SpritePipeline::cleanup()
-{
-    if (m_pipeline != nullptr) {
-        wgpuRenderPipelineRelease(m_pipeline);
-    }
-    if (m_pipeline_layout != nullptr) {
-        wgpuPipelineLayoutRelease(m_pipeline_layout);
-    }
-    if (m_bg_layout != nullptr) {
-        wgpuBindGroupLayoutRelease(m_bg_layout);
-    }
-}
-
-void SpritePipeline::move(SpritePipeline&& other)
-{
-    m_bg_layout = other.m_bg_layout;
-    m_pipeline_layout = other.m_pipeline_layout;
-    m_pipeline = other.m_pipeline;
-
-    other.m_bg_layout = nullptr;
-    other.m_pipeline_layout = nullptr;
-    other.m_pipeline = nullptr;
 }

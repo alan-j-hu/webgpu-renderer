@@ -1,7 +1,8 @@
-#include "noworry/Draw2D/Renderer2D.h"
+#include "noworry/Draw2D/Frame2D.h"
 #include <utility>
 
 Frame2D::Frame2D(WGPUDevice device, RenderTarget& target)
+    : m_target(&target)
 {
     m_queue = wgpuDeviceGetQueue(device);
 
@@ -41,13 +42,14 @@ Frame2D::Frame2D(Frame2D&& other)
     *this = std::move(other);
 }
 
-Frame2D Frame2D::operator=(Frame2D&& other)
+Frame2D& Frame2D::operator=(Frame2D&& other)
 {
+    std::swap(m_target, other.m_target);
     std::swap(m_queue, other.m_queue);
     std::swap(m_pass, other.m_pass);
     std::swap(m_encoder, other.m_encoder);
 
-    return std::move(*this);
+    return *this;
 }
 
 Frame2D::~Frame2D()
@@ -69,15 +71,4 @@ void Frame2D::finish()
         wgpuCommandEncoderFinish(m_encoder, &buffer_desc);
     wgpuQueueSubmit(m_queue, 1, &command_buffer);
     wgpuCommandBufferRelease(command_buffer);
-}
-
-Renderer2D::Renderer2D(WGPUDevice device)
-    : m_device(device),
-      m_pipeline(device)
-{
-}
-
-Frame2D Renderer2D::begin(RenderTarget& target)
-{
-    return Frame2D(m_device, target);
 }

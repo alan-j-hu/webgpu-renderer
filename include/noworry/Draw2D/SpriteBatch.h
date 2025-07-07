@@ -1,10 +1,12 @@
 #ifndef SPRITEBATCH_H
 #define SPRITEBATCH_H
 
+#include "Frame2D.h"
 #include "SpritePipeline.h"
 #include "Spritesheet.h"
 
 #include <cstddef>
+#include <optional>
 #include <vector>
 
 #include <glm/vec4.hpp>
@@ -25,7 +27,9 @@ public:
 
     virtual ~SpriteBatch();
 
-    void begin(WGPURenderPassEncoder encoder);
+    SpritePipeline& pipeline() { return m_pipeline; }
+
+    void begin(RenderTarget&);
 
     void end();
 
@@ -36,8 +40,7 @@ private:
     WGPUDevice m_device;
     SpritePipeline m_pipeline;
 
-    WGPURenderPassEncoder m_encoder;
-    bool m_is_drawing;
+    std::optional<Frame2D> m_frame;
 
     struct DrawCall
     {
@@ -50,6 +53,9 @@ private:
     std::vector<glm::vec4> m_vertices;
     WGPUBuffer m_vertex_buffer;
     WGPUBuffer m_index_buffer;
+
+    WGPUBuffer m_viewproj_buffer;
+    WGPUBindGroup m_global_bind_group;
 
     void flush();
 };

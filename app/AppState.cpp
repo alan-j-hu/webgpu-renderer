@@ -8,7 +8,7 @@
 
 AppState::AppState(WGPUDevice device)
     : m_renderer(device),
-      m_renderer_2d(device),
+      m_sprite_batch(device, 100),
       m_resources(m_renderer),
       m_small_grid_mesh(
           create_grid(device,

@@ -10,7 +10,7 @@
 #include "Tileset/TileRotations.h"
 
 #include "noworry/renderer.h"
-#include "noworry/Draw2D/Renderer2D.h"
+#include "noworry/Draw2D/SpriteBatch.h"
 #include "noworry/rendertarget.h"
 #include "noworry/resourcetable.h"
 #include "noworry/camera/orthographiccamera.h"
@@ -41,7 +41,7 @@ public:
     WGPUColor background_color() { return m_background_color; }
 
     Renderer& renderer() { return m_renderer; }
-    Renderer2D& renderer_2d() { return m_renderer_2d; }
+    SpriteBatch& sprite_batch() { return m_sprite_batch; }
     ModalStack& modals() { return m_modals; }
     ResourceTable& resources() { return m_resources; }
 
@@ -74,7 +74,7 @@ private:
 
     WGPUColor m_background_color;
     Renderer m_renderer;
-    Renderer2D m_renderer_2d;
+    SpriteBatch m_sprite_batch;
     ModalStack m_modals;
     ResourceTable m_resources;
 

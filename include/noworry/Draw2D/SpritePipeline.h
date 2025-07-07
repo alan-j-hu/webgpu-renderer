@@ -20,13 +20,12 @@ public:
     WGPUBindGroup
     create_bind_group(WGPUDevice, WGPUTextureView, WGPUSampler) const;
 
+    WGPUBindGroup create_global_bind_group(WGPUDevice, WGPUBuffer) const;
 private:
+    WGPUBindGroupLayout m_global_bg_layout;
     WGPUBindGroupLayout m_bg_layout;
     WGPUPipelineLayout m_pipeline_layout;
     WGPURenderPipeline m_pipeline;
-
-    void cleanup();
-    void move(SpritePipeline&&);
 };
 
 #endif

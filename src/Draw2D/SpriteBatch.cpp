@@ -1,11 +1,11 @@
 #include "noworry/Draw2D/SpriteBatch.h"
 #include <cstdint>
+#include <glm/mat4x4.hpp>
 
 SpriteBatch::SpriteBatch(WGPUDevice device, std::size_t max)
     : m_capacity(max),
       m_device(device),
-      m_pipeline(device),
-      m_is_drawing(false)
+      m_pipeline(device)
 {
     const std::size_t ibuffer_size = 6 * sizeof(std::uint16_t) * max;
     std::vector<std::uint16_t> indices;
@@ -34,9 +34,20 @@ SpriteBatch::SpriteBatch(WGPUDevice device, std::size_t max)
     ibuffer_desc.mappedAtCreation = false;
     m_index_buffer = wgpuDeviceCreateBuffer(device, &ibuffer_desc);
 
+    WGPUBufferDescriptor viewproj_buffer_desc = { 0 };
+    viewproj_buffer_desc.nextInChain = nullptr;
+    viewproj_buffer_desc.usage =
+        WGPUBufferUsage_CopyDst | WGPUBufferUsage_Uniform;
+    viewproj_buffer_desc.size = 64;
+    viewproj_buffer_desc.mappedAtCreation = false;
+    m_viewproj_buffer = wgpuDeviceCreateBuffer(device, &viewproj_buffer_desc);
+
     WGPUQueue queue = wgpuDeviceGetQueue(device);
     wgpuQueueWriteBuffer(queue, m_index_buffer, 0,
                          indices.data(), ibuffer_size);
+
+    m_global_bind_group =
+        m_pipeline.create_global_bind_group(device, m_viewproj_buffer);
 }
 
 SpriteBatch::~SpriteBatch()
@@ -47,25 +58,34 @@ SpriteBatch::~SpriteBatch()
     if (m_vertex_buffer != nullptr) {
         wgpuBufferRelease(m_vertex_buffer);
     }
+    if (m_viewproj_buffer != nullptr) {
+        wgpuBufferRelease(m_viewproj_buffer);
+    }
+    if (m_global_bind_group != nullptr) {
+        wgpuBindGroupRelease(m_global_bind_group);
+    }
 }
 
-void SpriteBatch::begin(WGPURenderPassEncoder encoder)
+void SpriteBatch::begin(RenderTarget& target)
 {
-    m_encoder = encoder;
     m_current_draw_call.bind_group = nullptr;
     m_current_draw_call.begin = 0;
-    m_is_drawing = true;
+    m_frame = std::move(Frame2D(m_device, target));
 }
 
 void SpriteBatch::end()
 {
+    if (!m_frame) {
+        return;
+    }
+
     m_current_draw_call.end = 6 * (m_vertices.size() + 1);
     m_draw_calls.push_back(m_current_draw_call);
     flush();
     m_current_draw_call.bind_group = nullptr;
     m_current_draw_call.begin = 0;
-    m_encoder = nullptr;
-    m_is_drawing = false;
+    m_frame->finish();
+    m_frame.reset();
 }
 
 void SpriteBatch::draw(
@@ -73,7 +93,7 @@ void SpriteBatch::draw(
     const Region& dest,
     const Region& src)
 {
-    if (!m_is_drawing) {
+    if (!m_frame) {
         return;
     }
 
@@ -104,12 +124,14 @@ void SpriteBatch::draw(
 
 void SpriteBatch::flush()
 {
-    if (!m_is_drawing) {
+    if (!m_frame) {
         return;
     }
     if (m_draw_calls.size() == 0) {
         return;
     }
+
+    WGPURenderPassEncoder encoder = m_frame->pass();
 
     WGPUQueue queue = wgpuDeviceGetQueue(m_device);
     wgpuQueueWriteBuffer(queue, m_vertex_buffer, 0, m_vertices.data(),
@@ -117,12 +139,27 @@ void SpriteBatch::flush()
 
     m_vertices.clear();
 
-    wgpuRenderPassEncoderSetPipeline(m_encoder, m_pipeline.pipeline());
+    glm::mat4 viewproj(1);
+    viewproj[0][0] = 2.0f / m_frame->target().width();
+    viewproj[1][1] = -2.0f / m_frame->target().height();
+    viewproj[3][0] = -1.0f;
+    viewproj[3][1] = 1.0f;
+
+    wgpuQueueWriteBuffer(queue, m_viewproj_buffer, 0, &viewproj,
+                         sizeof(glm::mat4));
+
+    wgpuRenderPassEncoderSetPipeline(encoder, m_pipeline.pipeline());
     wgpuRenderPassEncoderSetVertexBuffer(
-        m_encoder, 0, m_vertex_buffer, 0, wgpuBufferGetSize(m_vertex_buffer));
+        encoder, 0, m_vertex_buffer, 0, wgpuBufferGetSize(m_vertex_buffer));
     wgpuRenderPassEncoderSetIndexBuffer(
-        m_encoder, m_index_buffer, WGPUIndexFormat_Uint16, 0,
+        encoder, m_index_buffer, WGPUIndexFormat_Uint16, 0,
         wgpuBufferGetSize(m_index_buffer));
+    wgpuRenderPassEncoderSetBindGroup(
+        encoder,
+        0,
+        m_global_bind_group,
+        0,
+        nullptr);
 
     for (int i = 0; i < m_draw_calls.size(); ++i) {
         DrawCall& draw_call = m_draw_calls[i];
@@ -130,13 +167,13 @@ void SpriteBatch::flush()
             continue;
         }
         wgpuRenderPassEncoderSetBindGroup(
-            m_encoder,
-            0,
+            encoder,
+            1,
             draw_call.bind_group,
             0,
             nullptr);
         wgpuRenderPassEncoderDrawIndexed(
-            m_encoder,
+            encoder,
             draw_call.end - draw_call.begin,
             1,
             draw_call.begin,

@@ -32,7 +32,6 @@ private:
     // Must initialize RenderTarget before spritesheet
     RenderTarget m_subwindow_2d;
     RenderTarget m_subwindow_3d;
-    SpriteBatch m_sprite_batch;
     Spritesheet m_spritesheet;
     TilePicker m_tile_picker;
 

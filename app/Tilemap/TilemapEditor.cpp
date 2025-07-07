@@ -13,11 +13,10 @@ TilemapEditor::TilemapEditor(AppState& app_state)
       m_subwindow_2d(app_state.renderer().device(), 500, 500),
       m_subwindow_3d(app_state.renderer().device(), 500, 500),
       m_spritesheet(app_state.renderer().device(),
-                    app_state.renderer_2d().pipeline(),
+                    app_state.sprite_batch().pipeline(),
                     m_subwindow_3d.texture(),
                     app_state.renderer().default_sampler()),
       m_scene(app_state.renderer(), m_camera),
-      m_sprite_batch(app_state.renderer().device(), 100),
       m_grid_mesh(
           create_grid(app_state.renderer().device(),
                       glm::vec3(0, 0, 0),
@@ -27,7 +26,7 @@ TilemapEditor::TilemapEditor(AppState& app_state)
                       glm::vec3(0, 16, 0))),
       m_tile_picker(app_state)
 {
-    m_subwindow_2d.set_clear_color(app_state.background_color());
+    //m_subwindow_2d.set_clear_color(app_state.background_color());
     m_subwindow_3d.set_clear_color(app_state.background_color());
 
     m_camera.set_position(glm::vec3(8.0f, -1.0f, 10.0f));
@@ -42,8 +41,7 @@ void TilemapEditor::render()
     render_preview();
 
     {
-        Frame2D frame = m_app_state.renderer_2d().begin(m_subwindow_2d);
-        m_sprite_batch.begin(frame.pass());
+        m_app_state.sprite_batch().begin(m_subwindow_2d);
 
         Region src;
         src.x = 0;
@@ -52,15 +50,14 @@ void TilemapEditor::render()
         src.h = 1;
 
         Region dest;
-        dest.x = -1;
-        dest.y = -1;
-        dest.w = 1;
-        dest.h = 1;
+        dest.x = 0;
+        dest.y = 0;
+        dest.w = m_subwindow_2d.width();
+        dest.h = m_subwindow_2d.height();
 
-        m_sprite_batch.draw(m_spritesheet, dest, src);
+        m_app_state.sprite_batch().draw(m_spritesheet, dest, src);
 
-        m_sprite_batch.end();
-        frame.finish();
+        m_app_state.sprite_batch().end();
     }
 
     auto project = m_app_state.project();
