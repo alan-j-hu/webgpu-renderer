@@ -47,7 +47,14 @@ void AbstractCamera::update_matrix(CameraData* data)
     data->viewproj = m_viewproj;
 }
 
-glm::vec3 AbstractCamera::unproject(glm::vec3 ndc)
+glm::vec3 AbstractCamera::project(const glm::vec3& pos) const
+{
+    glm::vec4 ndc = m_viewproj * glm::vec4(pos, 1);
+    ndc /= ndc.w;
+    return ndc;
+}
+
+glm::vec3 AbstractCamera::unproject(const glm::vec3& ndc) const
 {
     glm::vec4 world = m_inv_viewproj * glm::vec4(ndc, 1);
     world /= world.w;

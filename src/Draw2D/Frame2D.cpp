@@ -10,15 +10,47 @@ Frame2D::Frame2D(WGPUDevice device, RenderTarget& target)
     m_encoder =
         wgpuDeviceCreateCommandEncoder(device, &encoder_desc);
 
+    m_load_op = WGPULoadOp_Clear;
+}
+
+Frame2D::Frame2D(Frame2D&& other)
+{
+    m_target = nullptr;
+    m_queue = nullptr;
+    m_encoder = nullptr;
+    *this = std::move(other);
+}
+
+Frame2D& Frame2D::operator=(Frame2D&& other)
+{
+    std::swap(m_target, other.m_target);
+    std::swap(m_queue, other.m_queue);
+    std::swap(m_encoder, other.m_encoder);
+    std::swap(m_load_op, other.m_load_op);
+
+    return *this;
+}
+
+Frame2D::~Frame2D()
+{
+    if (m_encoder != nullptr) {
+        wgpuCommandEncoderRelease(m_encoder);
+    }
+}
+
+WGPURenderPassEncoder Frame2D::begin_pass()
+{
     WGPURenderPassColorAttachment color_attachment = { 0 };
     color_attachment.depthSlice = WGPU_DEPTH_SLICE_UNDEFINED;
-    color_attachment.loadOp = WGPULoadOp_Clear;
+    color_attachment.loadOp = m_load_op;
     color_attachment.storeOp = WGPUStoreOp_Store;
-    color_attachment.clearValue = target.clear_color();
-    color_attachment.view = target.texture().view();
+    color_attachment.clearValue = m_target->clear_color();
+    color_attachment.view = m_target->texture().view();
+
+    m_load_op = WGPULoadOp_Load;
 
     WGPURenderPassDepthStencilAttachment depth_stencil_attachment = { 0 };
-    depth_stencil_attachment.view = target.depth_texture().view();
+    depth_stencil_attachment.view = m_target->depth_texture().view();
     depth_stencil_attachment.depthClearValue = 1.0f;
     depth_stencil_attachment.depthLoadOp = WGPULoadOp_Clear;
     depth_stencil_attachment.depthStoreOp = WGPUStoreOp_Store;
@@ -33,42 +65,23 @@ Frame2D::Frame2D(WGPUDevice device, RenderTarget& target)
     render_pass_desc.colorAttachments = &color_attachment;
     render_pass_desc.depthStencilAttachment = &depth_stencil_attachment;
 
-    m_pass = wgpuCommandEncoderBeginRenderPass(
+    return wgpuCommandEncoderBeginRenderPass(
         m_encoder, &render_pass_desc);
 }
 
-Frame2D::Frame2D(Frame2D&& other)
+void Frame2D::end_pass(WGPURenderPassEncoder pass)
 {
-    *this = std::move(other);
-}
-
-Frame2D& Frame2D::operator=(Frame2D&& other)
-{
-    std::swap(m_target, other.m_target);
-    std::swap(m_queue, other.m_queue);
-    std::swap(m_pass, other.m_pass);
-    std::swap(m_encoder, other.m_encoder);
-
-    return *this;
-}
-
-Frame2D::~Frame2D()
-{
-    if (m_pass != nullptr) {
-        wgpuRenderPassEncoderRelease(m_pass);
-    }
-    if (m_pass != nullptr) {
-        wgpuCommandEncoderRelease(m_encoder);
-    }
+    wgpuRenderPassEncoderEnd(pass);
+    wgpuRenderPassEncoderRelease(pass);
 }
 
 void Frame2D::finish()
 {
-    wgpuRenderPassEncoderEnd(m_pass);
-
     WGPUCommandBufferDescriptor buffer_desc = { 0 };
     WGPUCommandBuffer command_buffer =
         wgpuCommandEncoderFinish(m_encoder, &buffer_desc);
     wgpuQueueSubmit(m_queue, 1, &command_buffer);
     wgpuCommandBufferRelease(command_buffer);
+
+    m_load_op = WGPULoadOp_Clear;
 }

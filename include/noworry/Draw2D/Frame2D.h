@@ -17,7 +17,9 @@ public:
 
     RenderTarget& target() { return *m_target; }
 
-    WGPURenderPassEncoder pass() { return m_pass; }
+    WGPURenderPassEncoder begin_pass();
+
+    void end_pass(WGPURenderPassEncoder);
 
     void finish();
 
@@ -25,7 +27,7 @@ private:
     RenderTarget* m_target;
     WGPUQueue m_queue;
     WGPUCommandEncoder m_encoder;
-    WGPURenderPassEncoder m_pass;
+    WGPULoadOp m_load_op;
 };
 
 #endif

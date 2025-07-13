@@ -124,12 +124,12 @@ fn fs_main(input: FragmentInput) -> @location(0) vec4f {
     WGPUBlendState blend = {
         .color= {
             .operation = WGPUBlendOperation_Add,
-            .srcFactor = WGPUBlendFactor_Src,
+            .srcFactor = WGPUBlendFactor_One,
             .dstFactor = WGPUBlendFactor_Zero
         },
         .alpha = {
             .operation = WGPUBlendOperation_Add,
-            .srcFactor = WGPUBlendFactor_Src,
+            .srcFactor = WGPUBlendFactor_One,
             .dstFactor = WGPUBlendFactor_Zero
         }
     };

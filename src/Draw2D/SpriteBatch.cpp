@@ -11,7 +11,7 @@ SpriteBatch::SpriteBatch(WGPUDevice device, std::size_t max)
     std::vector<std::uint16_t> indices;
     indices.reserve(6 * max);
     for (int i = 0; i < max; ++i) {
-        int index = 6 * i;
+        int index = 4 * i;
         indices.push_back(index);
         indices.push_back(index + 1);
         indices.push_back(index + 2);
@@ -79,7 +79,7 @@ void SpriteBatch::end()
         return;
     }
 
-    m_current_draw_call.end = 6 * (m_vertices.size() + 1);
+    m_current_draw_call.end = 6 * (m_draw_calls.size() + 1);
     m_draw_calls.push_back(m_current_draw_call);
     flush();
     m_current_draw_call.bind_group = nullptr;
@@ -108,6 +108,8 @@ void SpriteBatch::draw(
         m_current_draw_call.end = 6 * (m_draw_calls.size() + 1);
         m_draw_calls.push_back(m_current_draw_call);
 
+        //flush();
+
         m_current_draw_call.bind_group = spritesheet.bind_group();
         m_current_draw_call.begin = 6 * m_draw_calls.size();
     }
@@ -131,8 +133,6 @@ void SpriteBatch::flush()
         return;
     }
 
-    WGPURenderPassEncoder encoder = m_frame->pass();
-
     WGPUQueue queue = wgpuDeviceGetQueue(m_device);
     wgpuQueueWriteBuffer(queue, m_vertex_buffer, 0, m_vertices.data(),
                          sizeof(glm::vec4) * m_vertices.size());
@@ -148,24 +148,28 @@ void SpriteBatch::flush()
     wgpuQueueWriteBuffer(queue, m_viewproj_buffer, 0, &viewproj,
                          sizeof(glm::mat4));
 
-    wgpuRenderPassEncoderSetPipeline(encoder, m_pipeline.pipeline());
-    wgpuRenderPassEncoderSetVertexBuffer(
-        encoder, 0, m_vertex_buffer, 0, wgpuBufferGetSize(m_vertex_buffer));
-    wgpuRenderPassEncoderSetIndexBuffer(
-        encoder, m_index_buffer, WGPUIndexFormat_Uint16, 0,
-        wgpuBufferGetSize(m_index_buffer));
-    wgpuRenderPassEncoderSetBindGroup(
-        encoder,
-        0,
-        m_global_bind_group,
-        0,
-        nullptr);
-
     for (int i = 0; i < m_draw_calls.size(); ++i) {
         DrawCall& draw_call = m_draw_calls[i];
         if (draw_call.begin == draw_call.end) {
             continue;
         }
+
+        WGPURenderPassEncoder encoder = m_frame->begin_pass();
+
+        wgpuRenderPassEncoderSetPipeline(encoder, m_pipeline.pipeline());
+        wgpuRenderPassEncoderSetVertexBuffer(
+            encoder, 0, m_vertex_buffer, 0,
+            wgpuBufferGetSize(m_vertex_buffer));
+        wgpuRenderPassEncoderSetIndexBuffer(
+            encoder, m_index_buffer, WGPUIndexFormat_Uint16, 0,
+            wgpuBufferGetSize(m_index_buffer));
+        wgpuRenderPassEncoderSetBindGroup(
+            encoder,
+            0,
+            m_global_bind_group,
+            0,
+            nullptr);
+
         wgpuRenderPassEncoderSetBindGroup(
             encoder,
             1,
@@ -179,6 +183,8 @@ void SpriteBatch::flush()
             draw_call.begin,
             0,
             0);
+
+        m_frame->end_pass(encoder);
     }
 
     m_draw_calls.clear();

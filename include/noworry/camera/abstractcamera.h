@@ -13,7 +13,9 @@ public:
     virtual void set_position(const glm::vec3& position) override;
     virtual void set_target(const glm::vec3& target) override;
     virtual void update_matrix(CameraData*) override;
-    virtual glm::vec3 unproject(glm::vec3 ndc) override;
+
+    virtual glm::vec3 project(const glm::vec3& pos) const override;
+    virtual glm::vec3 unproject(const glm::vec3& ndc) const override;
 
 protected:
     glm::vec3 position() const;

@@ -1,6 +1,7 @@
 #ifndef TILEMAPEDITOR_H
 #define TILEMAPEDITOR_H
 
+#include "CursorOverlay.h"
 #include "../AppState.h"
 #include "../TilePicker.h"
 
@@ -17,6 +18,9 @@
 #include <memory>
 #include <vector>
 
+#include <glm/vec2.hpp>
+#include <glm/vec3.hpp>
+
 /// Level map editor.
 class TilemapEditor
 {
@@ -24,6 +28,13 @@ public:
     TilemapEditor(AppState&);
 
     void render();
+
+    glm::vec3 map_2d_to_3d(const glm::vec2&) const;
+    glm::vec2 map_3d_to_2d(const glm::vec3&) const;
+
+    glm::vec2 mouse_pos() const;
+
+    int selected_tile() const { return m_selected_tile; }
 
 private:
     int m_camera_selection;
@@ -45,6 +56,8 @@ private:
     Transform m_transform;
     OrthographicCamera m_ortho_camera;
     PerspectiveCamera m_camera;
+
+    CursorOverlay m_cursor_overlay;
 
     Mesh m_grid_mesh;
 
