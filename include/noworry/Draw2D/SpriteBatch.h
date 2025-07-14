@@ -20,6 +20,7 @@ struct Region
     int h;
 };
 
+// TODO: Investigate more efficient sprite renderer implementation
 class SpriteBatch
 {
 public:
@@ -28,6 +29,8 @@ public:
     virtual ~SpriteBatch();
 
     SpritePipeline& pipeline() { return m_pipeline; }
+
+    void resize(int size);
 
     void begin(RenderTarget&);
 

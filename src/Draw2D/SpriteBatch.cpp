@@ -5,34 +5,11 @@
 SpriteBatch::SpriteBatch(WGPUDevice device, std::size_t max)
     : m_capacity(max),
       m_device(device),
-      m_pipeline(device)
+      m_pipeline(device),
+      m_vertex_buffer(nullptr),
+      m_index_buffer(nullptr)
 {
-    const std::size_t ibuffer_size = 6 * sizeof(std::uint16_t) * max;
-    std::vector<std::uint16_t> indices;
-    indices.reserve(6 * max);
-    for (int i = 0; i < max; ++i) {
-        int index = 4 * i;
-        indices.push_back(index);
-        indices.push_back(index + 1);
-        indices.push_back(index + 2);
-        indices.push_back(index);
-        indices.push_back(index + 2);
-        indices.push_back(index + 3);
-    }
-
-    WGPUBufferDescriptor vbuffer_desc = { 0 };
-    vbuffer_desc.nextInChain = nullptr;
-    vbuffer_desc.usage = WGPUBufferUsage_CopyDst | WGPUBufferUsage_Vertex;
-    vbuffer_desc.size = 4 * sizeof(glm::vec4) * max;
-    vbuffer_desc.mappedAtCreation = false;
-    m_vertex_buffer = wgpuDeviceCreateBuffer(device, &vbuffer_desc);
-
-    WGPUBufferDescriptor ibuffer_desc = { 0 };
-    ibuffer_desc.nextInChain = nullptr;
-    ibuffer_desc.usage = WGPUBufferUsage_CopyDst | WGPUBufferUsage_Index;
-    ibuffer_desc.size = ibuffer_size;
-    ibuffer_desc.mappedAtCreation = false;
-    m_index_buffer = wgpuDeviceCreateBuffer(device, &ibuffer_desc);
+    resize(max);
 
     WGPUBufferDescriptor viewproj_buffer_desc = { 0 };
     viewproj_buffer_desc.nextInChain = nullptr;
@@ -41,10 +18,6 @@ SpriteBatch::SpriteBatch(WGPUDevice device, std::size_t max)
     viewproj_buffer_desc.size = 64;
     viewproj_buffer_desc.mappedAtCreation = false;
     m_viewproj_buffer = wgpuDeviceCreateBuffer(device, &viewproj_buffer_desc);
-
-    WGPUQueue queue = wgpuDeviceGetQueue(device);
-    wgpuQueueWriteBuffer(queue, m_index_buffer, 0,
-                         indices.data(), ibuffer_size);
 
     m_global_bind_group =
         m_pipeline.create_global_bind_group(device, m_viewproj_buffer);
@@ -64,6 +37,49 @@ SpriteBatch::~SpriteBatch()
     if (m_global_bind_group != nullptr) {
         wgpuBindGroupRelease(m_global_bind_group);
     }
+}
+
+void SpriteBatch::resize(int size)
+{
+    if (m_index_buffer != nullptr) {
+        wgpuBufferRelease(m_index_buffer);
+    }
+    if (m_vertex_buffer != nullptr) {
+        wgpuBufferRelease(m_vertex_buffer);
+    }
+
+    const std::size_t ibuffer_size = 6 * sizeof(std::uint16_t) * size;
+    std::vector<std::uint16_t> indices;
+    indices.reserve(6 * size);
+    for (int i = 0; i < size; ++i) {
+        int index = 4 * i;
+        indices.push_back(index);
+        indices.push_back(index + 1);
+        indices.push_back(index + 2);
+        indices.push_back(index);
+        indices.push_back(index + 2);
+        indices.push_back(index + 3);
+    }
+
+    WGPUBufferDescriptor vbuffer_desc = { 0 };
+    vbuffer_desc.nextInChain = nullptr;
+    vbuffer_desc.usage = WGPUBufferUsage_CopyDst | WGPUBufferUsage_Vertex;
+    vbuffer_desc.size = 4 * sizeof(glm::vec4) * size;
+    vbuffer_desc.mappedAtCreation = false;
+    m_vertex_buffer = wgpuDeviceCreateBuffer(m_device, &vbuffer_desc);
+
+    WGPUBufferDescriptor ibuffer_desc = { 0 };
+    ibuffer_desc.nextInChain = nullptr;
+    ibuffer_desc.usage = WGPUBufferUsage_CopyDst | WGPUBufferUsage_Index;
+    ibuffer_desc.size = ibuffer_size;
+    ibuffer_desc.mappedAtCreation = false;
+    m_index_buffer = wgpuDeviceCreateBuffer(m_device, &ibuffer_desc);
+
+    WGPUQueue queue = wgpuDeviceGetQueue(m_device);
+    wgpuQueueWriteBuffer(queue, m_index_buffer, 0,
+                         indices.data(), ibuffer_size);
+
+    m_capacity = size;
 }
 
 void SpriteBatch::begin(RenderTarget& target)
@@ -97,18 +113,12 @@ void SpriteBatch::draw(
         return;
     }
 
-    if (m_vertices.size() == 4 * m_capacity) {
-        flush();
-    }
-
     WGPUBindGroup bind_group = spritesheet.bind_group();
     if (m_current_draw_call.bind_group == nullptr) {
         m_current_draw_call.bind_group = bind_group;
     } else if (bind_group != m_current_draw_call.bind_group) {
         m_current_draw_call.end = 6 * (m_draw_calls.size() + 1);
         m_draw_calls.push_back(m_current_draw_call);
-
-        //flush();
 
         m_current_draw_call.bind_group = spritesheet.bind_group();
         m_current_draw_call.begin = 6 * m_draw_calls.size();
@@ -131,6 +141,10 @@ void SpriteBatch::flush()
     }
     if (m_draw_calls.size() == 0) {
         return;
+    }
+
+    if (m_vertices.size() > m_capacity) {
+        resize(m_vertices.capacity());
     }
 
     WGPUQueue queue = wgpuDeviceGetQueue(m_device);
