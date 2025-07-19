@@ -16,11 +16,13 @@ add_executable(demo
   Pane.cpp
   Reducer.cpp
   TilePicker.cpp
+  TileThumbnail.cpp
   Commands/Command.cpp
   Commands/CreateLayerCommand.cpp
   Commands/CreateTileCommand.cpp
   Commands/PlaceTileCommand.cpp
   Commands/UpdateTileCommand.cpp
+  Tilemap/CursorOverlay.cpp
   Tilemap/TilemapEditor.cpp
   Tileset/AddTile.cpp
   Tileset/ModelInspector.cpp

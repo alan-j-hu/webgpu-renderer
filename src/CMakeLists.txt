@@ -12,6 +12,10 @@ add_library(noworry
   camera/abstractcamera.cpp
   camera/orthographiccamera.cpp
   camera/perspectivecamera.cpp
+  Draw2D/Frame2D.cpp
+  Draw2D/SpritePipeline.cpp
+  Draw2D/SpriteRenderer.cpp
+  Draw2D/Spritesheet.cpp
   Pipeline/MeshVertexShader.cpp
   Pipeline/PipelineFactory.cpp
   Material/FlatMaterial.cpp

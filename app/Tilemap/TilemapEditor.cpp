@@ -10,8 +10,14 @@ TilemapEditor::TilemapEditor(AppState& app_state)
       m_app_state(app_state),
       m_selected_layer {-1},
       m_selected_tile {-1},
-      m_subwindow(app_state.renderer().device(), 500, 500),
+      m_subwindow_2d(app_state.renderer().device(), 500, 500),
+      m_subwindow_3d(app_state.renderer().device(), 500, 500),
+      m_spritesheet(app_state.renderer().device(),
+                    app_state.sprite_renderer().pipeline(),
+                    m_subwindow_3d.texture(),
+                    app_state.renderer().default_sampler()),
       m_scene(app_state.renderer(), m_camera),
+      m_cursor_overlay(app_state, *this),
       m_grid_mesh(
           create_grid(app_state.renderer().device(),
                       glm::vec3(0, 0, 0),
@@ -21,7 +27,8 @@ TilemapEditor::TilemapEditor(AppState& app_state)
                       glm::vec3(0, 16, 0))),
       m_tile_picker(app_state)
 {
-    m_subwindow.set_clear_color(app_state.background_color());
+    //m_subwindow_2d.set_clear_color(app_state.background_color());
+    m_subwindow_3d.set_clear_color(app_state.background_color());
 
     m_camera.set_position(glm::vec3(8.0f, -1.0f, 10.0f));
     m_camera.set_target(glm::vec3(8.0f, 8.0f, 0.0f));
@@ -30,9 +37,58 @@ TilemapEditor::TilemapEditor(AppState& app_state)
     m_ortho_camera.set_target(glm::vec3(0.0f, 0.0f, 0.0f));
 }
 
+glm::vec3 TilemapEditor::map_2d_to_3d(const glm::vec2& vec2d) const
+{
+    glm::vec2 v = vec2d;
+    v.x /= m_subwindow_2d.width() / 2;
+    v.y /= m_subwindow_2d.height() / 2;
+    v.x -= 1;
+    v.y -= 1;
+    v.y *= -1;
+    return m_ortho_camera.unproject(glm::vec3(v, 0));
+}
+
+glm::vec2 TilemapEditor::map_3d_to_2d(const glm::vec3& vec3d) const
+{
+    glm::vec2 v = m_ortho_camera.project(vec3d);
+    v.y *= -1;
+    v.x += 1;
+    v.y += 1;
+    v.x *= m_subwindow_2d.width() / 2;
+    v.y *= m_subwindow_2d.height() / 2;
+    return v;
+}
+
+glm::vec2 TilemapEditor::mouse_pos() const
+{
+    return glm::vec2(m_mouse_rel_x, m_mouse_rel_y);
+}
+
 void TilemapEditor::render()
 {
     render_preview();
+
+    {
+        m_app_state.sprite_renderer().begin(m_subwindow_2d);
+
+        Region src;
+        src.x = 0;
+        src.y = 0;
+        src.w = 1;
+        src.h = 1;
+
+        Region dest;
+        dest.x = 0;
+        dest.y = 0;
+        dest.w = m_subwindow_2d.width();
+        dest.h = m_subwindow_2d.height();
+
+        m_app_state.sprite_renderer().draw(m_spritesheet, dest, src);
+        m_cursor_overlay.draw(m_subwindow_2d, m_app_state.sprite_renderer());
+
+        m_app_state.sprite_renderer().end();
+    }
+
     auto project = m_app_state.project();
 
     if (ImGui::BeginChild("Map", ImVec2(500, 700))) {
@@ -64,8 +120,8 @@ void TilemapEditor::render()
         ImVec2 mouse_pos = ImGui::GetMousePos();
         m_mouse_rel_x = mouse_pos.x - screen_pos.x;
         m_mouse_rel_y = mouse_pos.y - screen_pos.y;
-        ImGui::Image((ImTextureID)(intptr_t)m_subwindow.texture().view(),
-                     ImVec2(m_subwindow.width(), m_subwindow.height()));
+        ImGui::Image((ImTextureID)(intptr_t)m_subwindow_2d.texture().view(),
+                     ImVec2(m_subwindow_2d.width(), m_subwindow_2d.height()));
     }
     ImGui::EndChild();
 
@@ -95,7 +151,7 @@ void TilemapEditor::render()
 
 void TilemapEditor::render_preview()
 {
-    Frame frame(m_app_state.renderer(), m_subwindow, m_scene);
+    Frame frame(m_app_state.renderer(), m_subwindow_3d, m_scene);
     frame.add(m_transform, m_grid_mesh, m_app_state.wireframe_material());
 
     auto& project = m_app_state.project();
@@ -130,8 +186,8 @@ void TilemapEditor::unproject()
     auto& project = m_app_state.project();
 
     glm::vec2 pos =
-        glm::vec2(m_mouse_rel_x / m_subwindow.width(),
-                  m_mouse_rel_y / m_subwindow.height());
+        glm::vec2(m_mouse_rel_x / m_subwindow_3d.width(),
+                  m_mouse_rel_y / m_subwindow_3d.height());
     pos.x = 2 * pos.x - 1;
     pos.y = 2 * pos.y - 1;
     auto world = m_ortho_camera.unproject(glm::vec3(pos, 1));

@@ -8,6 +8,7 @@
 
 AppState::AppState(WGPUDevice device)
     : m_renderer(device),
+      m_sprite_renderer(device, 100),
       m_resources(m_renderer),
       m_small_grid_mesh(
           create_grid(device,
@@ -55,10 +56,10 @@ void AppState::push_command(std::unique_ptr<Command> command)
 void AppState::refresh_thumbnails()
 {
     while (m_thumbnail_cache.size() < m_project.tiledef_count()) {
-        m_thumbnail_cache.emplace_back(m_renderer.device(), 64, 64);
+        m_thumbnail_cache.emplace_back(*this);
     }
     for (int i = 0; i < m_project.tiledef_count(); ++i) {
-        RenderTarget& target = m_thumbnail_cache.at(i);
+        RenderTarget& target = m_thumbnail_cache.at(i).render_target();
         {
             Frame frame(m_renderer, target, m_thumbnail_scene);
             auto def = m_project.tiledef_at(i);
