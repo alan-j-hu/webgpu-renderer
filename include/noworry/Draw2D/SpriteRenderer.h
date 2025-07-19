@@ -1,5 +1,5 @@
-#ifndef SPRITEBATCH_H
-#define SPRITEBATCH_H
+#ifndef SPRITE_RENDERER_H
+#define SPRITE_RENDERER_H
 
 #include "Frame2D.h"
 #include "SpritePipeline.h"
@@ -21,12 +21,12 @@ struct Region
 };
 
 // TODO: Investigate more efficient sprite renderer implementation
-class SpriteBatch
+class SpriteRenderer
 {
 public:
-    SpriteBatch(WGPUDevice device, std::size_t max);
+    SpriteRenderer(WGPUDevice device, std::size_t max);
 
-    virtual ~SpriteBatch();
+    virtual ~SpriteRenderer();
 
     SpritePipeline& pipeline() { return m_pipeline; }
 

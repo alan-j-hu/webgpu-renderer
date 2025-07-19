@@ -6,7 +6,7 @@ CursorOverlay::CursorOverlay(AppState& app_state, TilemapEditor& editor)
 {
 }
 
-void CursorOverlay::draw(RenderTarget& target, SpriteBatch& sprite_batch)
+void CursorOverlay::draw(RenderTarget& target, SpriteRenderer& sprite_renderer)
 {
     const Project& project = m_app_state->project();
     TileThumbnail* thumb = nullptr;
@@ -32,7 +32,7 @@ void CursorOverlay::draw(RenderTarget& target, SpriteBatch& sprite_batch)
         dest.w = pos_tr.x - pos_bl.x;
         dest.h = pos_bl.y - pos_tr.y;
 
-        sprite_batch.draw(thumb->spritesheet(),
+        sprite_renderer.draw(thumb->spritesheet(),
                           dest,
                           src);
     }

@@ -8,7 +8,6 @@
 #include "noworry/mesh.h"
 #include "noworry/renderer.h"
 #include "noworry/rendertarget.h"
-#include "noworry/Draw2D/SpriteBatch.h"
 #include "noworry/Draw2D/Spritesheet.h"
 #include "noworry/transform.h"
 #include "noworry/camera/orthographiccamera.h"

@@ -1,8 +1,8 @@
-#include "noworry/Draw2D/SpriteBatch.h"
+#include "noworry/Draw2D/SpriteRenderer.h"
 #include <cstdint>
 #include <glm/mat4x4.hpp>
 
-SpriteBatch::SpriteBatch(WGPUDevice device, std::size_t max)
+SpriteRenderer::SpriteRenderer(WGPUDevice device, std::size_t max)
     : m_capacity(max),
       m_device(device),
       m_pipeline(device),
@@ -23,7 +23,7 @@ SpriteBatch::SpriteBatch(WGPUDevice device, std::size_t max)
         m_pipeline.create_global_bind_group(device, m_viewproj_buffer);
 }
 
-SpriteBatch::~SpriteBatch()
+SpriteRenderer::~SpriteRenderer()
 {
     if (m_index_buffer != nullptr) {
         wgpuBufferRelease(m_index_buffer);
@@ -39,7 +39,7 @@ SpriteBatch::~SpriteBatch()
     }
 }
 
-void SpriteBatch::resize(int size)
+void SpriteRenderer::resize(int size)
 {
     if (m_index_buffer != nullptr) {
         wgpuBufferRelease(m_index_buffer);
@@ -82,14 +82,14 @@ void SpriteBatch::resize(int size)
     m_capacity = size;
 }
 
-void SpriteBatch::begin(RenderTarget& target)
+void SpriteRenderer::begin(RenderTarget& target)
 {
     m_current_draw_call.bind_group = nullptr;
     m_current_draw_call.begin = 0;
     m_frame = std::move(Frame2D(m_device, target));
 }
 
-void SpriteBatch::end()
+void SpriteRenderer::end()
 {
     if (!m_frame) {
         return;
@@ -104,7 +104,7 @@ void SpriteBatch::end()
     m_frame.reset();
 }
 
-void SpriteBatch::draw(
+void SpriteRenderer::draw(
     const Spritesheet& spritesheet,
     const Region& dest,
     const Region& src)
@@ -134,7 +134,7 @@ void SpriteBatch::draw(
                                    src.x + src.w, src.y));
 }
 
-void SpriteBatch::flush()
+void SpriteRenderer::flush()
 {
     if (!m_frame) {
         return;

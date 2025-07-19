@@ -13,7 +13,7 @@ TilemapEditor::TilemapEditor(AppState& app_state)
       m_subwindow_2d(app_state.renderer().device(), 500, 500),
       m_subwindow_3d(app_state.renderer().device(), 500, 500),
       m_spritesheet(app_state.renderer().device(),
-                    app_state.sprite_batch().pipeline(),
+                    app_state.sprite_renderer().pipeline(),
                     m_subwindow_3d.texture(),
                     app_state.renderer().default_sampler()),
       m_scene(app_state.renderer(), m_camera),
@@ -69,7 +69,7 @@ void TilemapEditor::render()
     render_preview();
 
     {
-        m_app_state.sprite_batch().begin(m_subwindow_2d);
+        m_app_state.sprite_renderer().begin(m_subwindow_2d);
 
         Region src;
         src.x = 0;
@@ -83,10 +83,10 @@ void TilemapEditor::render()
         dest.w = m_subwindow_2d.width();
         dest.h = m_subwindow_2d.height();
 
-        m_app_state.sprite_batch().draw(m_spritesheet, dest, src);
-        m_cursor_overlay.draw(m_subwindow_2d, m_app_state.sprite_batch());
+        m_app_state.sprite_renderer().draw(m_spritesheet, dest, src);
+        m_cursor_overlay.draw(m_subwindow_2d, m_app_state.sprite_renderer());
 
-        m_app_state.sprite_batch().end();
+        m_app_state.sprite_renderer().end();
     }
 
     auto project = m_app_state.project();
