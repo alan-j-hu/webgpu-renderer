@@ -31,6 +31,8 @@ public:
     glm::vec3 map_2d_to_3d(const glm::vec2&) const;
     glm::vec2 map_3d_to_2d(const glm::vec3&) const;
 
+    std::optional<std::pair<int, int>> mouseover_cell();
+
     glm::vec2 mouse_pos() const;
 
     int selected_tile() const { return m_selected_tile; }

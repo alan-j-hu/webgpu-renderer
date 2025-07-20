@@ -59,6 +59,24 @@ glm::vec2 TilemapEditor::map_3d_to_2d(const glm::vec3& vec3d) const
     return v;
 }
 
+std::optional<std::pair<int, int>> TilemapEditor::mouseover_cell()
+{
+    glm::vec2 pos = mouse_pos();
+    glm::vec3 pos_3d = map_2d_to_3d(pos);
+
+    if (pos_3d.x < 0 || pos_3d.x >= 16) {
+        return std::nullopt;
+    }
+    if (pos_3d.y < 0 || pos_3d.y >= 16) {
+        return std::nullopt;
+    }
+
+    int x = (int) pos_3d.x;
+    int y = (int) pos_3d.y;
+
+    return std::optional(std::pair<int, int>(x, y));
+}
+
 glm::vec2 TilemapEditor::mouse_pos() const
 {
     return glm::vec2(m_mouse_rel_x, m_mouse_rel_y);
@@ -185,18 +203,11 @@ void TilemapEditor::unproject()
 {
     auto& project = m_app_state.project();
 
-    glm::vec2 pos =
-        glm::vec2(m_mouse_rel_x / m_subwindow_3d.width(),
-                  m_mouse_rel_y / m_subwindow_3d.height());
-    pos.x = 2 * pos.x - 1;
-    pos.y = 2 * pos.y - 1;
-    auto world = m_ortho_camera.unproject(glm::vec3(pos, 1));
-    ImGui::Text("%f, %f\n%f, %f", pos.x, pos.y, world.x, world.y);
-
     if (ImGui::IsMouseDown(0)) {
-        if (world.x >= 0 && world.x < 16 && world.y >= 0 && world.y < 16) {
-            int x = (int) world.x;
-            int y = (int) world.y;
+        auto cell_opt = mouseover_cell();
+        if (cell_opt) {
+            int x = cell_opt->first;
+            int y = cell_opt->second;
 
             if (m_selected_layer != -1 && m_selected_tile != -1) {
                 m_app_state.push_command(std::make_unique<PlaceTileCommand>(
