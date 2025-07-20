@@ -22,8 +22,9 @@ add_executable(demo
   Commands/CreateTileCommand.cpp
   Commands/PlaceTileCommand.cpp
   Commands/UpdateTileCommand.cpp
-  Tilemap/CursorOverlay.cpp
   Tilemap/TilemapEditor.cpp
+  Tilemap/TileMode.cpp
+  Tilemap/View3DMode.cpp
   Tileset/AddTile.cpp
   Tileset/ModelInspector.cpp
   Tileset/RotationDropdown.cpp

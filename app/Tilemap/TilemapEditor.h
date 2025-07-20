@@ -1,7 +1,9 @@
 #ifndef TILEMAPEDITOR_H
 #define TILEMAPEDITOR_H
 
-#include "CursorOverlay.h"
+#include "Mode.h"
+#include "TileMode.h"
+#include "View3DMode.h"
 #include "../AppState.h"
 #include "../TilePicker.h"
 
@@ -35,7 +37,7 @@ public:
 
     glm::vec2 mouse_pos() const;
 
-    int selected_tile() const { return m_selected_tile; }
+    int selected_layer() const { return m_selected_layer; }
 
 private:
     int m_camera_selection;
@@ -45,10 +47,8 @@ private:
     RenderTarget m_subwindow_2d;
     RenderTarget m_subwindow_3d;
     Spritesheet m_spritesheet;
-    TilePicker m_tile_picker;
 
     int m_selected_layer;
-    int m_selected_tile;
 
     float m_mouse_rel_x;
     float m_mouse_rel_y;
@@ -58,13 +58,15 @@ private:
     OrthographicCamera m_ortho_camera;
     PerspectiveCamera m_camera;
 
-    CursorOverlay m_cursor_overlay;
+    TileMode m_tile_mode;
+    View3DMode m_view_3d_mode;
+    Mode* m_current_mode;
 
     Mesh m_grid_mesh;
 
     void render_preview();
 
-    void unproject();
+    void draw_toolbar();
 };
 
 #endif

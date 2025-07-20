@@ -9,7 +9,6 @@ TilemapEditor::TilemapEditor(AppState& app_state)
     : m_camera_selection(0),
       m_app_state(app_state),
       m_selected_layer {-1},
-      m_selected_tile {-1},
       m_subwindow_2d(app_state.renderer().device(), 500, 500),
       m_subwindow_3d(app_state.renderer().device(), 500, 500),
       m_spritesheet(app_state.renderer().device(),
@@ -17,15 +16,16 @@ TilemapEditor::TilemapEditor(AppState& app_state)
                     m_subwindow_3d.texture(),
                     app_state.renderer().default_sampler()),
       m_scene(app_state.renderer(), m_camera),
-      m_cursor_overlay(app_state, *this),
+      m_tile_mode(app_state, *this),
+      m_view_3d_mode(app_state, *this),
+      m_current_mode(&m_tile_mode),
       m_grid_mesh(
           create_grid(app_state.renderer().device(),
                       glm::vec3(0, 0, 0),
                       16,
                       16,
                       glm::vec3(16, 0, 0),
-                      glm::vec3(0, 16, 0))),
-      m_tile_picker(app_state)
+                      glm::vec3(0, 16, 0)))
 {
     //m_subwindow_2d.set_clear_color(app_state.background_color());
     m_subwindow_3d.set_clear_color(app_state.background_color());
@@ -84,6 +84,9 @@ glm::vec2 TilemapEditor::mouse_pos() const
 
 void TilemapEditor::render()
 {
+    draw_toolbar();
+
+    m_current_mode->handle_input();
     render_preview();
 
     {
@@ -102,7 +105,10 @@ void TilemapEditor::render()
         dest.h = m_subwindow_2d.height();
 
         m_app_state.sprite_renderer().draw(m_spritesheet, dest, src);
-        m_cursor_overlay.draw(m_subwindow_2d, m_app_state.sprite_renderer());
+
+        m_current_mode->draw_overlay(
+            m_subwindow_2d,
+            m_app_state.sprite_renderer());
 
         m_app_state.sprite_renderer().end();
     }
@@ -110,30 +116,6 @@ void TilemapEditor::render()
     auto project = m_app_state.project();
 
     if (ImGui::BeginChild("Map", ImVec2(500, 700))) {
-        const char* items[] = {
-            "Perspective",
-            "Orthographic"
-        };
-
-        if (ImGui::BeginCombo("##camera", items[m_camera_selection])) {
-            for (int i = 0; i < IM_ARRAYSIZE(items); ++i) {
-                bool is_selected = i == m_camera_selection;
-                if (ImGui::Selectable(items[i], is_selected)) {
-                    m_camera_selection = i;
-                }
-                if (is_selected) {
-                    ImGui::SetItemDefaultFocus();
-                }
-            }
-            ImGui::EndCombo();
-        }
-
-        if (m_camera_selection == 0) {
-            m_scene.set_camera(m_camera);
-        } else {
-            m_scene.set_camera(m_ortho_camera);
-        }
-
         ImVec2 screen_pos = ImGui::GetCursorScreenPos();
         ImVec2 mouse_pos = ImGui::GetMousePos();
         m_mouse_rel_x = mouse_pos.x - screen_pos.x;
@@ -145,8 +127,8 @@ void TilemapEditor::render()
 
     ImGui::SameLine();
 
-    if (ImGui::BeginChild("Side Pane", ImVec2(200, 200))) {
-        m_tile_picker.render(m_selected_tile);
+    if (ImGui::BeginChild("Side Pane", ImVec2(200, 700))) {
+        m_current_mode->draw_controls();
 
         if (ImGui::Button("Add Layer")) {
             m_app_state.push_command(std::make_unique<CreateLayerCommand>());
@@ -161,8 +143,6 @@ void TilemapEditor::render()
             }
           ImGui::EndListBox();
         }
-
-        unproject();
     }
     ImGui::EndChild();
 }
@@ -188,8 +168,8 @@ void TilemapEditor::render_preview()
                     continue;
                 }
                 Material& material = resolved.material == nullptr
-                  ? m_app_state.default_material()
-                  : *resolved.material;
+                    ? m_app_state.default_material()
+                    : *resolved.material;
 
                 Transform transform;
                 transform.set_translation(glm::vec3(x, y, inst.z()));
@@ -199,22 +179,15 @@ void TilemapEditor::render_preview()
     }
 }
 
-void TilemapEditor::unproject()
+void TilemapEditor::draw_toolbar()
 {
-    auto& project = m_app_state.project();
-
-    if (ImGui::IsMouseDown(0)) {
-        auto cell_opt = mouseover_cell();
-        if (cell_opt) {
-            int x = cell_opt->first;
-            int y = cell_opt->second;
-
-            if (m_selected_layer != -1 && m_selected_tile != -1) {
-                m_app_state.push_command(std::make_unique<PlaceTileCommand>(
-                    m_selected_layer, x, y, 0,
-                    project.tiledef_at(m_selected_tile)
-                ));
-            }
-        }
+    if (ImGui::Button("View 3D")) {
+        m_scene.set_camera(m_camera);
+        m_current_mode = &m_view_3d_mode;
+    }
+    ImGui::SameLine();
+    if (ImGui::Button("Edit Tiles")) {
+        m_scene.set_camera(m_ortho_camera);
+        m_current_mode = &m_tile_mode;
     }
 }
