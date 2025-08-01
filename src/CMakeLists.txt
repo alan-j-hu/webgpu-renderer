@@ -16,6 +16,8 @@ add_library(noworry
   Draw2D/SpritePipeline.cpp
   Draw2D/SpriteRenderer.cpp
   Draw2D/Spritesheet.cpp
+  Draw3D/Frame3D.cpp
+  Draw3D/ModelGroup.cpp
   Pipeline/MeshVertexShader.cpp
   Pipeline/PipelineFactory.cpp
   Material/FlatMaterial.cpp

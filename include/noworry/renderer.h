@@ -3,6 +3,8 @@
 
 #include "mesh.h"
 #include "texture.h"
+#include "Draw3D/Frame3D.h"
+#include "Draw3D/ModelGroup.h"
 #include "Material/Effect.h"
 #include "Material/FlatEffect.h"
 #include "Material/Material.h"
@@ -10,6 +12,7 @@
 #include "Pipeline/PipelineFactory.h"
 
 #include <memory>
+#include <optional>
 #include <vector>
 
 class Camera;
@@ -17,7 +20,6 @@ class RenderObject;
 class RenderTarget;
 class Renderer;
 class Scene;
-class Transform;
 
 /// Builds a single frame. Create a new Frame object for each render frame.
 class Frame
@@ -34,26 +36,6 @@ private:
     Renderer* m_renderer;
     RenderTarget* m_target;
     Scene* m_scene;
-};
-
-/// Holds the buffer and bind group for the model transform. The renderer
-/// maintains these objects in a pool.
-class ModelGroup
-{
-public:
-    ModelGroup(Renderer&);
-    ModelGroup(const ModelGroup&) = delete;
-    ModelGroup& operator=(const ModelGroup&) = delete;
-    ModelGroup(ModelGroup&&);
-    ModelGroup& operator=(ModelGroup&&);
-    ~ModelGroup();
-
-    void copy(Renderer& renderer, Transform& transform);
-    WGPUBindGroup bind_group() { return m_bind_group; }
-
-private:
-    WGPUBuffer m_buffer;
-    WGPUBindGroup m_bind_group;
 };
 
 /// Renderer. The same renderer can be used for multiple scenes and
@@ -110,6 +92,8 @@ private:
     std::vector<std::unique_ptr<Effect>> m_effects;
     std::vector<std::unique_ptr<ModelGroup>> m_model_groups;
     int m_next_group;
+
+    std::optional<Frame3D> m_frame;
 
     void do_render(WGPURenderPassEncoder encoder);
 };
