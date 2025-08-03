@@ -27,68 +27,11 @@ Frame::~Frame()
     m_renderer->render(*m_target, *m_scene);
 }
 
-ModelGroup::ModelGroup(Renderer& renderer)
-{
-    WGPUBufferDescriptor buffer_desc = { 0 };
-    buffer_desc.nextInChain = nullptr;
-    buffer_desc.usage = WGPUBufferUsage_CopyDst | WGPUBufferUsage_Uniform;
-    buffer_desc.size = sizeof(ModelUniforms);
-    buffer_desc.mappedAtCreation = false;
-    m_buffer = wgpuDeviceCreateBuffer(renderer.device(), &buffer_desc);
-
-    m_bind_group =
-        renderer.mesh_vertex_shader().create_model_group(renderer.device(),
-                                                         m_buffer);
-}
-
-ModelGroup::ModelGroup(ModelGroup&& other)
-{
-    m_buffer = other.m_buffer;
-    m_bind_group = other.m_bind_group;
-    other.m_buffer = nullptr;
-    other.m_bind_group = nullptr;
-}
-
-ModelGroup& ModelGroup::operator=(ModelGroup&& other)
-{
-    if (m_buffer != nullptr) {
-        wgpuBufferRelease(m_buffer);
-    }
-    if (m_bind_group != nullptr) {
-        wgpuBindGroupRelease(m_bind_group);
-    }
-
-    m_buffer = other.m_buffer;
-    m_bind_group = other.m_bind_group;
-    other.m_buffer = nullptr;
-    other.m_bind_group = nullptr;
-
-    return *this;
-}
-
-ModelGroup::~ModelGroup()
-{
-    if (m_buffer != nullptr) {
-        wgpuBufferRelease(m_buffer);
-    }
-    if (m_bind_group != nullptr) {
-        wgpuBindGroupRelease(m_bind_group);
-    }
-}
-
-void ModelGroup::copy(Renderer& renderer, Transform& transform)
-{
-    ModelUniforms uniforms {};
-    transform.update_matrix(uniforms);
-
-    WGPUQueue queue = wgpuDeviceGetQueue(renderer.device());
-    wgpuQueueWriteBuffer(queue, m_buffer, 0, &uniforms, sizeof(float[16]));
-}
-
 Renderer::Renderer(WGPUDevice device)
     : m_device(device),
       m_mesh_vertex_shader(device),
-      m_next_group(0)
+      m_batcher(*this),
+      m_object_group_pool(*this)
 {
     m_effects.emplace_back(std::make_unique<FlatEffect>(m_device));
     m_effects.emplace_back(std::make_unique<TextureEffect>(m_device));
@@ -110,14 +53,6 @@ Renderer::Renderer(WGPUDevice device)
 Renderer::~Renderer()
 {
     wgpuSamplerRelease(m_sampler);
-}
-
-ModelGroup& Renderer::alloc_group()
-{
-    while (m_next_group >= m_model_groups.size()) {
-        m_model_groups.push_back(std::make_unique<ModelGroup>(*this));
-    }
-    return *m_model_groups[m_next_group++];
 }
 
 void Renderer::render(RenderTarget& target, Scene& scene)
@@ -167,7 +102,7 @@ void Renderer::render(RenderTarget& target, Scene& scene)
     wgpuCommandEncoderRelease(encoder);
     wgpuCommandBufferRelease(command_buffer);
 
-    m_next_group = 0;
+    m_object_group_pool.reset();
 }
 
 void Renderer::do_render(Scene& scene, WGPURenderPassEncoder encoder)
@@ -175,8 +110,9 @@ void Renderer::do_render(Scene& scene, WGPURenderPassEncoder encoder)
     scene.update(*this);
 
     for (auto& ptr : scene.children()) {
-        m_pipeline_factory.enqueue(*this, *ptr);
+        m_batcher.enqueue(*ptr);
     }
 
-    m_pipeline_factory.draw(encoder);
+    m_pipeline_factory.draw(*this, encoder);
+    m_batcher.draw(encoder);
 }

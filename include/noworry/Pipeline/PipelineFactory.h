@@ -8,9 +8,10 @@
 #include <unordered_map>
 #include <vector>
 
+class Renderer;
+
 struct PipelineKey
 {
-    MeshVertexShader* vertex_shader;
     Effect* effect;
     WGPUPrimitiveTopology topology;
     bool operator==(const PipelineKey&) const = default;
@@ -21,10 +22,9 @@ struct std::hash<PipelineKey>
 {
     std::size_t operator()(const PipelineKey& k) const noexcept
     {
-        auto h1 = std::hash<MeshVertexShader*>{}(k.vertex_shader);
-        auto h2 = std::hash<Effect*>{}(k.effect);
-        auto h3 = std::hash<WGPUPrimitiveTopology>{}(k.topology);
-        return h1 ^ (h2 << 1) ^ (h3 << 3);
+        auto h1 = std::hash<Effect*>{}(k.effect);
+        auto h2 = std::hash<WGPUPrimitiveTopology>{}(k.topology);
+        return h1 ^ (h2 << 1);
     }
 };
 
@@ -32,7 +32,7 @@ struct std::hash<PipelineKey>
 class Pipeline
 {
 public:
-    Pipeline(WGPUDevice device, const PipelineKey&);
+    Pipeline(Renderer& renderer, const PipelineKey&);
     Pipeline(const Pipeline& other) = delete;
     Pipeline(Pipeline&&);
 
@@ -46,7 +46,9 @@ public:
 
     void enqueue(RenderObject);
 
-    void draw(WGPURenderPassEncoder encoder);
+    void draw(Renderer&, WGPURenderPassEncoder encoder);
+
+    WGPURenderPipeline pipeline() { return m_pipeline; }
 
 private:
     WGPUPipelineLayout m_pipeline_layout;
@@ -55,18 +57,16 @@ private:
     bool m_queued;
 };
 
-class Renderer;
-
 /// A pipeline factory stores a pipeline cache.
 class PipelineFactory
 {
 public:
-    Pipeline& get_pipeline(WGPUDevice device, const PipelineKey&);
+    Pipeline& get_pipeline(Renderer& renderer, const PipelineKey&);
 
     void enqueue(Pipeline&);
     void enqueue(Renderer& renderer, RenderObject ro);
 
-    void draw(WGPURenderPassEncoder encoder);
+    void draw(Renderer&, WGPURenderPassEncoder encoder);
 
 private:
     std::unordered_map<PipelineKey, Pipeline> m_pipelines;

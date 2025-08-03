@@ -4,15 +4,15 @@
 #include "noworry/Material/Material.h"
 #include <utility>
 
-Pipeline::Pipeline(WGPUDevice device, const PipelineKey& key)
+Pipeline::Pipeline(Renderer& renderer, const PipelineKey& key)
 {
     m_queued = false;
 
     // Layout
     WGPUBindGroupLayout layouts[3] = {
-        key.vertex_shader->global_layout(),
+        renderer.mesh_vertex_shader().global_layout(),
         key.effect->layout(),
-        key.vertex_shader->model_layout()
+        renderer.mesh_vertex_shader().model_layout()
     };
 
     WGPUPipelineLayoutDescriptor pipeline_layout_desc = { 0 };
@@ -20,7 +20,8 @@ Pipeline::Pipeline(WGPUDevice device, const PipelineKey& key)
     pipeline_layout_desc.bindGroupLayouts = layouts;
 
     m_pipeline_layout =
-        wgpuDeviceCreatePipelineLayout(device, &pipeline_layout_desc);
+        wgpuDeviceCreatePipelineLayout(renderer.device(),
+                                       &pipeline_layout_desc);
 
     // Pipeline
     WGPUVertexBufferLayout vertex_buffer_layout;
@@ -62,7 +63,8 @@ Pipeline::Pipeline(WGPUDevice device, const PipelineKey& key)
     WGPURenderPipelineDescriptor pipeline_desc = { 0 };
     pipeline_desc.label = {"pipeline", WGPU_STRLEN};
     pipeline_desc.layout = m_pipeline_layout;
-    pipeline_desc.vertex.module = key.vertex_shader->vertex_shader();
+    pipeline_desc.vertex.module =
+        renderer.mesh_vertex_shader().vertex_shader();
     pipeline_desc.vertex.entryPoint = {"vs_main", WGPU_STRLEN};
     pipeline_desc.vertex.bufferCount = 1;
     pipeline_desc.vertex.buffers = &vertex_buffer_layout;
@@ -75,7 +77,8 @@ Pipeline::Pipeline(WGPUDevice device, const PipelineKey& key)
     pipeline_desc.multisample.mask = ~0u;
     pipeline_desc.fragment = &fragment;
 
-    m_pipeline = wgpuDeviceCreateRenderPipeline(device, &pipeline_desc);
+    m_pipeline =
+        wgpuDeviceCreateRenderPipeline(renderer.device(), &pipeline_desc);
 }
 
 Pipeline::Pipeline(Pipeline&& other)
@@ -121,15 +124,19 @@ void Pipeline::enqueue(RenderObject ro)
     m_render_queue.push_back(ro);
 }
 
-void Pipeline::draw(WGPURenderPassEncoder encoder)
+void Pipeline::draw(Renderer& renderer, WGPURenderPassEncoder encoder)
 {
     wgpuRenderPassEncoderSetPipeline(encoder, m_pipeline);
     for (auto& render_object : m_render_queue) {
         int count = render_object.mesh().index_count();
+
+        ObjectBindGroup* group = renderer.bind_group_pool().alloc();
+        group->copy(renderer, render_object.transform());
+
         wgpuRenderPassEncoderSetBindGroup(
             encoder, 1, render_object.material().bind_group(), 0, nullptr);
         wgpuRenderPassEncoderSetBindGroup(
-            encoder, 2, render_object.bind_group(), 0, nullptr);
+            encoder, 2, group->bind_group(), 0, nullptr);
 
         wgpuRenderPassEncoderSetVertexBuffer(
             encoder,
@@ -151,14 +158,14 @@ void Pipeline::draw(WGPURenderPassEncoder encoder)
 }
 
 Pipeline& PipelineFactory::get_pipeline(
-    WGPUDevice device, const PipelineKey& key)
+    Renderer& renderer, const PipelineKey& key)
 {
     auto it = m_pipelines.find(key);
     if (it != m_pipelines.end()) {
         return it->second;
     }
 
-    Pipeline pipeline(device, key);
+    Pipeline pipeline(renderer, key);
     auto pair = m_pipelines.emplace(key, std::move(pipeline));
     return pair.first->second;
 }
@@ -174,19 +181,18 @@ void PipelineFactory::enqueue(Pipeline& pipeline)
 void PipelineFactory::enqueue(Renderer& renderer, RenderObject ro)
 {
     PipelineKey key {};
-    key.vertex_shader = &renderer.mesh_vertex_shader();
     key.effect = &ro.material().effect();
     key.topology = ro.mesh().topology();
-    Pipeline& pipeline = get_pipeline(renderer.device(), key);
+    Pipeline& pipeline = get_pipeline(renderer, key);
 
     enqueue(pipeline);
     pipeline.enqueue(ro);
 }
 
-void PipelineFactory::draw(WGPURenderPassEncoder encoder)
+void PipelineFactory::draw(Renderer& renderer, WGPURenderPassEncoder encoder)
 {
     for (Pipeline* pipeline : m_pipeline_queue) {
-        pipeline->draw(encoder);
+        pipeline->draw(renderer, encoder);
         pipeline->set_queued(false);
     }
     m_pipeline_queue.clear();

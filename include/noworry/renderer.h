@@ -3,6 +3,8 @@
 
 #include "mesh.h"
 #include "texture.h"
+#include "Gfx3D/ObjectBindGroup.h"
+#include "Gfx3D/RenderBatch.h"
 #include "Material/Effect.h"
 #include "Material/FlatEffect.h"
 #include "Material/Material.h"
@@ -34,26 +36,6 @@ private:
     Renderer* m_renderer;
     RenderTarget* m_target;
     Scene* m_scene;
-};
-
-/// Holds the buffer and bind group for the model transform. The renderer
-/// maintains these objects in a pool.
-class ModelGroup
-{
-public:
-    ModelGroup(Renderer&);
-    ModelGroup(const ModelGroup&) = delete;
-    ModelGroup& operator=(const ModelGroup&) = delete;
-    ModelGroup(ModelGroup&&);
-    ModelGroup& operator=(ModelGroup&&);
-    ~ModelGroup();
-
-    void copy(Renderer& renderer, Transform& transform);
-    WGPUBindGroup bind_group() { return m_bind_group; }
-
-private:
-    WGPUBuffer m_buffer;
-    WGPUBindGroup m_bind_group;
 };
 
 /// Renderer. The same renderer can be used for multiple scenes and
@@ -98,7 +80,7 @@ public:
 
     PipelineFactory& pipeline_factory() { return m_pipeline_factory; }
 
-    ModelGroup& alloc_group();
+    ObjectBindGroupPool& bind_group_pool() { return m_object_group_pool; }
 
     void render(RenderTarget&, Scene& scene);
 
@@ -108,8 +90,9 @@ private:
     MeshVertexShader m_mesh_vertex_shader;
     PipelineFactory m_pipeline_factory;
     std::vector<std::unique_ptr<Effect>> m_effects;
-    std::vector<std::unique_ptr<ModelGroup>> m_model_groups;
-    int m_next_group;
+
+    ObjectBindGroupPool m_object_group_pool;
+    RenderBatcher m_batcher;
 
     void do_render(Scene& scene, WGPURenderPassEncoder encoder);
 };
