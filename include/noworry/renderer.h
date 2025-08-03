@@ -111,7 +111,7 @@ private:
     std::vector<std::unique_ptr<ModelGroup>> m_model_groups;
     int m_next_group;
 
-    void do_render(WGPURenderPassEncoder encoder);
+    void do_render(Scene& scene, WGPURenderPassEncoder encoder);
 };
 
 #endif

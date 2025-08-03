@@ -73,34 +73,8 @@ TileDefinitionEditor::render(const TileDef& definition)
                      ImVec2(50, 50));
     }
 
-    draw_frame(resolved);
-
-    ImGui::Image((ImTextureID)(intptr_t)m_preview.texture().view(),
-                 ImVec2(m_preview.width(), m_preview.height()));
-
     if (changed) {
         return std::make_optional<TileDef>(new_definition);
     }
     return std::nullopt;
-}
-
-void TileDefinitionEditor::draw_frame(const ResolvedTile& resolved)
-{
-    Frame frame(m_app_state->renderer(), m_preview, m_scene);
-
-    Transform transform;
-    frame.add(transform,
-              m_app_state->small_grid_mesh(),
-              m_app_state->wireframe_material());
-
-    if (resolved.mesh != nullptr) {
-        Material* material = resolved.material;
-        if (material == nullptr) {
-            material = &m_app_state->default_material();
-        }
-
-        frame.add(transform,
-                  resolved.mesh->mesh(),
-                  *material);
-    }
 }

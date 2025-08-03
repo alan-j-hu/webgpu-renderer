@@ -1,18 +1,16 @@
 #ifndef SCENE_H
 #define SCENE_H
 
+#include "Node.h"
 #include "renderobject.h"
 #include "../Pipeline/MeshVertexShader.h"
 #include "../mesh.h"
 #include "../renderer.h"
 #include "../camera/camera.h"
-#include <memory>
-#include <vector>
 
-class Scene
+class Scene : public Node
 {
 public:
-
     Scene(Renderer&, Camera&);
     Scene(const Scene&) = delete;
     Scene& operator=(const Scene&) = delete;
@@ -27,7 +25,6 @@ public:
     WGPUBindGroup bind_group() { return m_bind_group; }
 
 private:
-    bool m_moved = false;
     Renderer* m_renderer;
 
     GlobalUniforms m_uniforms;

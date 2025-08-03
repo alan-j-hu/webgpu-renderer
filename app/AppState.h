@@ -87,8 +87,7 @@ private:
 
     Project m_project;
 
-    Scene m_thumbnail_scene;
-    OrthographicCamera m_thumbnail_camera;
+    ThumbnailCapture m_capture;
     std::vector<TileThumbnail> m_thumbnail_cache;
 
     void visit_node(const aiScene* scene, const aiNode* node);

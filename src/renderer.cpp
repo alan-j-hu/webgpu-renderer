@@ -155,7 +155,7 @@ void Renderer::render(RenderTarget& target, Scene& scene)
         encoder, &render_pass_desc);
     wgpuRenderPassEncoderSetBindGroup(
         pass, 0, scene.bind_group(), 0, nullptr);
-    do_render(pass);
+    do_render(scene, pass);
     wgpuRenderPassEncoderEnd(pass);
 
     WGPUCommandBufferDescriptor buffer_desc = { 0 };
@@ -170,7 +170,13 @@ void Renderer::render(RenderTarget& target, Scene& scene)
     m_next_group = 0;
 }
 
-void Renderer::do_render(WGPURenderPassEncoder encoder)
+void Renderer::do_render(Scene& scene, WGPURenderPassEncoder encoder)
 {
+    scene.update(*this);
+
+    for (auto& ptr : scene.children()) {
+        m_pipeline_factory.enqueue(*this, *ptr);
+    }
+
     m_pipeline_factory.draw(encoder);
 }

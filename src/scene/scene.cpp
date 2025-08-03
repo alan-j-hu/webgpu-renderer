@@ -15,38 +15,32 @@ Scene::Scene(Renderer& renderer, Camera& camera)
 }
 
 Scene::Scene(Scene&& other)
-    : m_uniforms(other.m_uniforms),
-      m_buffer(other.m_buffer),
-      m_bind_group(other.m_bind_group),
-      m_camera(other.m_camera)
 {
-    other.m_moved = true;
-    other.m_buffer = nullptr;
-    other.m_bind_group = nullptr;
+    m_buffer = nullptr;
+    m_bind_group = nullptr;
+    m_camera = nullptr;
+
+    *this = std::move(other);
 }
 
 Scene& Scene::operator=(Scene&& other)
 {
-    wgpuBindGroupRelease(m_bind_group);
-    wgpuBufferRelease(m_buffer);
-
-    m_uniforms = other.m_uniforms;
-    m_buffer = other.m_buffer;
-    m_bind_group = other.m_bind_group;
-    m_camera = other.m_camera;
-
-    other.m_moved = true;
-    other.m_buffer = nullptr;
-    other.m_bind_group = nullptr;
+    std::swap(m_uniforms, other.m_uniforms);
+    std::swap(m_buffer, other.m_buffer);
+    std::swap(m_bind_group, other.m_bind_group);
+    std::swap(m_camera, other.m_camera);
 
     return *this;
 }
 
 Scene::~Scene()
 {
-    if (m_moved) return;
-    wgpuBindGroupRelease(m_bind_group);
-    wgpuBufferRelease(m_buffer);
+    if (m_bind_group != nullptr) {
+        wgpuBindGroupRelease(m_bind_group);
+    }
+    if (m_buffer != nullptr) {
+        wgpuBufferRelease(m_buffer);
+    }
 }
 
 void Scene::set_camera(Camera& camera)

@@ -18,23 +18,6 @@ ModelInspector::ModelInspector(std::string name, int flex, AppState& app_state)
     m_camera.set_target(glm::vec3(2.0f, 0.5f, 1.0f));
 }
 
-bool ModelInspector::render_preview()
-{
-    Transform transform;
-
-    Frame frame(m_app_state->renderer(), m_tile_preview, m_scene);
-    frame.add(transform,
-              m_app_state->small_grid_mesh(),
-              m_app_state->wireframe_material());
-    if (m_selected_tile != nullptr) {
-        frame.add(
-            transform,
-            m_selected_tile->rotated(m_rotation).mesh(),
-            m_app_state->default_material());
-    }
-    return true;
-}
-
 void ModelInspector::content()
 {
     namespace fs = std::filesystem;
@@ -59,7 +42,6 @@ void ModelInspector::content()
 
     rotation_dropdown(m_rotation);
 
-    render_preview();
     ImGui::Image((ImTextureID)(intptr_t)m_tile_preview.texture().view(),
                  ImVec2(m_tile_preview.width(), m_tile_preview.height()));
 

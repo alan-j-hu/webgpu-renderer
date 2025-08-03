@@ -38,8 +38,6 @@ private:
     PerspectiveCamera m_camera;
 
     std::vector<std::filesystem::path> m_sink;
-
-    bool render_preview();
 };
 
 #endif

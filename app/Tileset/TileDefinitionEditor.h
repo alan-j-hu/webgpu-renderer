@@ -26,8 +26,6 @@ private:
     RenderTarget m_preview;
     PerspectiveCamera m_camera;
     Scene m_scene;
-
-    void draw_frame(const ResolvedTile& resolved);
 };
 
 #endif

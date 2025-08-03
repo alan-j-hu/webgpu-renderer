@@ -17,19 +17,11 @@ AppState::AppState(WGPUDevice device)
                       5,
                       glm::vec3(5, 0, 0),
                       glm::vec3(0, 5, 0))),
-      m_thumbnail_camera(),
-      m_thumbnail_scene(m_renderer, m_thumbnail_camera)
+      m_capture(*this)
 {
     m_background_color = {0.0f, 0.5f, 0.5f, 1.0f};
     m_default_material = &m_resources.add_flat_material(0.5, 0.5, 0.5);
     m_wireframe_material = &m_resources.add_wireframe_material(1, 1, 1);
-
-    m_thumbnail_camera.set_top(1);
-    m_thumbnail_camera.set_bottom(0);
-    m_thumbnail_camera.set_left(0);
-    m_thumbnail_camera.set_right(1);
-    m_thumbnail_camera.set_position(glm::vec3(0, 0, 1));
-    m_thumbnail_camera.set_target(glm::vec3(0, 0, 0));
 }
 
 ResolvedTile AppState::resolve_tile(const TileDef& def)
@@ -60,21 +52,18 @@ void AppState::refresh_thumbnails()
     }
     for (int i = 0; i < m_project.tiledef_count(); ++i) {
         RenderTarget& target = m_thumbnail_cache.at(i).render_target();
-        {
-            Frame frame(m_renderer, target, m_thumbnail_scene);
-            auto def = m_project.tiledef_at(i);
-            ResolvedTile resolved = resolve_tile(*def);
+        auto def = m_project.tiledef_at(i);
+        ResolvedTile resolved = resolve_tile(*def);
 
-            if (resolved.mesh == nullptr) {
-                continue;
-            }
-            Material& material = resolved.material == nullptr
-                ? default_material()
-                : *resolved.material;
-
-            Transform transform;
-            frame.add(transform, resolved.mesh->mesh(), material);
+        if (resolved.mesh == nullptr) {
+            continue;
         }
+        Material& material = resolved.material == nullptr
+            ? default_material()
+          : *resolved.material;
+
+        Transform transform;
+        m_capture.capture(target, transform, material, resolved.mesh->mesh());
     }
 }
 
