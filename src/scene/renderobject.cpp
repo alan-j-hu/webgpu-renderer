@@ -1,12 +1,12 @@
 #include "noworry/Material/Material.h"
+#include "noworry/Gfx3D/BasicMesh.h"
 #include "noworry/scene/renderobject.h"
-#include "noworry/mesh.h"
 #include "noworry/renderer.h"
 
 RenderObject::RenderObject(
     Renderer& renderer,
     Transform& transform,
-    const Mesh& mesh,
+    const BasicMesh& mesh,
     Material& material)
     : m_mesh(&mesh), m_material(&material)
 {

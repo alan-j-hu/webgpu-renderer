@@ -18,7 +18,7 @@ void ThumbnailCapture::capture(
     RenderTarget& target,
     Transform& transform,
     Material& material,
-    const Mesh& mesh)
+    const BasicMesh& mesh)
 {
     m_scene.children().clear();
     m_scene

@@ -3,7 +3,6 @@
 #include "Tileset/TilesetPane.h"
 
 #include "noworry/application.h"
-#include "noworry/mesh.h"
 #include "noworry/renderer.h"
 #include "noworry/rendertarget.h"
 #include "noworry/resourcetable.h"

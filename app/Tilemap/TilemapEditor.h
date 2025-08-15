@@ -7,10 +7,10 @@
 #include "../AppState.h"
 #include "../TilePicker.h"
 
-#include "noworry/mesh.h"
 #include "noworry/renderer.h"
 #include "noworry/rendertarget.h"
 #include "noworry/Draw2D/Spritesheet.h"
+#include "noworry/Gfx3D/BasicMesh.h"
 #include "noworry/transform.h"
 #include "noworry/camera/orthographiccamera.h"
 #include "noworry/camera/perspectivecamera.h"
@@ -62,7 +62,7 @@ private:
     View3DMode m_view_3d_mode;
     Mode* m_current_mode;
 
-    Mesh m_grid_mesh;
+    BasicMesh m_grid_mesh;
 
     void render_preview();
 

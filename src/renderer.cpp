@@ -13,7 +13,9 @@ Frame::Frame(Renderer& renderer, RenderTarget& target, Scene& scene)
     m_scene = &scene;
 }
 
-Frame& Frame::add(Transform& transform, const Mesh& mesh, Material& material)
+Frame& Frame::add(Transform& transform,
+                  const BasicMesh& mesh,
+                  Material& material)
 {
     RenderObject ro(*m_renderer, transform, mesh, material);
     m_renderer->pipeline_factory().enqueue(*m_renderer, ro);

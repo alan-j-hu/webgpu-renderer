@@ -1,5 +1,5 @@
 #include "noworry/Gfx3D/RenderBatch.h"
-#include "noworry/mesh.h"
+#include "noworry/Gfx3D/BasicMesh.h"
 #include "noworry/renderer.h"
 #include "noworry/Material/Material.h"
 

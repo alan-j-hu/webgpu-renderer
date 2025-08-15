@@ -1,12 +1,12 @@
-#ifndef MESH_H
-#define MESH_H
+#ifndef BASIC_MESH_H
+#define BASIC_MESH_H
 
-#include "Pipeline/MeshVertexShader.h"
+#include "../Pipeline/MeshVertexShader.h"
 #include <cstddef>
 #include <webgpu/webgpu.h>
 
 /// A mesh consists of a vertex buffer and an index buffer in GPU memory.
-struct Mesh
+struct BasicMesh
 {
 public:
     /// @param device              - the device
@@ -16,17 +16,17 @@ public:
     /// @param indices             - the index buffer
     /// @param padded_index_count  - the padded length of the index buffer
     /// @param logical_index_count - the number of indices used by the mesh
-    Mesh(WGPUDevice device,
-         WGPUPrimitiveTopology topology,
-         Vertex* vertices, std::size_t vertex_count,
-         const std::uint16_t* indices, std::size_t padded_index_count,
-         std::size_t logical_index_count);
-    Mesh(const Mesh&) = delete;
-    Mesh(Mesh&& other);
-    Mesh& operator=(const Mesh&) = delete;
-    Mesh& operator=(Mesh&& other);
+    BasicMesh(WGPUDevice device,
+              WGPUPrimitiveTopology topology,
+              Vertex* vertices, std::size_t vertex_count,
+              const std::uint16_t* indices, std::size_t padded_index_count,
+              std::size_t logical_index_count);
+    BasicMesh(const BasicMesh&) = delete;
+    BasicMesh(BasicMesh&& other);
+    BasicMesh& operator=(const BasicMesh&) = delete;
+    BasicMesh& operator=(BasicMesh&& other);
 
-    ~Mesh();
+    ~BasicMesh();
 
     WGPUBuffer vertex_buffer() const { return m_vertex_buffer; }
     WGPUBuffer index_buffer() const { return m_index_buffer; }

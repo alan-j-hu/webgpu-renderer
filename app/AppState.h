@@ -52,7 +52,7 @@ public:
 
     Material& default_material() { return *m_default_material; }
     Material& wireframe_material() { return *m_wireframe_material; }
-    Mesh& small_grid_mesh() { return m_small_grid_mesh; }
+    BasicMesh& small_grid_mesh() { return m_small_grid_mesh; }
 
     /// Resolves a tile to its mesh and material.
     ResolvedTile resolve_tile(const TileDef& def);
@@ -83,7 +83,7 @@ private:
 
     Material* m_default_material;
     Material* m_wireframe_material;
-    Mesh m_small_grid_mesh;
+    BasicMesh m_small_grid_mesh;
 
     Project m_project;
 

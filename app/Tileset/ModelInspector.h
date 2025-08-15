@@ -5,7 +5,6 @@
 #include "../AppState.h"
 #include "../Modal.h"
 #include "../Pane.h"
-#include "noworry/mesh.h"
 #include "noworry/renderer.h"
 #include "noworry/rendertarget.h"
 #include "noworry/resourcetable.h"

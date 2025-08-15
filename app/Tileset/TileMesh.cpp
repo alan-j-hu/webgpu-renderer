@@ -9,7 +9,7 @@ TileMesh::TileMesh(
     const std::vector<std::uint16_t>& indices)
     : m_vertices(std::move(vertices))
 {
-    m_mesh = std::make_unique<Mesh>(
+    m_mesh = std::make_unique<BasicMesh>(
         app_state.renderer().device(),
         WGPUPrimitiveTopology_TriangleList,
         m_vertices.data(), m_vertices.size(),

@@ -2,7 +2,6 @@ add_library(noworry
   application.cpp
   grid.cpp
   init_wgpu.cpp
-  mesh.cpp
   renderer.cpp
   rendertarget.cpp
   resourcetable.cpp
@@ -16,6 +15,7 @@ add_library(noworry
   Draw2D/SpritePipeline.cpp
   Draw2D/SpriteRenderer.cpp
   Draw2D/Spritesheet.cpp
+  Gfx3D/BasicMesh.cpp
   Gfx3D/ObjectBindGroup.cpp
   Gfx3D/RenderBatch.cpp
   Pipeline/MeshVertexShader.cpp

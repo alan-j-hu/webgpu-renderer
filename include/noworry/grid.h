@@ -1,10 +1,10 @@
 #ifndef GRID_H
 #define GRID_H
 
-#include "mesh.h"
+#include "Gfx3D/BasicMesh.h"
 #include <glm/vec3.hpp>
 
-Mesh create_grid(
+BasicMesh create_grid(
     WGPUDevice device,
     const glm::vec3& pos,
     int w,

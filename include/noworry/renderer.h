@@ -1,8 +1,8 @@
 #ifndef RENDERER_H
 #define RENDERER_H
 
-#include "mesh.h"
 #include "texture.h"
+#include "Gfx3D/BasicMesh.h"
 #include "Gfx3D/ObjectBindGroup.h"
 #include "Gfx3D/RenderBatch.h"
 #include "Material/Effect.h"
@@ -30,7 +30,7 @@ public:
     /// The destructor submits frame data to the renderer.
     ~Frame();
 
-    Frame& add(Transform&, const Mesh&, Material&);
+    Frame& add(Transform&, const BasicMesh&, Material&);
 
 private:
     Renderer* m_renderer;

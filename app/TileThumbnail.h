@@ -17,7 +17,7 @@ public:
         RenderTarget& target,
         Transform& transform,
         Material& material,
-        const Mesh& mesh);
+        const BasicMesh& mesh);
 
 private:
     AppState* m_app_state;

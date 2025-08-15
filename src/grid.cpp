@@ -31,7 +31,7 @@ void create_parallel_lines(
     }
 }
 
-Mesh create_grid(
+BasicMesh create_grid(
     WGPUDevice device,
     const glm::vec3& pos,
     int w,
@@ -49,9 +49,9 @@ Mesh create_grid(
     }
 
     return
-        Mesh(device,
-             WGPUPrimitiveTopology_LineList,
-             vertices.data(), vertices.size(),
-             indices.data(), indices.size(),
-             indices.size());
+        BasicMesh(device,
+                  WGPUPrimitiveTopology_LineList,
+                  vertices.data(), vertices.size(),
+                  indices.data(), indices.size(),
+                  indices.size());
 }

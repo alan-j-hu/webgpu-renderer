@@ -4,9 +4,9 @@
 #include "Node.h"
 #include "renderobject.h"
 #include "../Pipeline/MeshVertexShader.h"
-#include "../mesh.h"
 #include "../renderer.h"
 #include "../camera/camera.h"
+#include "../Gfx3D/BasicMesh.h"
 
 class Scene : public Node
 {

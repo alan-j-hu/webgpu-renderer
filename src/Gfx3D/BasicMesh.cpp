@@ -1,10 +1,12 @@
-#include "noworry/mesh.h"
+#include "noworry/Gfx3D/BasicMesh.h"
 
-Mesh::Mesh(WGPUDevice device,
-           WGPUPrimitiveTopology topology,
-           Vertex* vertices, std::size_t vertex_count,
-           const std::uint16_t* indices, std::size_t padded_index_count,
-           std::size_t logical_index_count)
+BasicMesh::BasicMesh(WGPUDevice device,
+                     WGPUPrimitiveTopology topology,
+                     Vertex* vertices,
+                     std::size_t vertex_count,
+                     const std::uint16_t* indices,
+                     std::size_t padded_index_count,
+                     std::size_t logical_index_count)
 {
     m_topology = topology;
     m_vertex_count = vertex_count;
@@ -32,7 +34,7 @@ Mesh::Mesh(WGPUDevice device,
     wgpuQueueWriteBuffer(queue, m_index_buffer, 0, indices, ibuffer_size);
 }
 
-Mesh::Mesh(Mesh&& other)
+BasicMesh::BasicMesh(BasicMesh&& other)
 {
     m_topology = other.m_topology;
     m_vertex_count = other.m_vertex_count;
@@ -48,7 +50,7 @@ Mesh::Mesh(Mesh&& other)
     other.m_index_buffer = nullptr;
 }
 
-Mesh& Mesh::operator=(Mesh&& other)
+BasicMesh& BasicMesh::operator=(BasicMesh&& other)
 {
     wgpuBufferRelease(m_vertex_buffer);
     wgpuBufferRelease(m_index_buffer);
@@ -69,7 +71,7 @@ Mesh& Mesh::operator=(Mesh&& other)
     return *this;
 }
 
-Mesh::~Mesh()
+BasicMesh::~BasicMesh()
 {
     wgpuBufferRelease(m_vertex_buffer);
     wgpuBufferRelease(m_index_buffer);

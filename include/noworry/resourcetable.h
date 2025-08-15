@@ -1,9 +1,9 @@
 #ifndef RESOURCE_TABLE_H
 #define RESOURCE_TABLE_H
 
-#include "mesh.h"
 #include "texture.h"
 #include "renderer.h"
+#include "Gfx3D/BasicMesh.h"
 #include "Material/Material.h"
 #include "Material/FlatMaterial.h"
 #include "Material/TextureMaterial.h"
@@ -49,7 +49,7 @@ private:
     std::unordered_map<std::filesystem::path,
                        std::weak_ptr<TextureMaterial>> m_texture_materials;
     std::vector<std::unique_ptr<Material>> m_materials;
-    std::vector<std::unique_ptr<Mesh>> m_meshes;
+    std::vector<std::unique_ptr<BasicMesh>> m_meshes;
 };
 
 #endif

@@ -6,7 +6,7 @@
 #include <glm/vec3.hpp>
 
 struct Material;
-struct Mesh;
+struct BasicMesh;
 struct ModelGroup;
 struct Renderer;
 
@@ -15,15 +15,15 @@ struct Renderer;
 class RenderObject
 {
 public:
-    RenderObject(Renderer&, Transform&, const Mesh&, Material&);
+    RenderObject(Renderer&, Transform&, const BasicMesh&, Material&);
 
     Transform& transform() { return m_transform; }
-    const Mesh& mesh() const { return *m_mesh; }
+    const BasicMesh& mesh() const { return *m_mesh; }
     Material& material() { return *m_material; }
 
 private:
     Transform m_transform;
-    const Mesh* m_mesh;
+    const BasicMesh* m_mesh;
     Material* m_material;
 };
 
