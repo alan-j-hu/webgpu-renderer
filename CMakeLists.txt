@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.16)
+cmake_minimum_required(VERSION 3.23)
 project(Demo)
 
 include(FetchContent)
@@ -25,9 +25,17 @@ FetchContent_MakeAvailable(glm)
 FetchContent_Declare(
   dawn
   GIT_REPOSITORY https://dawn.googlesource.com/dawn
-  GIT_TAG 991810463a797d6e770127e604cdd3d8b8ff6e43
-  GIT_SUBMODULES "")
+  GIT_TAG ce20ecbdef2cb921fe9bf9ddd51a67a7e5e94b46
+  GIT_SHALLOW ON
+  GIT_PROGRESS TRUE
+  GIT_SUBMODULES ""
+  GIT_REMOTE_UPDATE_STRATEGY CHECKOUT
+  UPDATE_DISCONNECTED ON)
 set(DAWN_FETCH_DEPENDENCIES ON)
+set(DAWN_BUILD_MONOLITHIC_LIBRARY STATIC)
+set(DAWN_ENABLE_INSTALL ON)
+set(TINT_BUILD_CMD_TOOLS OFF)
+set(TINT_BUILD_TESTS OFF)
 
 FetchContent_MakeAvailable(dawn)
 
