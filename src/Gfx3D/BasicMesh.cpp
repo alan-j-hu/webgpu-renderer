@@ -1,4 +1,5 @@
 #include "noworry/Gfx3D/BasicMesh.h"
+#include <utility>
 
 BasicMesh::BasicMesh(WGPUDevice device,
                      WGPUPrimitiveTopology topology,
@@ -36,43 +37,32 @@ BasicMesh::BasicMesh(WGPUDevice device,
 
 BasicMesh::BasicMesh(BasicMesh&& other)
 {
-    m_topology = other.m_topology;
-    m_vertex_count = other.m_vertex_count;
-    m_padded_index_count = other.m_padded_index_count;
-    m_logical_index_count = other.m_logical_index_count;
-    m_vertex_buffer = other.m_vertex_buffer;
-    m_index_buffer = other.m_index_buffer;
+    m_vertex_count = 0;
+    m_padded_index_count = 0;
+    m_logical_index_count = 0;
+    m_vertex_buffer = nullptr;
+    m_index_buffer = nullptr;
 
-    other.m_vertex_count = 0;
-    other.m_padded_index_count = 0;
-    other.m_logical_index_count = 0;
-    other.m_vertex_buffer = nullptr;
-    other.m_index_buffer = nullptr;
+    *this = std::move(other);
 }
 
 BasicMesh& BasicMesh::operator=(BasicMesh&& other)
 {
-    wgpuBufferRelease(m_vertex_buffer);
-    wgpuBufferRelease(m_index_buffer);
-
-    m_topology = other.m_topology;
-    m_vertex_count = other.m_vertex_count;
-    m_padded_index_count = other.m_padded_index_count;
-    m_logical_index_count = other.m_logical_index_count;
-    m_vertex_buffer = other.m_vertex_buffer;
-    m_index_buffer = other.m_index_buffer;
-
-    other.m_vertex_count = 0;
-    other.m_padded_index_count = 0;
-    other.m_logical_index_count = 0;
-    other.m_vertex_buffer = nullptr;
-    other.m_index_buffer = nullptr;
-
+    std::swap(m_topology, other.m_topology);
+    std::swap(m_vertex_count, other.m_vertex_count);
+    std::swap(m_padded_index_count, other.m_padded_index_count);
+    std::swap(m_logical_index_count, other.m_logical_index_count);
+    std::swap(m_vertex_buffer, other.m_vertex_buffer);
+    std::swap(m_index_buffer, other.m_index_buffer);
     return *this;
 }
 
 BasicMesh::~BasicMesh()
 {
-    wgpuBufferRelease(m_vertex_buffer);
-    wgpuBufferRelease(m_index_buffer);
+    if (m_vertex_buffer != nullptr) {
+        wgpuBufferRelease(m_vertex_buffer);
+    }
+    if (m_index_buffer != nullptr) {
+        wgpuBufferRelease(m_index_buffer);
+    }
 }

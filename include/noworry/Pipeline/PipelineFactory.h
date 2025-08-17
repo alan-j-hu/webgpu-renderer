@@ -41,20 +41,11 @@ public:
 
     ~Pipeline();
 
-    bool queued() const { return m_queued; }
-    void set_queued(bool b) { m_queued = b; }
-
-    void enqueue(RenderObject);
-
-    void draw(Renderer&, WGPURenderPassEncoder encoder);
-
     WGPURenderPipeline pipeline() { return m_pipeline; }
 
 private:
     WGPUPipelineLayout m_pipeline_layout;
     WGPURenderPipeline m_pipeline;
-    std::vector<RenderObject> m_render_queue;
-    bool m_queued;
 };
 
 /// A pipeline factory stores a pipeline cache.
@@ -63,14 +54,8 @@ class PipelineFactory
 public:
     Pipeline& get_pipeline(Renderer& renderer, const PipelineKey&);
 
-    void enqueue(Pipeline&);
-    void enqueue(Renderer& renderer, RenderObject ro);
-
-    void draw(Renderer&, WGPURenderPassEncoder encoder);
-
 private:
     std::unordered_map<PipelineKey, Pipeline> m_pipelines;
-    std::vector<Pipeline*> m_pipeline_queue;
 };
 
 #endif

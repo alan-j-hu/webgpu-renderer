@@ -1,4 +1,5 @@
 #include "TilemapEditor.h"
+#include "LayerNode.h"
 #include "../Commands/CreateLayerCommand.h"
 #include "../Commands/PlaceTileCommand.h"
 #include "noworry/grid.h"
@@ -35,6 +36,8 @@ TilemapEditor::TilemapEditor(AppState& app_state)
 
     m_ortho_camera.set_position(glm::vec3(0.0f, 0.0f, 10.0f));
     m_ortho_camera.set_target(glm::vec3(0.0f, 0.0f, 0.0f));
+
+    m_scene.children().push_back(std::make_unique<LayerNode>(app_state));
 }
 
 glm::vec3 TilemapEditor::map_2d_to_3d(const glm::vec2& vec2d) const
@@ -149,34 +152,7 @@ void TilemapEditor::render()
 
 void TilemapEditor::render_preview()
 {
-    Frame frame(m_app_state.renderer(), m_subwindow_3d, m_scene);
-    frame.add(m_transform, m_grid_mesh, m_app_state.wireframe_material());
-
-    auto& project = m_app_state.project();
-    for (int i = 0; i < project.layer_count(); ++i) {
-        auto& layer = project.layer_at(i);
-        for (int y = 0; y < 16; ++y) {
-            for (int x = 0; x < 16; ++x) {
-                auto& opt = layer.at(x, y);
-                if (!opt) {
-                    continue;
-                }
-
-                auto& inst = opt.value();
-                ResolvedTile resolved = m_app_state.resolve_tile(inst.def());
-                if (resolved.mesh == nullptr) {
-                    continue;
-                }
-                Material& material = resolved.material == nullptr
-                    ? m_app_state.default_material()
-                    : *resolved.material;
-
-                Transform transform;
-                transform.set_translation(glm::vec3(x, y, inst.z()));
-                frame.add(transform, resolved.mesh->mesh(), material);
-            }
-        }
-    }
+    m_app_state.renderer().render(m_subwindow_3d, m_scene);
 }
 
 void TilemapEditor::draw_toolbar()

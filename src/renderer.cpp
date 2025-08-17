@@ -6,27 +6,18 @@
 #include "noworry/scene/scene.h"
 #include <utility>
 
-Frame::Frame(Renderer& renderer, RenderTarget& target, Scene& scene)
+Frame::Frame(Renderer& renderer, Scene& scene)
 {
     m_renderer = &renderer;
-    m_target = &target;
     m_scene = &scene;
 }
 
 Frame& Frame::add(Transform& transform,
-                  const BasicMesh& mesh,
+                  const Mesh& mesh,
                   Material& material)
 {
-    RenderObject ro(*m_renderer, transform, mesh, material);
-    m_renderer->pipeline_factory().enqueue(*m_renderer, ro);
-    //material.effect().enqueue(*m_renderer, transform, mesh, material);
+    m_renderer->batcher().enqueue_parts(mesh, material, transform);
     return *this;
-}
-
-Frame::~Frame()
-{
-    m_scene->update(*m_renderer);
-    m_renderer->render(*m_target, *m_scene);
 }
 
 Renderer::Renderer(WGPUDevice device)
@@ -109,12 +100,7 @@ void Renderer::render(RenderTarget& target, Scene& scene)
 
 void Renderer::do_render(Scene& scene, WGPURenderPassEncoder encoder)
 {
-    scene.update(*this);
-
-    for (auto& ptr : scene.children()) {
-        m_batcher.enqueue(*ptr);
-    }
-
-    m_pipeline_factory.draw(*this, encoder);
+    Frame frame(*this, scene);
+    scene.render(frame);
     m_batcher.draw(encoder);
 }

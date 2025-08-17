@@ -3,6 +3,15 @@
 #include "noworry/renderer.h"
 #include "noworry/Material/Material.h"
 
+DrawCall::DrawCall(const Mesh& p_mesh,
+                   Material& p_material,
+                   const Transform& p_transform)
+    : mesh(&p_mesh),
+      material_group(p_material.bind_group()),
+      transform(p_transform)
+{
+}
+
 void RenderBatch::set_pipeline(Pipeline& pipeline)
 {
     m_pipeline = &pipeline;
@@ -10,33 +19,41 @@ void RenderBatch::set_pipeline(Pipeline& pipeline)
 
 void RenderBatch::enqueue(RenderObject& object)
 {
-    m_draw_calls.push_back(&object);
+    m_draw_calls.emplace_back(
+        object.mesh(), object.material(), object.transform());
+}
+
+void RenderBatch::enqueue_parts(const Mesh& mesh,
+                                Material& mat,
+                                const Transform& transform)
+{
+    m_draw_calls.emplace_back(mesh, mat, transform);
 }
 
 void RenderBatch::draw(Renderer& renderer, WGPURenderPassEncoder encoder)
 {
     wgpuRenderPassEncoderSetPipeline(encoder, m_pipeline->pipeline());
-    for (auto object : m_draw_calls) {
-        int count = object->mesh().index_count();
+    for (auto& draw_call : m_draw_calls) {
+        int count = draw_call.mesh->index_count();
 
         ObjectBindGroup* group = renderer.bind_group_pool().alloc();
-        group->copy(renderer, object->transform());
+        group->copy(renderer, draw_call.transform);
 
         wgpuRenderPassEncoderSetBindGroup(
-            encoder, 1, object->material().bind_group(), 0, nullptr);
+            encoder, 1, draw_call.material_group, 0, nullptr);
         wgpuRenderPassEncoderSetBindGroup(
             encoder, 2, group->bind_group(), 0, nullptr);
 
         wgpuRenderPassEncoderSetVertexBuffer(
             encoder,
             0,
-            object->mesh().vertex_buffer(),
+            draw_call.mesh->vertex_buffer(),
             0,
-            wgpuBufferGetSize(object->mesh().vertex_buffer()));
+            wgpuBufferGetSize(draw_call.mesh->vertex_buffer()));
 
         wgpuRenderPassEncoderSetIndexBuffer(
             encoder,
-            object->mesh().index_buffer(),
+            draw_call.mesh->index_buffer(),
             WGPUIndexFormat_Uint16,
             0,
             count * sizeof(std::uint16_t));
@@ -49,13 +66,22 @@ void RenderBatch::draw(Renderer& renderer, WGPURenderPassEncoder encoder)
 
 RenderBatcher::RenderBatcher(Renderer& renderer)
 {
+    m_pool_index = 0;
     m_renderer = &renderer;
 }
 
 void RenderBatcher::enqueue(RenderObject& object)
 {
-    RenderBatch* batch = search(object);
+    RenderBatch* batch = search(object.material(), object.mesh());
     batch->enqueue(object);
+}
+
+void RenderBatcher::enqueue_parts(const Mesh& mesh,
+                                  Material& mat,
+                                  const Transform& transform)
+{
+    RenderBatch* batch = search(mat, mesh);
+    batch->enqueue_parts(mesh, mat, transform);
 }
 
 void RenderBatcher::draw(WGPURenderPassEncoder encoder)
@@ -70,11 +96,11 @@ void RenderBatcher::draw(WGPURenderPassEncoder encoder)
 RenderBatch* RenderBatcher::next_free(Pipeline& pipeline)
 {
     if (m_pool_index >= m_pool.size()) {
-        m_pool.emplace_back();
+        m_pool.push_back(std::make_unique<RenderBatch>());
     }
-    RenderBatch& batch = m_pool[m_pool_index++];
-    batch.set_pipeline(pipeline);
-    return &batch;
+    RenderBatch* batch = m_pool[m_pool_index++].get();
+    batch->set_pipeline(pipeline);
+    return batch;
 }
 
 void RenderBatcher::reset()
@@ -83,12 +109,12 @@ void RenderBatcher::reset()
     m_batches.clear();
 }
 
-RenderBatch* RenderBatcher::search(RenderObject& object)
+RenderBatch* RenderBatcher::search(Material& material, const Mesh& mesh)
 {
     PipelineKey key = {};
 
-    key.effect = &object.material().effect();
-    key.topology = object.mesh().topology();
+    key.effect = &material.effect();
+    key.topology = mesh.topology();
 
     auto it = m_batches.find(key);
     if (it == m_batches.end()) {

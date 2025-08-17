@@ -2,28 +2,31 @@
 #define RENDEROBJECT_H
 
 #include "../transform.h"
+#include "../Gfx3D/Renderable.h"
 #include <glm/mat4x4.hpp>
 #include <glm/vec3.hpp>
 
 struct Material;
-struct BasicMesh;
+struct Mesh;
 struct ModelGroup;
 struct Renderer;
 
 /// Tells the renderer to draw the given mesh with the given material,
 /// at the given transform.
-class RenderObject
+class RenderObject : public Renderable
 {
 public:
-    RenderObject(Renderer&, Transform&, const BasicMesh&, Material&);
+    RenderObject(Renderer&, Transform&, const Mesh&, Material&);
 
     Transform& transform() { return m_transform; }
-    const BasicMesh& mesh() const { return *m_mesh; }
+    const Mesh& mesh() const { return *m_mesh; }
     Material& material() { return *m_material; }
+
+    virtual void render(Frame& frame) override;
 
 private:
     Transform m_transform;
-    const BasicMesh* m_mesh;
+    const Mesh* m_mesh;
     Material* m_material;
 };
 

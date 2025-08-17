@@ -1,12 +1,13 @@
 #ifndef BASIC_MESH_H
 #define BASIC_MESH_H
 
+#include "Mesh.h"
 #include "../Pipeline/MeshVertexShader.h"
 #include <cstddef>
 #include <webgpu/webgpu.h>
 
 /// A mesh consists of a vertex buffer and an index buffer in GPU memory.
-struct BasicMesh
+class BasicMesh : public Mesh
 {
 public:
     /// @param device              - the device
@@ -26,13 +27,22 @@ public:
     BasicMesh& operator=(const BasicMesh&) = delete;
     BasicMesh& operator=(BasicMesh&& other);
 
-    ~BasicMesh();
+    virtual ~BasicMesh();
 
-    WGPUBuffer vertex_buffer() const { return m_vertex_buffer; }
-    WGPUBuffer index_buffer() const { return m_index_buffer; }
-    std::size_t vertex_count() const { return m_vertex_count; }
-    std::size_t index_count() const { return m_logical_index_count; }
-    WGPUPrimitiveTopology topology() const { return m_topology; }
+    virtual WGPUBuffer vertex_buffer() const override
+    { return m_vertex_buffer; }
+
+    virtual WGPUBuffer index_buffer() const override
+    { return m_index_buffer; }
+
+    virtual std::size_t vertex_count() const override
+    { return m_vertex_count; }
+
+    virtual std::size_t index_count() const override
+    { return m_logical_index_count; }
+
+    virtual WGPUPrimitiveTopology topology() const override
+    { return m_topology; }
 
 private:
     WGPUBuffer m_vertex_buffer;

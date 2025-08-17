@@ -6,9 +6,9 @@
 #include "../Pipeline/MeshVertexShader.h"
 #include "../renderer.h"
 #include "../camera/camera.h"
-#include "../Gfx3D/BasicMesh.h"
+#include "../Gfx3D/Renderable.h"
 
-class Scene : public Node
+class Scene : public Node, public Renderable
 {
 public:
     Scene(Renderer&, Camera&);
@@ -20,7 +20,7 @@ public:
 
     void set_camera(Camera& camera);
 
-    void update(Renderer&);
+    void render(Frame&);
 
     WGPUBindGroup bind_group() { return m_bind_group; }
 

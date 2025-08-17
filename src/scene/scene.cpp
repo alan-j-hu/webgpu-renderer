@@ -48,10 +48,14 @@ void Scene::set_camera(Camera& camera)
     m_camera = &camera;
 }
 
-void Scene::update(Renderer& renderer)
+void Scene::render(Frame& frame)
 {
     m_camera->update_matrix(&m_uniforms.camera);
-    WGPUQueue queue = wgpuDeviceGetQueue(renderer.device());
+    WGPUQueue queue = wgpuDeviceGetQueue(frame.renderer().device());
     wgpuQueueWriteBuffer(
         queue, m_buffer, 0, &m_uniforms, sizeof(GlobalUniforms));
+
+    for (auto& ptr : children()) {
+        ptr->render(frame);
+    }
 }

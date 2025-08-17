@@ -16,6 +16,7 @@ add_library(noworry
   Draw2D/SpriteRenderer.cpp
   Draw2D/Spritesheet.cpp
   Gfx3D/BasicMesh.cpp
+  Gfx3D/DynamicMesh.cpp
   Gfx3D/ObjectBindGroup.cpp
   Gfx3D/RenderBatch.cpp
   Pipeline/MeshVertexShader.cpp

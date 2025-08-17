@@ -25,16 +25,13 @@ class Transform;
 class Frame
 {
 public:
-    Frame(Renderer& renderer, RenderTarget& target, Scene& scene);
+    Frame(Renderer& renderer, Scene& scene);
+    Frame& add(Transform&, const Mesh&, Material&);
 
-    /// The destructor submits frame data to the renderer.
-    ~Frame();
-
-    Frame& add(Transform&, const BasicMesh&, Material&);
+    Renderer& renderer() { return *m_renderer; }
 
 private:
     Renderer* m_renderer;
-    RenderTarget* m_target;
     Scene* m_scene;
 };
 
@@ -81,6 +78,8 @@ public:
     PipelineFactory& pipeline_factory() { return m_pipeline_factory; }
 
     ObjectBindGroupPool& bind_group_pool() { return m_object_group_pool; }
+
+    RenderBatcher& batcher() { return m_batcher; }
 
     void render(RenderTarget&, Scene& scene);
 

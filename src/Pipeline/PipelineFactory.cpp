@@ -6,8 +6,6 @@
 
 Pipeline::Pipeline(Renderer& renderer, const PipelineKey& key)
 {
-    m_queued = false;
-
     // Layout
     WGPUBindGroupLayout layouts[3] = {
         renderer.mesh_vertex_shader().global_layout(),
@@ -82,29 +80,16 @@ Pipeline::Pipeline(Renderer& renderer, const PipelineKey& key)
 }
 
 Pipeline::Pipeline(Pipeline&& other)
-    : m_queued(other.m_queued),
-      m_pipeline_layout(other.m_pipeline_layout),
-      m_pipeline(other.m_pipeline)
+    : m_pipeline_layout(nullptr),
+      m_pipeline(nullptr)
 {
-    other.m_pipeline_layout = nullptr;
-    other.m_pipeline = nullptr;
+    *this = std::move(other);
 }
 
 Pipeline& Pipeline::operator=(Pipeline&& other)
 {
-    if (m_pipeline != nullptr) {
-        wgpuRenderPipelineRelease(m_pipeline);
-    }
-    if (m_pipeline_layout != nullptr) {
-        wgpuPipelineLayoutRelease(m_pipeline_layout);
-    }
-
-    m_queued = other.m_queued;
-    m_pipeline_layout = other.m_pipeline_layout;
-    m_pipeline = other.m_pipeline;
-
-    other.m_pipeline_layout = nullptr;
-    other.m_pipeline = nullptr;
+    std::swap(m_pipeline_layout, other.m_pipeline_layout);
+    std::swap(m_pipeline, other.m_pipeline);
 
     return *this;
 }
@@ -119,44 +104,6 @@ Pipeline::~Pipeline()
     }
 }
 
-void Pipeline::enqueue(RenderObject ro)
-{
-    m_render_queue.push_back(ro);
-}
-
-void Pipeline::draw(Renderer& renderer, WGPURenderPassEncoder encoder)
-{
-    wgpuRenderPassEncoderSetPipeline(encoder, m_pipeline);
-    for (auto& render_object : m_render_queue) {
-        int count = render_object.mesh().index_count();
-
-        ObjectBindGroup* group = renderer.bind_group_pool().alloc();
-        group->copy(renderer, render_object.transform());
-
-        wgpuRenderPassEncoderSetBindGroup(
-            encoder, 1, render_object.material().bind_group(), 0, nullptr);
-        wgpuRenderPassEncoderSetBindGroup(
-            encoder, 2, group->bind_group(), 0, nullptr);
-
-        wgpuRenderPassEncoderSetVertexBuffer(
-            encoder,
-            0,
-            render_object.mesh().vertex_buffer(),
-            0,
-            wgpuBufferGetSize(render_object.mesh().vertex_buffer()));
-
-        wgpuRenderPassEncoderSetIndexBuffer(
-            encoder,
-            render_object.mesh().index_buffer(),
-            WGPUIndexFormat_Uint16,
-            0,
-            count * sizeof(std::uint16_t));
-
-        wgpuRenderPassEncoderDrawIndexed(encoder, count, 1, 0, 0, 0);
-    }
-    m_render_queue.clear();
-}
-
 Pipeline& PipelineFactory::get_pipeline(
     Renderer& renderer, const PipelineKey& key)
 {
@@ -168,32 +115,4 @@ Pipeline& PipelineFactory::get_pipeline(
     Pipeline pipeline(renderer, key);
     auto pair = m_pipelines.emplace(key, std::move(pipeline));
     return pair.first->second;
-}
-
-void PipelineFactory::enqueue(Pipeline& pipeline)
-{
-    if (!pipeline.queued()) {
-        m_pipeline_queue.push_back(&pipeline);
-        pipeline.set_queued(true);
-    }
-}
-
-void PipelineFactory::enqueue(Renderer& renderer, RenderObject ro)
-{
-    PipelineKey key {};
-    key.effect = &ro.material().effect();
-    key.topology = ro.mesh().topology();
-    Pipeline& pipeline = get_pipeline(renderer, key);
-
-    enqueue(pipeline);
-    pipeline.enqueue(ro);
-}
-
-void PipelineFactory::draw(Renderer& renderer, WGPURenderPassEncoder encoder)
-{
-    for (Pipeline* pipeline : m_pipeline_queue) {
-        pipeline->draw(renderer, encoder);
-        pipeline->set_queued(false);
-    }
-    m_pipeline_queue.clear();
 }
