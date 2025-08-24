@@ -4,6 +4,7 @@
 #include "Mesh.h"
 #include "../Pipeline/MeshVertexShader.h"
 #include <cstddef>
+#include <span>
 #include <webgpu/webgpu.h>
 
 /// A mesh consists of a vertex buffer and an index buffer in GPU memory.
@@ -13,14 +14,12 @@ public:
     /// @param device              - the device
     /// @param topology            - the interpretation of the vertex order
     /// @param vertices            - the vertex buffer
-    /// @param vertex_count        - the number of vertices
     /// @param indices             - the index buffer
-    /// @param padded_index_count  - the padded length of the index buffer
     /// @param logical_index_count - the number of indices used by the mesh
     BasicMesh(WGPUDevice device,
               WGPUPrimitiveTopology topology,
-              Vertex* vertices, std::size_t vertex_count,
-              const std::uint16_t* indices, std::size_t padded_index_count,
+              std::span<const Vertex> vertices,
+              std::span<const std::uint16_t> indices,
               std::size_t logical_index_count);
     BasicMesh(const BasicMesh&) = delete;
     BasicMesh(BasicMesh&& other);

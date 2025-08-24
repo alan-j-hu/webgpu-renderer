@@ -160,10 +160,8 @@ std::unique_ptr<Mesh> ResourceTable::load_mesh(aiMesh* ai_mesh)
     std::unique_ptr<BasicMesh> gpu_mesh = std::make_unique<BasicMesh>(
         m_renderer->device(),
         WGPUPrimitiveTopology_TriangleList,
-        vertices.data(),
-        vertices.size(),
-        indices.data(),
-        indices.size(),
+        vertices,
+        indices,
         logical_count
     );
 

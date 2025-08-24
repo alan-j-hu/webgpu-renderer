@@ -51,7 +51,7 @@ BasicMesh create_grid(
     return
         BasicMesh(device,
                   WGPUPrimitiveTopology_LineList,
-                  vertices.data(), vertices.size(),
-                  indices.data(), indices.size(),
+                  vertices,
+                  indices,
                   indices.size());
 }
