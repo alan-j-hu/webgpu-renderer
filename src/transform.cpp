@@ -9,11 +9,7 @@ Transform::Transform()
     m_scale = glm::vec3(1.0f, 1.0f, 1.0f);
 }
 
-Transform::~Transform()
-{
-}
-
-void Transform::update_matrix(ModelUniforms& model)
+glm::mat4 Transform::matrix() const
 {
     glm::mat4 transform = glm::mat4(1);
     // Unintuitively, the matrix argument is the *left* mtrix (i.e. the
@@ -22,5 +18,5 @@ void Transform::update_matrix(ModelUniforms& model)
     transform = glm::translate(transform, m_translation);
     transform = glm::rotate(transform, m_yaw, glm::vec3(0, 1, 0));
     transform = glm::scale(transform, m_scale);
-    model.transform = transform;
+    return transform;
 }

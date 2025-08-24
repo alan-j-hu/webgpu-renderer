@@ -3,10 +3,11 @@
 
 #include <memory>
 #include <vector>
+
+#include <glm/mat4x4.hpp>
 #include <webgpu/webgpu.h>
 
 class Renderer;
-class Transform;
 class ObjectBindGroupPool;
 
 class ObjectBindGroup
@@ -17,7 +18,7 @@ public:
     ObjectBindGroup& operator=(ObjectBindGroup&&);
     ~ObjectBindGroup();
 
-    void copy(Renderer& renderer, Transform& transform);
+    void copy(Renderer& renderer, const glm::mat4& transform);
     WGPUBindGroup bind_group() { return m_bind_group; }
 
 private:

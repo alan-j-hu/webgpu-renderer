@@ -5,7 +5,7 @@
 
 RenderObject::RenderObject(
     Renderer& renderer,
-    Transform& transform,
+    const Transform& transform,
     const Mesh& mesh,
     Material& material)
     : m_mesh(&mesh), m_material(&material)

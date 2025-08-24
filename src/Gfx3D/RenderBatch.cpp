@@ -4,8 +4,8 @@
 #include "noworry/Material/Material.h"
 
 DrawCall::DrawCall(const Mesh& p_mesh,
-                   Material& p_material,
-                   const Transform& p_transform)
+                   const Material& p_material,
+                   const glm::mat4& p_transform)
     : mesh(&p_mesh),
       material_group(p_material.bind_group()),
       transform(p_transform)
@@ -20,12 +20,12 @@ void RenderBatch::set_pipeline(Pipeline& pipeline)
 void RenderBatch::enqueue(RenderObject& object)
 {
     m_draw_calls.emplace_back(
-        object.mesh(), object.material(), object.transform());
+        object.mesh(), object.material(), object.transform().matrix());
 }
 
 void RenderBatch::enqueue_parts(const Mesh& mesh,
-                                Material& mat,
-                                const Transform& transform)
+                                const Material& mat,
+                                const glm::mat4& transform)
 {
     m_draw_calls.emplace_back(mesh, mat, transform);
 }
@@ -77,8 +77,8 @@ void RenderBatcher::enqueue(RenderObject& object)
 }
 
 void RenderBatcher::enqueue_parts(const Mesh& mesh,
-                                  Material& mat,
-                                  const Transform& transform)
+                                  const Material& mat,
+                                  const glm::mat4& transform)
 {
     RenderBatch* batch = search(mat, mesh);
     batch->enqueue_parts(mesh, mat, transform);
@@ -109,7 +109,7 @@ void RenderBatcher::reset()
     m_batches.clear();
 }
 
-RenderBatch* RenderBatcher::search(Material& material, const Mesh& mesh)
+RenderBatch* RenderBatcher::search(const Material& material, const Mesh& mesh)
 {
     PipelineKey key = {};
 

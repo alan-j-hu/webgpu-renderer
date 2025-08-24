@@ -12,11 +12,11 @@ class Transform
 {
 public:
     Transform();
-    ~Transform();
 
     const glm::vec3& translation() { return m_translation; }
     void set_translation(const glm::vec3& v) { m_translation = v; }
-    void update_matrix(ModelUniforms& model);
+
+    glm::mat4 matrix() const;
 
 private:
     glm::vec3 m_translation;

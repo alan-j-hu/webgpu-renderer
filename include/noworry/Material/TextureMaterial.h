@@ -19,8 +19,8 @@ public:
 
     int id() { return m_id; }
     const Texture& texture() { return *m_texture; }
-    virtual WGPUBindGroup bind_group() override { return m_bind_group; }
-    virtual TextureEffect& effect() override { return *m_effect; }
+    virtual WGPUBindGroup bind_group() const override { return m_bind_group; }
+    virtual TextureEffect& effect() const override { return *m_effect; }
 
 private:
     int m_id;

@@ -43,13 +43,10 @@ ObjectBindGroup::~ObjectBindGroup()
     }
 }
 
-void ObjectBindGroup::copy(Renderer& renderer, Transform& transform)
+void ObjectBindGroup::copy(Renderer& renderer, const glm::mat4& transform)
 {
-    ModelUniforms uniforms {};
-    transform.update_matrix(uniforms);
-
     WGPUQueue queue = wgpuDeviceGetQueue(renderer.device());
-    wgpuQueueWriteBuffer(queue, m_buffer, 0, &uniforms, sizeof(float[16]));
+    wgpuQueueWriteBuffer(queue, m_buffer, 0, &transform, sizeof(float[16]));
 }
 
 ObjectBindGroupPool::ObjectBindGroupPool(Renderer& renderer)

@@ -17,6 +17,9 @@ add_library(noworry
   Draw2D/Spritesheet.cpp
   Gfx3D/BasicMesh.cpp
   Gfx3D/DynamicMesh.cpp
+  Gfx3D/Model.cpp
+  Gfx3D/ModelInstance.cpp
+  Gfx3D/ModelPart.cpp
   Gfx3D/ObjectBindGroup.cpp
   Gfx3D/RenderBatch.cpp
   Pipeline/MeshVertexShader.cpp
@@ -28,6 +31,7 @@ add_library(noworry
   scene/renderobject.cpp
   scene/scene.cpp)
 target_include_directories(noworry PRIVATE ../include)
-target_link_libraries(noworry dawn::webgpu_dawn glm::glm glfw webgpu_glfw)
+target_link_libraries(noworry
+  assimp dawn::webgpu_dawn glm::glm glfw webgpu_glfw)
 set_property(TARGET noworry PROPERTY CXX_STANDARD 23)
 set_property(TARGET noworry PROPERTY C_STANDARD 23)

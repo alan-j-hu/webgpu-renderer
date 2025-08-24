@@ -22,10 +22,13 @@ public:
 private:
     AppState* m_app_state;
     std::vector<std::filesystem::path> m_sink;
+    std::optional<std::shared_ptr<Model>> m_model;
 
     RenderTarget m_preview;
     PerspectiveCamera m_camera;
     Scene m_scene;
+
+    void render_preview();
 };
 
 #endif

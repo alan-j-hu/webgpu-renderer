@@ -12,9 +12,9 @@ Frame::Frame(Renderer& renderer, Scene& scene)
     m_scene = &scene;
 }
 
-Frame& Frame::add(Transform& transform,
-                  const Mesh& mesh,
-                  Material& material)
+Frame& Frame::add(const Mesh& mesh,
+                  const Material& material,
+                  const glm::mat4& transform)
 {
     m_renderer->batcher().enqueue_parts(mesh, material, transform);
     return *this;

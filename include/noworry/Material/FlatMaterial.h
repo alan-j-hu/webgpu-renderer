@@ -15,8 +15,8 @@ public:
         float r, float g, float b);
 
     int id() { return m_id; }
-    virtual WGPUBindGroup bind_group() override { return m_bind_group; }
-    virtual FlatEffect& effect() override { return *m_effect; }
+    virtual WGPUBindGroup bind_group() const override { return m_bind_group; }
+    virtual FlatEffect& effect() const override { return *m_effect; }
 
 private:
     int m_id;

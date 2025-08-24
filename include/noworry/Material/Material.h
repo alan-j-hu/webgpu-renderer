@@ -9,8 +9,8 @@ class Material
 public:
     virtual ~Material() = default;
 
-    virtual WGPUBindGroup bind_group() = 0;
-    virtual Effect& effect() = 0;
+    virtual WGPUBindGroup bind_group() const = 0;
+    virtual Effect& effect() const = 0;
 };
 
 #endif

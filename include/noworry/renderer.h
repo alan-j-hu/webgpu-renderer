@@ -26,7 +26,7 @@ class Frame
 {
 public:
     Frame(Renderer& renderer, Scene& scene);
-    Frame& add(Transform&, const Mesh&, Material&);
+    Frame& add(const Mesh&, const Material&, const glm::mat4&);
 
     Renderer& renderer() { return *m_renderer; }
 

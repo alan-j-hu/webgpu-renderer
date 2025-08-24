@@ -16,7 +16,7 @@ struct Renderer;
 class RenderObject : public Renderable
 {
 public:
-    RenderObject(Renderer&, Transform&, const Mesh&, Material&);
+    RenderObject(Renderer&, const Transform&, const Mesh&, Material&);
 
     Transform& transform() { return m_transform; }
     const Mesh& mesh() const { return *m_mesh; }

@@ -29,8 +29,7 @@ LayerNode& LayerNode::operator=(LayerNode&& other)
 
 void LayerNode::render(Frame& frame)
 {
-    Transform transform;
-    frame.add(transform, *m_grid_mesh, m_app_state->wireframe_material());
+    frame.add(*m_grid_mesh, m_app_state->wireframe_material(), glm::mat4(1));
 
     auto& project = m_app_state->project();
     for (int i = 0; i < project.layer_count(); ++i) {
@@ -53,7 +52,7 @@ void LayerNode::render(Frame& frame)
 
                 Transform transform;
                 transform.set_translation(glm::vec3(x, y, inst.z()));
-                frame.add(transform, resolved.mesh->mesh(), material);
+                frame.add(resolved.mesh->mesh(), material, transform.matrix());
             }
         }
     }

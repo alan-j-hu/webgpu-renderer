@@ -8,15 +8,17 @@
 #include <unordered_map>
 #include <vector>
 
+#include <glm/mat4x4.hpp>
+
 struct DrawCall
 {
     const Mesh* mesh;
     WGPUBindGroup material_group;
-    Transform transform;
+    glm::mat4 transform;
 
     DrawCall(const Mesh& p_mesh,
-             Material& p_material,
-             const Transform& p_transform);
+             const Material& p_material,
+             const glm::mat4& p_transform);
 };
 
 class RenderBatch
@@ -27,8 +29,8 @@ public:
     void enqueue(RenderObject&);
 
     void enqueue_parts(const Mesh& mesh,
-                       Material& mat,
-                       const Transform& transform);
+                       const Material& mat,
+                       const glm::mat4& transform);
 
     void draw(Renderer&, WGPURenderPassEncoder encoder);
 
@@ -45,8 +47,8 @@ public:
     void enqueue(RenderObject&);
 
     void enqueue_parts(const Mesh& mesh,
-                       Material& mat,
-                       const Transform& transform);
+                       const Material& mat,
+                       const glm::mat4& transform);
 
     void draw(WGPURenderPassEncoder encoder);
 
@@ -61,7 +63,7 @@ private:
 
     void reset();
 
-    RenderBatch* search(Material& material, const Mesh& mesh);
+    RenderBatch* search(const Material& material, const Mesh& mesh);
 };
 
 #endif
