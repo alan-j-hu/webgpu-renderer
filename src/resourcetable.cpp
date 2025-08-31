@@ -80,9 +80,10 @@ ResourceTable::load_model(const std::filesystem::path& path)
     const aiScene* scene = importer.ReadFile(
         path.string(),
         aiProcess_CalcTangentSpace      |
-        aiProcess_Triangulate           |
+        aiProcess_GlobalScale           |
         aiProcess_JoinIdenticalVertices |
-        aiProcess_SortByPType);
+        aiProcess_SortByPType           |
+        aiProcess_Triangulate);
     if (scene == nullptr) {
         return std::nullopt;
     }
@@ -135,8 +136,8 @@ std::unique_ptr<Mesh> ResourceTable::load_mesh(aiMesh* ai_mesh)
     for (int i = 0; i < vc; ++i) {
         Vertex v;
         v.x = ai_mesh->mVertices[i].x;
-        v.y = ai_mesh->mVertices[i].y;
-        v.z = ai_mesh->mVertices[i].z;
+        v.y = -ai_mesh->mVertices[i].z;
+        v.z = ai_mesh->mVertices[i].y;
         v.u = ai_mesh->mTextureCoords[0][i].x;
         v.v = ai_mesh->mTextureCoords[0][i].y;
         vertices.push_back(v);
