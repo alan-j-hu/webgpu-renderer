@@ -1,6 +1,9 @@
 #include "LayerNode.h"
 #include "noworry/grid.h"
+#include "noworry/Gfx3D/ModelInstance.h"
+
 #include <utility>
+#include "glm/ext/matrix_transform.hpp"
 
 LayerNode::LayerNode(AppState& app_state)
     : m_app_state(&app_state),
@@ -42,17 +45,18 @@ void LayerNode::render(Frame& frame)
                 }
 
                 auto& inst = opt.value();
-                ResolvedTile resolved = m_app_state->resolve_tile(inst.def());
-                if (resolved.mesh == nullptr) {
-                    continue;
-                }
-                Material& material = resolved.material == nullptr
-                    ? m_app_state->default_material()
-                    : *resolved.material;
 
                 Transform transform;
                 transform.set_translation(glm::vec3(x, y, inst.z()));
-                frame.add(resolved.mesh->mesh(), material, transform.matrix());
+
+                if (!inst.def().model) {
+                    continue;
+                }
+
+                ModelInstance m(**inst.def().model);
+                m.transform() =
+                    glm::translate(m.transform(), glm::vec3(x, y, inst.z()));
+                m.render(frame);
             }
         }
     }

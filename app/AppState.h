@@ -25,13 +25,6 @@
 #include <assimp/scene.h>
 #include <webgpu/webgpu.h>
 
-/// The mesh and material of a tile definition.
-struct ResolvedTile
-{
-    const TileMesh* mesh = nullptr;
-    TextureMaterial* material = nullptr;
-};
-
 /// Helper class containing data used by multiple sub-editors.
 class AppState
 {
@@ -53,9 +46,6 @@ public:
     Material& default_material() { return *m_default_material; }
     Material& wireframe_material() { return *m_wireframe_material; }
     BasicMesh& small_grid_mesh() { return m_small_grid_mesh; }
-
-    /// Resolves a tile to its mesh and material.
-    ResolvedTile resolve_tile(const TileDef& def);
 
     const Project& project() const { return m_project; }
 

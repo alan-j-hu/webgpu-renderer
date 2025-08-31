@@ -1,6 +1,7 @@
 #ifndef REDUCER_H
 #define REDUCER_H
 
+#include "noworry/Gfx3D/Model.h"
 #include "noworry/Material/TextureMaterial.h"
 
 #include <filesystem>
@@ -30,9 +31,8 @@ struct TextureRef
 /// TileInsts.
 struct TileDef
 {
-    std::optional<TileRotations*> mesh;
+    std::optional<std::shared_ptr<Model>> model;
     RotationTag rotation;
-    std::optional<TextureRef> texture;
 };
 
 /// A TileInst instances a tile definition on the map.

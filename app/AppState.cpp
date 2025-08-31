@@ -24,21 +24,6 @@ AppState::AppState(WGPUDevice device)
     m_wireframe_material = &m_resources.add_wireframe_material(1, 1, 1);
 }
 
-ResolvedTile AppState::resolve_tile(const TileDef& def)
-{
-    ResolvedTile resolved;
-
-    if (def.mesh) {
-        resolved.mesh = &def.mesh.value()->rotated(def.rotation);
-    }
-
-    if (def.texture) {
-        resolved.material = def.texture.value().material.get();
-    }
-
-    return resolved;
-}
-
 void AppState::push_command(std::unique_ptr<Command> command)
 {
     command->redo(m_project);
@@ -53,17 +38,11 @@ void AppState::refresh_thumbnails()
     for (int i = 0; i < m_project.tiledef_count(); ++i) {
         RenderTarget& target = m_thumbnail_cache.at(i).render_target();
         auto def = m_project.tiledef_at(i);
-        ResolvedTile resolved = resolve_tile(*def);
 
-        if (resolved.mesh == nullptr) {
-            continue;
+        if (def->model) {
+            Transform transform;
+            m_capture.capture(target, transform, **def->model);
         }
-        Material& material = resolved.material == nullptr
-            ? default_material()
-          : *resolved.material;
-
-        Transform transform;
-        m_capture.capture(target, transform, material, resolved.mesh->mesh());
     }
 }
 

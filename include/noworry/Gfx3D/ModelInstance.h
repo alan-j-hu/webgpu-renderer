@@ -12,6 +12,10 @@ class ModelInstance : public Renderable
 public:
     ModelInstance(const Model&);
 
+    const glm::mat4& transform() const;
+
+    glm::mat4& transform();
+
     virtual void render(Frame& frame) override;
 
 private:

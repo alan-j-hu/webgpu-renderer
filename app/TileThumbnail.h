@@ -4,6 +4,7 @@
 #include "noworry/rendertarget.h"
 #include "noworry/camera/orthographiccamera.h"
 #include "noworry/Draw2D/Spritesheet.h"
+#include "noworry/Gfx3D/Model.h"
 #include "noworry/scene/scene.h"
 
 struct AppState;
@@ -16,8 +17,7 @@ public:
     void capture(
         RenderTarget& target,
         Transform& transform,
-        Material& material,
-        const BasicMesh& mesh);
+        const Model& model);
 
 private:
     AppState* m_app_state;

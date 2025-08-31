@@ -1,5 +1,6 @@
 #include "TileThumbnail.h"
 #include "AppState.h"
+#include "noworry/Gfx3D/ModelInstance.h"
 
 ThumbnailCapture::ThumbnailCapture(AppState& app_state)
     : m_app_state(&app_state),
@@ -17,17 +18,12 @@ ThumbnailCapture::ThumbnailCapture(AppState& app_state)
 void ThumbnailCapture::capture(
     RenderTarget& target,
     Transform& transform,
-    Material& material,
-    const BasicMesh& mesh)
+    const Model& model)
 {
     m_scene.children().clear();
     m_scene
         .children()
-        .push_back(std::make_unique<RenderObject>(
-            m_app_state->renderer(),
-            transform,
-            mesh,
-            material));
+        .push_back(std::make_unique<ModelInstance>(model));
 
     m_app_state->renderer().render(target, m_scene);
 }

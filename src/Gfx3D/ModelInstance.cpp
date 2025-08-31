@@ -10,6 +10,16 @@ ModelInstance::ModelInstance(const Model& model)
     }
 }
 
+const glm::mat4& ModelInstance::transform() const
+{
+    return m_transform;
+}
+
+glm::mat4& ModelInstance::transform()
+{
+    return m_transform;
+}
+
 void ModelInstance::render(Frame& frame)
 {
     auto meshes = m_model->meshes();

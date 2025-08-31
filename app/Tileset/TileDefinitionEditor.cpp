@@ -26,23 +26,6 @@ TileDefinitionEditor::render(const TileDef& definition)
     TileDef new_definition = definition;
     bool changed = false;
 
-    ResolvedTile resolved = m_app_state->resolve_tile(definition);
-
-    const char* label = "Choose Mesh";
-    if (definition.mesh) {
-        label = definition.mesh.value()->name().c_str();
-    }
-
-    if (ImGui::BeginCombo("Shape", label)) {
-        for (auto& pair : m_app_state->mesh_map()) {
-            if (ImGui::Selectable(pair.second->name().c_str(), false)) {
-                changed = true;
-                new_definition.mesh = pair.second;
-            }
-        }
-        ImGui::EndCombo();
-    }
-
     rotation_dropdown(new_definition.rotation);
     if (new_definition.rotation != definition.rotation) {
         changed = true;
@@ -70,37 +53,12 @@ TileDefinitionEditor::render(const TileDef& definition)
 
             auto inst = std::make_unique<ModelInstance>(**opt);
             m_scene.children().push_back(std::move(inst));
-        }
 
-        m_sink.clear();
-    }
-
-    if (ImGui::Button("Choose Texture")) {
-        m_app_state->modals().push(
-            std::make_unique<FileDialog>(fs::current_path(), m_sink));
-    }
-
-    if (m_sink.size() > 0) {
-        std::filesystem::path& path = m_sink[0];
-        if (!definition.texture || path != definition.texture.value().path) {
+            new_definition.model = opt;
             changed = true;
-            auto optional =
-                m_app_state->resources().load_texture_material(path);
-            if (optional) {
-                TextureRef texture_ref;
-                texture_ref.path = path;
-                texture_ref.material = optional.value();
-                new_definition.texture =
-                    std::make_optional<TextureRef>(texture_ref);
-            }
         }
-        m_sink.clear();
-    }
 
-    if (resolved.material != nullptr) {
-        ImGui::Image((ImTextureID)(intptr_t)
-                     resolved.material->texture().view(),
-                     ImVec2(50, 50));
+        m_sink.clear();
     }
 
     ImGui::Image((ImTextureID)(intptr_t)
