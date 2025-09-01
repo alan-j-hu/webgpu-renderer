@@ -16,13 +16,7 @@
 #include "noworry/camera/orthographiccamera.h"
 #include "noworry/scene/scene.h"
 
-#include <filesystem>
-#include <map>
-#include <string_view>
 #include <vector>
-
-#include <assimp/mesh.h>
-#include <assimp/scene.h>
 #include <webgpu/webgpu.h>
 
 /// Helper class containing data used by multiple sub-editors.
@@ -38,11 +32,6 @@ public:
     ModalStack& modals() { return m_modals; }
     ResourceTable& resources() { return m_resources; }
 
-    const std::map<std::string_view, TileRotations*>& mesh_map() const
-    {
-        return m_mesh_map;
-    }
-
     Material& default_material() { return *m_default_material; }
     Material& wireframe_material() { return *m_wireframe_material; }
     BasicMesh& small_grid_mesh() { return m_small_grid_mesh; }
@@ -57,8 +46,6 @@ public:
     }
     void refresh_thumbnails();
 
-    void load_meshes(std::filesystem::path& path);
-
 private:
     std::vector<std::unique_ptr<Command>> m_history;
 
@@ -68,9 +55,6 @@ private:
     ModalStack m_modals;
     ResourceTable m_resources;
 
-    std::map<std::string_view, TileRotations*> m_mesh_map;
-    std::vector<std::unique_ptr<TileRotations>> m_meshes;
-
     Material* m_default_material;
     Material* m_wireframe_material;
     BasicMesh m_small_grid_mesh;
@@ -79,9 +63,6 @@ private:
 
     ThumbnailCapture m_capture;
     std::vector<TileThumbnail> m_thumbnail_cache;
-
-    void visit_node(const aiScene* scene, const aiNode* node);
-    TileRotations& load_mesh(const char* name, aiMesh* mesh);
 };
 
 #endif

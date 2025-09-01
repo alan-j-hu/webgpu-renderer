@@ -27,7 +27,6 @@ add_executable(demo
   Tilemap/TileMode.cpp
   Tilemap/View3DMode.cpp
   Tileset/AddTile.cpp
-  Tileset/ModelInspector.cpp
   Tileset/RotationDropdown.cpp
   Tileset/TileDefinitionEditor.cpp
   Tileset/TileList.cpp
