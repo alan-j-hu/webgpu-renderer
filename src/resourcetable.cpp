@@ -18,21 +18,18 @@ ResourceTable::ResourceTable(Renderer& renderer)
 std::optional<std::shared_ptr<Texture>>
 ResourceTable::load_texture(const std::filesystem::path& path)
 {
-    auto it = m_textures.find(path);
-    if (it != m_textures.end()) {
-        if (auto shared = it->second.lock()) {
-            return shared;
-        }
+    auto opt = m_textures.find(path);
+    if (opt) {
+        return opt;
     }
 
-    auto optional = Texture::from_path(m_renderer->device(), path);
-    if (!optional) {
+    auto texture = Texture::from_path(m_renderer->device(), path);
+    if (!texture) {
         return std::nullopt;
     }
 
-    auto ptr = std::make_shared<Texture>(std::move(optional.value()));
-    std::weak_ptr<Texture> handle = ptr;
-    m_textures.emplace(path, std::move(handle));
+    auto ptr = std::make_shared<Texture>(std::move(texture.value()));
+    m_textures.store(path, ptr);
 
     return std::optional(std::move(ptr));
 }
@@ -40,15 +37,13 @@ ResourceTable::load_texture(const std::filesystem::path& path)
 std::optional<std::shared_ptr<TextureMaterial>>
 ResourceTable::load_texture_material(const std::filesystem::path& path)
 {
-    auto it = m_texture_materials.find(path);
-    if (it != m_texture_materials.end()) {
-        if (auto shared = it->second.lock()) {
-            return shared;
-        }
+    auto opt = m_texture_materials.find(path);
+    if (opt) {
+        return opt;
     }
 
-    auto optional = load_texture(path);
-    if (!optional) {
+    auto texture = load_texture(path);
+    if (!texture) {
         return std::nullopt;
     }
 
@@ -56,10 +51,9 @@ ResourceTable::load_texture_material(const std::filesystem::path& path)
         m_mat_id++,
         m_renderer->device(),
         *m_renderer->effect<TextureEffect>(),
-        std::move(optional.value()),
+        std::move(texture.value()),
         m_renderer->default_sampler());
-    std::weak_ptr<TextureMaterial> handle = material;
-    m_texture_materials.emplace(path, std::move(handle));
+    m_texture_materials.store(path, material);
 
     return material;
 }
@@ -67,11 +61,9 @@ ResourceTable::load_texture_material(const std::filesystem::path& path)
 std::optional<std::shared_ptr<Model>>
 ResourceTable::load_model(const std::filesystem::path& path)
 {
-    auto it = m_models.find(path);
-    if (it != m_models.end()) {
-        if (auto shared = it->second.lock()) {
-            return shared;
-        }
+    auto opt = m_models.find(path);
+    if (opt) {
+        return opt;
     }
 
     std::shared_ptr<Model> model = std::make_shared<Model>();
@@ -122,8 +114,7 @@ ResourceTable::load_model(const std::filesystem::path& path)
         return std::nullopt;
     }
 
-    std::weak_ptr<Model> handle = model;
-    m_models.emplace(path, std::move(handle));
+    m_models.store(path, model);
 
     return model;
 }

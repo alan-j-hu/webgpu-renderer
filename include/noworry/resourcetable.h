@@ -8,6 +8,7 @@
 #include "Material/Material.h"
 #include "Material/FlatMaterial.h"
 #include "Material/TextureMaterial.h"
+#include "Resource/ResourceCache.h"
 
 #include <filesystem>
 #include <memory>
@@ -54,12 +55,9 @@ private:
 
     std::shared_ptr<Material> m_default_material;
 
-    std::unordered_map<std::filesystem::path,
-                       std::weak_ptr<Texture>> m_textures;
-    std::unordered_map<std::filesystem::path,
-                       std::weak_ptr<TextureMaterial>> m_texture_materials;
-    std::unordered_map<std::filesystem::path,
-                       std::weak_ptr<Model>> m_models;
+    ResourceCache<Texture> m_textures;
+    ResourceCache<TextureMaterial> m_texture_materials;
+    ResourceCache<Model> m_models;
 
     std::vector<std::unique_ptr<Material>> m_materials;
     std::vector<std::unique_ptr<BasicMesh>> m_meshes;
