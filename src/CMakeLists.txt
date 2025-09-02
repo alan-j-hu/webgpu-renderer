@@ -28,6 +28,7 @@ add_library(noworry
   Material/FlatEffect.cpp
   Material/TextureMaterial.cpp
   Material/TextureEffect.cpp
+  Resource/ResourceLoader.cpp
   scene/renderobject.cpp
   scene/scene.cpp)
 target_include_directories(noworry PRIVATE ../include)
