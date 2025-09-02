@@ -1,6 +1,7 @@
 #include "TileDefinitionEditor.h"
 #include "RotationDropdown.h"
 #include "../FileDialog.h"
+#include "noworry/Resource/ResourceLoader.h"
 #include "noworry/resourcetable.h"
 #include "noworry/Gfx3D/ModelInstance.h"
 #include "imgui.h"
@@ -38,7 +39,7 @@ TileDefinitionEditor::render(const TileDef& definition)
 
     if (m_sink.size() > 0) {
         std::filesystem::path& path = m_sink[0];
-        auto opt = m_app_state->resources().load_model(path);
+        auto opt = m_app_state->resources().load<Model>(path);
 
         if (opt) {
             m_model = opt;

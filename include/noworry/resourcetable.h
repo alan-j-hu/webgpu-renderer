@@ -18,6 +18,9 @@
 #include <assimp/scene.h>
 #include <glm/mat4x4.hpp>
 
+template<class T>
+class ResourceLoader;
+
 /// A cache for loading and storing textures and materials. If a file has
 /// already been loaded and is in use, it will not be loaded again.
 ///
@@ -32,14 +35,31 @@ public:
     ResourceTable(ResourceTable&&) = default;
     ResourceTable& operator=(ResourceTable&&) = default;
 
-    std::optional<std::shared_ptr<Texture>>
-    load_texture(const std::filesystem::path& path);
+    Renderer& renderer() { return *m_renderer; }
 
-    std::optional<std::shared_ptr<TextureMaterial>>
-    load_texture_material(const std::filesystem::path& path);
+    std::shared_ptr<Material> default_material()
+    {
+        return m_default_material;
+    }
 
-    std::optional<std::shared_ptr<Model>>
-    load_model(const std::filesystem::path& path);
+    template<class T>
+    ResourceCache<T>& cache();
+
+    template<class T>
+    std::optional<std::shared_ptr<T>> load(const std::filesystem::path& path)
+    {
+        auto opt = cache<T>().find(path);
+        if (opt) {
+            return opt;
+        }
+
+        ResourceLoader<T> loader;
+        auto t = loader.load(*this, path);
+        if (t) {
+            cache<T>().store(path, *t);
+        }
+        return t;
+    }
 
     FlatMaterial& add_flat_material(float, float, float);
 
@@ -61,10 +81,24 @@ private:
 
     std::vector<std::unique_ptr<Material>> m_materials;
     std::vector<std::unique_ptr<BasicMesh>> m_meshes;
-
-    std::unique_ptr<Mesh> load_mesh(aiMesh*);
-
-    bool load_node(Model&, const aiScene* scene, const glm::mat4&, aiNode*);
 };
+
+template<>
+inline ResourceCache<Texture>& ResourceTable::cache<Texture>()
+{
+    return m_textures;
+}
+
+template<>
+inline ResourceCache<TextureMaterial>& ResourceTable::cache<TextureMaterial>()
+{
+    return m_texture_materials;
+}
+
+template<>
+inline ResourceCache<Model>& ResourceTable::cache<Model>()
+{
+    return m_models;
+}
 
 #endif
