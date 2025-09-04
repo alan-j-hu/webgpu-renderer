@@ -18,8 +18,8 @@ add_library(noworry
   Gfx3D/BasicMesh.cpp
   Gfx3D/DynamicMesh.cpp
   Gfx3D/Model.cpp
+  Gfx3D/ModelData.cpp
   Gfx3D/ModelInstance.cpp
-  Gfx3D/ModelPart.cpp
   Gfx3D/ObjectBindGroup.cpp
   Gfx3D/RenderBatch.cpp
   Pipeline/MeshVertexShader.cpp

@@ -2,7 +2,7 @@
 #define MODEL_H
 
 #include "Mesh.h"
-#include "ModelPart.h"
+#include "ModelData.h"
 #include "../Material/Material.h"
 #include <memory>
 #include <span>
@@ -11,22 +11,29 @@
 class Model
 {
 public:
-    std::span<const std::unique_ptr<Mesh>> meshes() const;
+    struct Part
+    {
+        Part(std::unique_ptr<Mesh>, std::shared_ptr<Material>);
 
-    std::span<const std::shared_ptr<Material>> materials() const;
+        const Mesh& mesh() const;
 
-    std::span<const ModelPart> parts() const;
+        const Material& material() const;
 
-    void add_mesh(std::unique_ptr<Mesh>);
+    private:
+        std::unique_ptr<Mesh> m_mesh;
+        std::shared_ptr<Material> m_material;
+    };
 
-    void add_material(std::shared_ptr<Material>);
+    Model() = default;
 
-    void add_part(ModelPart);
+    Model(WGPUDevice device, const ModelData&);
+
+    std::span<const Part> parts() const;
+
+    void add_part(Part);
 
 private:
-    std::vector<std::unique_ptr<Mesh>> m_meshes;
-    std::vector<std::shared_ptr<Material>> m_materials;
-    std::vector<ModelPart> m_parts;
+    std::vector<Part> m_parts;
 };
 
 #endif

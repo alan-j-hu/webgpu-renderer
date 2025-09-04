@@ -2,6 +2,7 @@
 #define RESOURCE_LOADER_H
 
 #include "../resourcetable.h"
+#include "../Gfx3D/ModelData.h"
 
 #include <memory>
 #include <optional>
@@ -35,13 +36,21 @@ public:
     std::optional<std::shared_ptr<Model>> load(
         ResourceTable& resources,
         const std::filesystem::path& path);
+};
 
-    std::unique_ptr<Mesh> load_mesh(
+template<>
+class ResourceLoader<ModelData>
+{
+public:
+    std::optional<std::shared_ptr<ModelData>> load(
         ResourceTable& resources,
-        aiMesh* ai_mesh);
+        const std::filesystem::path& path);
 
+private:
     bool load_node(
-        Model& model,
+        ResourceTable& resources,
+        const std::filesystem::path& path,
+        ModelData& model,
         const aiScene* ai_scene,
         const glm::mat4& parent_transform,
         aiNode* ai_node);
