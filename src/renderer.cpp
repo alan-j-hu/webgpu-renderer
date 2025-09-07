@@ -16,7 +16,9 @@ Frame& Frame::add(const Mesh& mesh,
                   const Material& material,
                   const glm::mat4& transform)
 {
-    m_renderer->batcher().enqueue_parts(mesh, material, transform);
+    if (mesh.vertex_count() != 0 && mesh.index_count() != 0) {
+        m_renderer->batcher().enqueue_parts(mesh, material, transform);
+    }
     return *this;
 }
 

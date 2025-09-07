@@ -15,6 +15,8 @@ LayerNode::LayerNode(AppState& app_state)
                       glm::vec3(16, 0, 0),
                       glm::vec3(0, 16, 0)))
 {
+    m_model = std::make_unique<DynamicModel>();
+    m_instance = DynamicModelInstance(*m_model);
 }
 
 LayerNode::LayerNode(LayerNode&& other)
@@ -26,13 +28,25 @@ LayerNode::LayerNode(LayerNode&& other)
 LayerNode& LayerNode::operator=(LayerNode&& other)
 {
     std::swap(m_app_state, other.m_app_state);
+    std::swap(m_model, other.m_model);
     std::swap(m_grid_mesh, other.m_grid_mesh);
+    std::swap(m_instance, other.m_instance);
     return *this;
 }
 
 void LayerNode::render(Frame& frame)
 {
     frame.add(*m_grid_mesh, m_app_state->wireframe_material(), glm::mat4(1));
+
+    update();
+
+    m_model->flush(frame.renderer().device());
+    m_instance->render(frame);
+}
+
+void LayerNode::update()
+{
+    m_model->reset();
 
     auto& project = m_app_state->project();
     for (int i = 0; i < project.layer_count(); ++i) {
@@ -45,18 +59,14 @@ void LayerNode::render(Frame& frame)
                 }
 
                 auto& inst = opt.value();
-
-                Transform transform;
-                transform.set_translation(glm::vec3(x, y, inst.z()));
-
-                if (!inst.def().model) {
+                if (!inst.def().model_data) {
                     continue;
                 }
 
-                ModelInstance m(**inst.def().model);
-                m.transform() =
-                    glm::translate(m.transform(), glm::vec3(x, y, inst.z()));
-                m.render(frame);
+                glm::mat4 transform =
+                    glm::translate(glm::mat4(1), glm::vec3(x, y, inst.z()));
+
+                m_model->add_model(**inst.def().model_data, transform);
             }
         }
     }

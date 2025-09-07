@@ -4,6 +4,7 @@
 #include "Mesh.h"
 #include "../Pipeline/MeshVertexShader.h"
 #include <cstddef>
+#include <span>
 #include <vector>
 
 class DynamicMesh : public Mesh
@@ -32,10 +33,7 @@ public:
 
     void clear();
 
-    void append(const Vertex*,
-                std::size_t,
-                const std::uint16_t*,
-                std::size_t);
+    void append(std::span<const Vertex>, std::span<const std::uint16_t>);
 
     void flush(WGPUDevice device);
 

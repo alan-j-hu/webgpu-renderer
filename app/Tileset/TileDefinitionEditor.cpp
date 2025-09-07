@@ -39,10 +39,11 @@ TileDefinitionEditor::render(const TileDef& definition)
 
     if (m_sink.size() > 0) {
         std::filesystem::path& path = m_sink[0];
-        auto opt = m_app_state->resources().load<Model>(path);
+        auto model_opt = m_app_state->resources().load<Model>(path);
+        auto model_data_opt = m_app_state->resources().load<ModelData>(path);
 
-        if (opt) {
-            m_model = opt;
+        if (model_opt && model_data_opt) {
+            m_model = model_opt;
 
             m_scene.children().clear();
 
@@ -52,10 +53,11 @@ TileDefinitionEditor::render(const TileDef& definition)
                 m_app_state->small_grid_mesh(),
                 m_app_state->wireframe_material()));
 
-            auto inst = std::make_unique<ModelInstance>(**opt);
+            auto inst = std::make_unique<ModelInstance>(**model_opt);
             m_scene.children().push_back(std::move(inst));
 
-            new_definition.model = opt;
+            new_definition.model = model_opt;
+            new_definition.model_data = model_data_opt;
             changed = true;
         }
 

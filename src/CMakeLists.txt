@@ -17,6 +17,8 @@ add_library(noworry
   Draw2D/Spritesheet.cpp
   Gfx3D/BasicMesh.cpp
   Gfx3D/DynamicMesh.cpp
+  Gfx3D/DynamicModel.cpp
+  Gfx3D/DynamicModelInstance.cpp
   Gfx3D/Model.cpp
   Gfx3D/ModelData.cpp
   Gfx3D/ModelInstance.cpp

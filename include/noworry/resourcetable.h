@@ -5,6 +5,7 @@
 #include "renderer.h"
 #include "Gfx3D/BasicMesh.h"
 #include "Gfx3D/Model.h"
+#include "Gfx3D/ModelData.h"
 #include "Material/Material.h"
 #include "Material/FlatMaterial.h"
 #include "Material/TextureMaterial.h"
@@ -77,6 +78,7 @@ private:
 
     ResourceCache<Texture> m_textures;
     ResourceCache<TextureMaterial> m_texture_materials;
+    ResourceCache<ModelData> m_model_data;
     ResourceCache<Model> m_models;
 
     std::vector<std::unique_ptr<Material>> m_materials;
@@ -93,6 +95,12 @@ template<>
 inline ResourceCache<TextureMaterial>& ResourceTable::cache<TextureMaterial>()
 {
     return m_texture_materials;
+}
+
+template<>
+inline ResourceCache<ModelData>& ResourceTable::cache<ModelData>()
+{
+    return m_model_data;
 }
 
 template<>

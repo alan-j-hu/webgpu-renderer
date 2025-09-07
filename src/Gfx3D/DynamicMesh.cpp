@@ -44,16 +44,15 @@ void DynamicMesh::clear()
     m_indices.clear();
 }
 
-void DynamicMesh::append(const Vertex* vertices,
-                         std::size_t vertex_count,
-                         const std::uint16_t* indices,
-                         std::size_t index_count)
+void DynamicMesh::append(std::span<const Vertex> vertices,
+                         std::span<const std::uint16_t> indices)
 {
-    std::uint16_t index_offset = m_indices.size();
-    m_vertices.insert(m_vertices.end(), vertices, vertices + vertex_count);
+    std::uint16_t index_offset = m_vertices.size();
+    m_vertices.insert(m_vertices.end(),
+                      vertices.begin(), vertices.end());
 
-    for (int i = 0; i < index_count; ++i) {
-        m_indices.push_back(indices[i] + index_offset);
+    for (auto index : indices) {
+        m_indices.push_back(index + index_offset);
     }
 }
 
@@ -98,7 +97,8 @@ void DynamicMesh::resize_index(WGPUDevice device)
 
     std::size_t index_capacity = m_indices.capacity();
     if (index_capacity % 2 == 1) {
-        ++index_capacity;
+        index_capacity *= 2;
+        m_indices.reserve(index_capacity);
     }
 
     WGPUBufferDescriptor ibuffer_desc = { 0 };

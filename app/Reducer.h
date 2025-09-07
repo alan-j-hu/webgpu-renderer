@@ -31,6 +31,7 @@ struct TextureRef
 /// TileInsts.
 struct TileDef
 {
+    std::optional<std::shared_ptr<ModelData>> model_data;
     std::optional<std::shared_ptr<Model>> model;
     RotationTag rotation;
 };
