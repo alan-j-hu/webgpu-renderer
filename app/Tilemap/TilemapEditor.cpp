@@ -6,6 +6,16 @@
 
 #include "imgui.h"
 
+TilemapEditor::AddLayerListener::AddLayerListener(TilemapEditor& editor)
+    : m_editor(&editor)
+{
+}
+
+void TilemapEditor::AddLayerListener::operator()(Layer& layer)
+{
+    m_editor->add_layer(layer);
+}
+
 TilemapEditor::TilemapEditor(AppState& app_state)
     : m_camera_selection(0),
       m_app_state(app_state),
@@ -26,8 +36,11 @@ TilemapEditor::TilemapEditor(AppState& app_state)
                       16,
                       16,
                       glm::vec3(16, 0, 0),
-                      glm::vec3(0, 16, 0)))
+                      glm::vec3(0, 16, 0))),
+      m_add_layer_listener(*this)
 {
+    app_state.connect_tilemap_editor(*this);
+
     //m_subwindow_2d.set_clear_color(app_state.background_color());
     m_subwindow_3d.set_clear_color(app_state.background_color());
 
@@ -37,7 +50,19 @@ TilemapEditor::TilemapEditor(AppState& app_state)
     m_ortho_camera.set_position(glm::vec3(0.0f, 0.0f, 10.0f));
     m_ortho_camera.set_target(glm::vec3(0.0f, 0.0f, 0.0f));
 
-    m_scene.children().push_back(std::make_unique<LayerNode>(app_state));
+    Transform transform;
+
+    m_scene.children().push_back(std::make_unique<RenderObject>(
+        app_state.renderer(),
+        transform,
+        m_grid_mesh,
+        app_state.wireframe_material()
+    ));
+}
+
+TilemapEditor::~TilemapEditor()
+{
+    m_app_state.disconnect_tilemap_editor(*this);
 }
 
 glm::vec3 TilemapEditor::map_2d_to_3d(const glm::vec2& vec2d) const
@@ -116,7 +141,7 @@ void TilemapEditor::render()
         m_app_state.sprite_renderer().end();
     }
 
-    auto project = m_app_state.project();
+    auto& project = m_app_state.project();
 
     if (ImGui::BeginChild("Map", ImVec2(500, 700))) {
         ImVec2 screen_pos = ImGui::GetCursorScreenPos();
@@ -166,4 +191,11 @@ void TilemapEditor::draw_toolbar()
         m_scene.set_camera(m_ortho_camera);
         m_current_mode = &m_tile_mode;
     }
+}
+
+void TilemapEditor::add_layer(Layer& layer)
+{
+    auto ptr = std::make_unique<LayerNode>(m_app_state, layer);
+    m_layer_nodes.emplace_back(ptr.get());
+    m_scene.children().push_back(std::move(ptr));
 }

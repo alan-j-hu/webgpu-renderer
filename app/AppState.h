@@ -19,6 +19,8 @@
 #include <vector>
 #include <webgpu/webgpu.h>
 
+class TilemapEditor;
+
 /// Helper class containing data used by multiple sub-editors.
 class AppState
 {
@@ -45,6 +47,10 @@ public:
         return m_thumbnail_cache.at(i);
     }
     void refresh_thumbnails();
+
+    void connect_tilemap_editor(TilemapEditor&);
+
+    void disconnect_tilemap_editor(TilemapEditor&);
 
 private:
     std::vector<std::unique_ptr<Command>> m_history;

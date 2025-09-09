@@ -1,6 +1,7 @@
 #ifndef TILEMAPEDITOR_H
 #define TILEMAPEDITOR_H
 
+#include "LayerNode.h"
 #include "Mode.h"
 #include "TileMode.h"
 #include "View3DMode.h"
@@ -28,6 +29,8 @@ class TilemapEditor
 public:
     TilemapEditor(AppState&);
 
+    ~TilemapEditor();
+
     void render();
 
     glm::vec3 map_2d_to_3d(const glm::vec2&) const;
@@ -39,7 +42,20 @@ public:
 
     int selected_layer() const { return m_selected_layer; }
 
+    Listener<Layer&>& add_layer_listener() { return m_add_layer_listener; }
+
 private:
+    class AddLayerListener : public Listener<Layer&>
+    {
+    public:
+        AddLayerListener(TilemapEditor&);
+
+        virtual void operator()(Layer&) override;
+
+    private:
+        TilemapEditor* m_editor;
+    };
+
     int m_camera_selection;
 
     AppState& m_app_state;
@@ -64,9 +80,14 @@ private:
 
     BasicMesh m_grid_mesh;
 
+    std::vector<LayerNode*> m_layer_nodes;
+    AddLayerListener m_add_layer_listener;
+
     void render_preview();
 
     void draw_toolbar();
+
+    void add_layer(Layer&);
 };
 
 #endif

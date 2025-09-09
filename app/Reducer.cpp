@@ -21,6 +21,7 @@ const std::optional<TileInst>& Layer::at(int x, int y) const
 void Layer::set(int x, int y, std::optional<TileInst> option)
 {
     m_tiles[y * 16 + x] = std::move(option);
+    m_listenable.notify(*this);
 }
 
 std::size_t Project::tiledef_count() const
@@ -45,12 +46,12 @@ std::size_t Project::layer_count() const
 
 const Layer& Project::layer_at(int idx) const
 {
-    return m_layers.at(idx);
+    return *m_layers.at(idx);
 }
 
 Layer& Project::layer_at(int idx)
 {
-    return m_layers.at(idx);
+    return *m_layers.at(idx);
 }
 
 void Project::remove_tiledef(int idx)
@@ -63,7 +64,8 @@ void Project::remove_tiledef(int idx)
 
 void Project::add_layer()
 {
-    m_layers.emplace_back();
+    m_layers.push_back(std::make_unique<Layer>());
+    m_add_layer_listenable.notify(*m_layers.at(m_layers.size() - 1));
 }
 
 void Project::remove_layer(int idx)

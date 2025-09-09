@@ -5,7 +5,30 @@
 #include <utility>
 #include "glm/ext/matrix_transform.hpp"
 
-LayerNode::LayerNode(AppState& app_state)
+LayerNode::ChangeListener::ChangeListener(LayerNode& node)
+    : m_node(&node)
+{
+}
+
+LayerNode::ChangeListener::ChangeListener(LayerNode::ChangeListener&& other)
+{
+    m_node = nullptr;
+    *this = std::move(other);
+}
+
+LayerNode::ChangeListener&
+LayerNode::ChangeListener::operator=(LayerNode::ChangeListener&& other)
+{
+    std::swap(m_node, other.m_node);
+    return *this;
+}
+
+void LayerNode::ChangeListener::operator()(const Layer& layer)
+{
+    m_node->update();
+}
+
+LayerNode::LayerNode(AppState& app_state, Layer& layer)
     : m_app_state(&app_state),
       m_grid_mesh(
           create_grid(app_state.renderer().device(),
@@ -13,10 +36,16 @@ LayerNode::LayerNode(AppState& app_state)
                       16,
                       16,
                       glm::vec3(16, 0, 0),
-                      glm::vec3(0, 16, 0)))
+                      glm::vec3(0, 16, 0))),
+      m_layer(&layer)
 {
     m_model = std::make_unique<DynamicModel>();
     m_instance = DynamicModelInstance(*m_model);
+    m_change_listener = std::make_unique<LayerNode::ChangeListener>(*this);
+
+    update();
+
+    layer.listenable().add_listener(*m_change_listener);
 }
 
 LayerNode::LayerNode(LayerNode&& other)
@@ -31,16 +60,13 @@ LayerNode& LayerNode::operator=(LayerNode&& other)
     std::swap(m_model, other.m_model);
     std::swap(m_grid_mesh, other.m_grid_mesh);
     std::swap(m_instance, other.m_instance);
+    std::swap(m_change_listener, other.m_change_listener);
     return *this;
 }
 
 void LayerNode::render(Frame& frame)
 {
     frame.add(*m_grid_mesh, m_app_state->wireframe_material(), glm::mat4(1));
-
-    update();
-
-    m_model->flush(frame.renderer().device());
     m_instance->render(frame);
 }
 
@@ -48,26 +74,24 @@ void LayerNode::update()
 {
     m_model->reset();
 
-    auto& project = m_app_state->project();
-    for (int i = 0; i < project.layer_count(); ++i) {
-        auto& layer = project.layer_at(i);
-        for (int y = 0; y < 16; ++y) {
-            for (int x = 0; x < 16; ++x) {
-                auto& opt = layer.at(x, y);
-                if (!opt) {
-                    continue;
-                }
-
-                auto& inst = opt.value();
-                if (!inst.def().model_data) {
-                    continue;
-                }
-
-                glm::mat4 transform =
-                    glm::translate(glm::mat4(1), glm::vec3(x, y, inst.z()));
-
-                m_model->add_model(**inst.def().model_data, transform);
+    for (int y = 0; y < 16; ++y) {
+        for (int x = 0; x < 16; ++x) {
+            auto& opt = m_layer->at(x, y);
+            if (!opt) {
+                continue;
             }
+
+            auto& inst = opt.value();
+            if (!inst.def().model_data) {
+                continue;
+            }
+
+            glm::mat4 transform =
+                glm::translate(glm::mat4(1), glm::vec3(x, y, inst.z()));
+
+            m_model->add_model(**inst.def().model_data, transform);
         }
     }
+
+    m_model->flush(m_app_state->renderer().device());
 }
