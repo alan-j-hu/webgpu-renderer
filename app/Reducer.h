@@ -56,6 +56,12 @@ private:
 struct Layer
 {
 public:
+    class Listener
+    {
+    public:
+        virtual void notify(const Layer&) = 0;
+    };
+
     Layer();
     Layer(Layer&&) noexcept = default;
     Layer& operator=(Layer&&) noexcept = default;
@@ -64,17 +70,24 @@ public:
 
     void set(int x, int y, std::optional<TileInst> option);
 
-    Listenable<const Layer&>& listenable() { return m_listenable; }
+    Listenable<Listener>& listenable() { return m_listenable; }
 
 private:
     std::vector<std::optional<TileInst>> m_tiles;
-    Listenable<const Layer&> m_listenable;
+    Listenable<Listener> m_listenable;
 };
 
 /// A top-level Project.
 class Project
 {
 public:
+    class Listener
+    {
+    public:
+        virtual void add_layer(Layer&) = 0;
+        virtual void remove_layer(const int& index) = 0;
+    };
+
     Project() = default;
     Project(Project&&) = default;
     Project& operator=(Project&&) = default;
@@ -92,7 +105,7 @@ public:
     void add_layer();
     void remove_layer(int idx);
 
-    Listenable<Layer&>& add_layer_listenable()
+    Listenable<Listener>& add_layer_listenable()
     {
         return m_add_layer_listenable;
     }
@@ -100,7 +113,7 @@ public:
 private:
     std::vector<std::shared_ptr<TileDef>> m_tile_defs;
     std::vector<std::unique_ptr<Layer>> m_layers;
-    Listenable<Layer&> m_add_layer_listenable;
+    Listenable<Listener> m_add_layer_listenable;
 };
 
 #endif

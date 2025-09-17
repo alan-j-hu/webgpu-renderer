@@ -11,7 +11,6 @@ void CreateLayerCommand::up(Project& project)
 
 void CreateLayerCommand::down(Project& project)
 {
-    // TODO: Handle removing the LayerNode
     project.remove_layer(project.layer_count() - 1);
 }
 

@@ -42,15 +42,16 @@ public:
 
     int selected_layer() const { return m_selected_layer; }
 
-    Listener<Layer&>& add_layer_listener() { return m_add_layer_listener; }
+    Project::Listener& add_layer_listener() { return m_layer_listener; }
 
 private:
-    class AddLayerListener : public Listener<Layer&>
+    class LayerListener : public Project::Listener
     {
     public:
-        AddLayerListener(TilemapEditor&);
+        LayerListener(TilemapEditor&);
 
-        virtual void operator()(Layer&) override;
+        virtual void add_layer(Layer&) override;
+        virtual void remove_layer(const int& index) override;
 
     private:
         TilemapEditor* m_editor;
@@ -81,13 +82,15 @@ private:
     BasicMesh m_grid_mesh;
 
     std::vector<LayerNode*> m_layer_nodes;
-    AddLayerListener m_add_layer_listener;
+    LayerListener m_layer_listener;
 
     void render_preview();
 
     void draw_toolbar();
 
     void add_layer(Layer&);
+
+    void remove_layer(int index);
 };
 
 #endif

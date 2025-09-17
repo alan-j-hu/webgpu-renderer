@@ -20,14 +20,14 @@ public:
     virtual void render(Frame& frame) override;
 
 private:
-    class ChangeListener : public Listener<const Layer&>
+    class ChangeListener : public Layer::Listener
     {
     public:
         ChangeListener(LayerNode&);
         ChangeListener(ChangeListener&&);
         ChangeListener& operator=(ChangeListener&&);
 
-        virtual void operator()(const Layer&) override;
+        virtual void notify(const Layer&) override;
 
     private:
         LayerNode* m_node;

@@ -23,7 +23,7 @@ LayerNode::ChangeListener::operator=(LayerNode::ChangeListener&& other)
     return *this;
 }
 
-void LayerNode::ChangeListener::operator()(const Layer& layer)
+void LayerNode::ChangeListener::notify(const Layer& layer)
 {
     m_node->update();
 }

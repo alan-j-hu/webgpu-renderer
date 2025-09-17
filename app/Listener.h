@@ -2,25 +2,14 @@
 #define LISTENER_H
 
 #include <algorithm>
+#include <utility>
 #include <vector>
 
-/// The purpose of the listener is to facilitate loose coupling between the
-/// project file data structure and the non-essential graphical state.
-/// In MVC terms, the former is the model and the latter is the view.
-template<class T>
-class Listener
-{
-public:
-    virtual void operator()(T) = 0;
-
-private:
-};
-
-template<class T>
+template<class Listener>
 class Listenable
 {
 public:
-    bool add_listener(Listener<T>& listener)
+    bool add_listener(Listener& listener)
     {
         auto end = m_listeners.end();
         auto it = std::find(m_listeners.begin(), m_listeners.end(), &listener);
@@ -31,7 +20,7 @@ public:
         return true;
     }
 
-    bool remove_listener(Listener<T>& listener)
+    bool remove_listener(Listener& listener)
     {
         auto end = m_listeners.end();
         auto it = std::find(m_listeners.begin(), m_listeners.end(), &listener);
@@ -42,15 +31,16 @@ public:
         return true;
     }
 
-    void notify(T t)
+    template<class ...Args1, class ...Args2>
+    void notify(void (Listener::*member)(Args1&...), Args2&... args)
     {
         for (auto listener : m_listeners) {
-            (*listener)(t);
+            (listener->*member)(args...);
         }
     }
 
 private:
-    std::vector<Listener<T>*> m_listeners;
+    std::vector<Listener*> m_listeners;
 };
 
 #endif

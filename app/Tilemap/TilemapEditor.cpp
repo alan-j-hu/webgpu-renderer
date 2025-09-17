@@ -6,14 +6,19 @@
 
 #include "imgui.h"
 
-TilemapEditor::AddLayerListener::AddLayerListener(TilemapEditor& editor)
+TilemapEditor::LayerListener::LayerListener(TilemapEditor& editor)
     : m_editor(&editor)
 {
 }
 
-void TilemapEditor::AddLayerListener::operator()(Layer& layer)
+void TilemapEditor::LayerListener::add_layer(Layer& layer)
 {
     m_editor->add_layer(layer);
+}
+
+void TilemapEditor::LayerListener::remove_layer(const int& index)
+{
+    m_editor->remove_layer(index);
 }
 
 TilemapEditor::TilemapEditor(AppState& app_state)
@@ -37,7 +42,7 @@ TilemapEditor::TilemapEditor(AppState& app_state)
                       16,
                       glm::vec3(16, 0, 0),
                       glm::vec3(0, 16, 0))),
-      m_add_layer_listener(*this)
+      m_layer_listener(*this)
 {
     app_state.connect_tilemap_editor(*this);
 
@@ -198,4 +203,10 @@ void TilemapEditor::add_layer(Layer& layer)
     auto ptr = std::make_unique<LayerNode>(m_app_state, layer);
     m_layer_nodes.emplace_back(ptr.get());
     m_scene.children().push_back(std::move(ptr));
+}
+
+void TilemapEditor::remove_layer(int index)
+{
+    m_layer_nodes.erase(m_layer_nodes.begin() + index);
+    m_scene.children().erase(m_scene.children().begin() + index);
 }
