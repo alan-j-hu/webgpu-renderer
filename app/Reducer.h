@@ -52,6 +52,8 @@ private:
     short m_z;
 };
 
+bool operator==(const TileInst&, const TileInst&);
+
 /// A Layer is a square grid of TileInsts.
 struct Layer
 {

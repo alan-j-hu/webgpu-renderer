@@ -6,9 +6,10 @@ CreateTileCommand::CreateTileCommand(TileDef tile_def)
 {
 }
 
-void CreateTileCommand::up(Project& project)
+Command::Outcome CreateTileCommand::up(Project& project)
 {
     project.add_tiledef(m_tile_def);
+    return Outcome::COMPLETED;
 }
 
 void CreateTileCommand::down(Project& project)

@@ -196,6 +196,14 @@ void TilemapEditor::draw_toolbar()
         m_scene.set_camera(m_ortho_camera);
         m_current_mode = &m_tile_mode;
     }
+    ImGui::SameLine();
+    if (ImGui::Button("Undo")) {
+        m_app_state.undo();
+    }
+    ImGui::SameLine();
+    if (ImGui::Button("Redo")) {
+        m_app_state.redo();
+    }
 }
 
 void TilemapEditor::add_layer(Layer& layer)

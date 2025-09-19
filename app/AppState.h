@@ -42,6 +42,10 @@ public:
 
     void push_command(std::unique_ptr<Command>);
 
+    void undo();
+
+    void redo();
+
     TileThumbnail& tile_thumbnail(int i)
     {
         return m_thumbnail_cache.at(i);
@@ -54,6 +58,7 @@ public:
 
 private:
     std::vector<std::unique_ptr<Command>> m_history;
+    int m_history_cursor;
 
     WGPUColor m_background_color;
     Renderer m_renderer;

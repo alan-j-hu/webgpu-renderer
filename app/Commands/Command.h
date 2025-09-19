@@ -7,18 +7,24 @@
 class Command
 {
 public:
+    enum class Outcome
+    {
+        CANCELED,
+        COMPLETED
+    };
+
     Command();
 
     virtual const char* name() = 0;
 
     /// Throws if redo is attempted twice in a row.
-    void redo(Project&);
+    Outcome redo(Project&);
     /// Throws if undo is attempted twice in a row.
     void undo(Project&);
 
 protected:
     /// Override to implement the logic for redo.
-    virtual void up(Project&) = 0;
+    virtual Outcome up(Project&) = 0;
     /// Override to implement the logic for undo.
     virtual void down(Project&) = 0;
 

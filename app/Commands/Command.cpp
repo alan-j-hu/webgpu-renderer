@@ -15,11 +15,12 @@ void Command::undo(Project& project)
     m_state = State::DOWN;
 }
 
-void Command::redo(Project& project)
+Command::Outcome Command::redo(Project& project)
 {
     if (m_state == State::UP) {
         throw std::logic_error("Redo attempted twice!");
     }
-    up(project);
+    Command::Outcome outcome = up(project);
     m_state = State::UP;
+    return outcome;
 }

@@ -6,6 +6,7 @@ class Frame;
 class Renderable
 {
 public:
+    virtual ~Renderable() = default;
     virtual void render(Frame& frame) = 0;
 };
 

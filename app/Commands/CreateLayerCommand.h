@@ -11,7 +11,7 @@ public:
     virtual const char* name() override;
 
 protected:
-    virtual void up(Project&) override;
+    virtual Command::Outcome up(Project&) override;
     virtual void down(Project&) override;
 
 private:

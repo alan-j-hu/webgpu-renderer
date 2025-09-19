@@ -6,6 +6,11 @@ TileInst::TileInst(std::shared_ptr<TileDef> def, int z)
 {
 }
 
+bool operator==(const TileInst& lhs, const TileInst& rhs)
+{
+    return lhs.z() == rhs.z() && &lhs.def() == &rhs.def();
+}
+
 Layer::Layer()
 {
     for (int i = 0; i < 16 * 16; ++i) {
@@ -78,5 +83,5 @@ void Project::remove_layer(int idx)
     m_layers.erase(m_layers.begin() + idx);
     m_add_layer_listenable.notify(
         &Project::Listener::remove_layer,
-        (const int&)(m_layers.size() - 1));
+        (const int&)(idx));
 }

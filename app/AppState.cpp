@@ -18,7 +18,8 @@ AppState::AppState(WGPUDevice device)
                       5,
                       glm::vec3(5, 0, 0),
                       glm::vec3(0, 5, 0))),
-      m_capture(*this)
+      m_capture(*this),
+      m_history_cursor(0)
 {
     m_background_color = {0.0f, 0.5f, 0.5f, 1.0f};
     m_default_material = &m_resources.add_flat_material(0.5, 0.5, 0.5);
@@ -27,8 +28,31 @@ AppState::AppState(WGPUDevice device)
 
 void AppState::push_command(std::unique_ptr<Command> command)
 {
-    command->redo(m_project);
-    m_history.push_back(std::move(command));
+    if (command->redo(m_project) == Command::Outcome::COMPLETED) {
+        while (m_history.size() > m_history_cursor) {
+            m_history.pop_back();
+        }
+        m_history.push_back(std::move(command));
+        m_history_cursor = m_history.size();
+    }
+}
+
+void AppState::undo()
+{
+    if (m_history_cursor <= 0 || m_history_cursor > m_history.size()) {
+        return;
+    }
+    --m_history_cursor;
+    m_history[m_history_cursor]->undo(m_project);
+}
+
+void AppState::redo()
+{
+    if (m_history_cursor < 0 || m_history_cursor >= m_history.size()) {
+        return;
+    }
+    m_history[m_history_cursor]->redo(m_project);
+    ++m_history_cursor;
 }
 
 void AppState::refresh_thumbnails()

@@ -5,8 +5,9 @@ UpdateTileCommand::UpdateTileCommand(int idx, TileDef tile_def)
 {
 }
 
-void UpdateTileCommand::up(Project&)
+Command::Outcome UpdateTileCommand::up(Project&)
 {
+    return Outcome::COMPLETED;
 }
 
 void UpdateTileCommand::down(Project&)

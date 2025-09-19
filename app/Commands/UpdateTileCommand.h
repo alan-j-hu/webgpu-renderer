@@ -11,7 +11,7 @@ public:
     const char* name() override;
 
 protected:
-    void up(Project&) override;
+    Command::Outcome up(Project&) override;
     void down(Project&) override;
 
 private:

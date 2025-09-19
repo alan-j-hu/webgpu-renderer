@@ -4,9 +4,10 @@ CreateLayerCommand::CreateLayerCommand()
 {
 }
 
-void CreateLayerCommand::up(Project& project)
+Command::Outcome CreateLayerCommand::up(Project& project)
 {
     project.add_layer();
+    return Outcome::COMPLETED;
 }
 
 void CreateLayerCommand::down(Project& project)
