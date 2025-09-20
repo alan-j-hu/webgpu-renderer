@@ -32,7 +32,7 @@ public:
     }
 
     template<class ...Args1, class ...Args2>
-    void notify(void (Listener::*member)(Args1&...), Args2&... args)
+    void notify(void (Listener::*member)(Args1...), Args2&&... args)
     {
         for (auto listener : m_listeners) {
             (listener->*member)(args...);

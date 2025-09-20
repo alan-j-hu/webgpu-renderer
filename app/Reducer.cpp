@@ -81,7 +81,5 @@ void Project::remove_layer(int idx)
         return;
     }
     m_layers.erase(m_layers.begin() + idx);
-    m_add_layer_listenable.notify(
-        &Project::Listener::remove_layer,
-        (const int&)(idx));
+    m_add_layer_listenable.notify(&Project::Listener::remove_layer, idx);
 }

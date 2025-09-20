@@ -16,7 +16,7 @@ void TilemapEditor::LayerListener::add_layer(Layer& layer)
     m_editor->add_layer(layer);
 }
 
-void TilemapEditor::LayerListener::remove_layer(const int& index)
+void TilemapEditor::LayerListener::remove_layer(int index)
 {
     m_editor->remove_layer(index);
 }

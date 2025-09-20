@@ -51,7 +51,7 @@ private:
         LayerListener(TilemapEditor&);
 
         virtual void add_layer(Layer&) override;
-        virtual void remove_layer(const int& index) override;
+        virtual void remove_layer(int index) override;
 
     private:
         TilemapEditor* m_editor;

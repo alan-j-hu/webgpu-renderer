@@ -87,7 +87,7 @@ public:
     {
     public:
         virtual void add_layer(Layer&) = 0;
-        virtual void remove_layer(const int& index) = 0;
+        virtual void remove_layer(int index) = 0;
     };
 
     Project() = default;
