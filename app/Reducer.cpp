@@ -72,14 +72,29 @@ void Project::add_layer()
     m_layers.push_back(std::make_unique<Layer>());
     m_add_layer_listenable.notify(
         &Project::Listener::add_layer,
-        *m_layers.at(m_layers.size() - 1));
+        *m_layers.at(m_layers.size() - 1),
+        m_layers.size() - 1);
 }
 
-void Project::remove_layer(int idx)
+void Project::add_layer(std::unique_ptr<Layer> layer, int idx)
 {
-    if (idx < 0 || idx >= m_layers.size()) {
+    if (idx < 0 || idx > m_layers.size()) {
         return;
     }
+    m_layers.insert(m_layers.begin() + idx, std::move(layer));
+    m_add_layer_listenable.notify(
+        &Project::Listener::add_layer,
+        *m_layers.at(idx),
+        idx);
+}
+
+std::unique_ptr<Layer> Project::remove_layer(int idx)
+{
+    if (idx < 0 || idx >= m_layers.size()) {
+        return nullptr;
+    }
+    std::unique_ptr<Layer> layer = std::move(m_layers.at(idx));
     m_layers.erase(m_layers.begin() + idx);
     m_add_layer_listenable.notify(&Project::Listener::remove_layer, idx);
+    return layer;
 }

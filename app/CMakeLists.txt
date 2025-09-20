@@ -20,6 +20,7 @@ add_executable(demo
   Commands/Command.cpp
   Commands/CreateLayerCommand.cpp
   Commands/CreateTileCommand.cpp
+  Commands/DeleteLayerCommand.cpp
   Commands/PlaceTileCommand.cpp
   Commands/UpdateTileCommand.cpp
   Tilemap/LayerNode.cpp

@@ -86,7 +86,7 @@ public:
     class Listener
     {
     public:
-        virtual void add_layer(Layer&) = 0;
+        virtual void add_layer(Layer&, int index) = 0;
         virtual void remove_layer(int index) = 0;
     };
 
@@ -105,7 +105,8 @@ public:
     Layer& layer_at(int idx);
 
     void add_layer();
-    void remove_layer(int idx);
+    void add_layer(std::unique_ptr<Layer>, int idx);
+    std::unique_ptr<Layer> remove_layer(int idx);
 
     Listenable<Listener>& add_layer_listenable()
     {

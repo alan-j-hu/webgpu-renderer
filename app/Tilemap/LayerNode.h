@@ -16,6 +16,7 @@ public:
     LayerNode(AppState&, Layer&);
     LayerNode(LayerNode&&);
     LayerNode& operator=(LayerNode&&);
+    ~LayerNode();
 
     virtual void render(Frame& frame) override;
 
@@ -34,7 +35,7 @@ private:
     };
 
     AppState* m_app_state;
-    const Layer* m_layer;
+    Layer* m_layer;
     std::unique_ptr<DynamicModel> m_model;
     std::optional<DynamicModelInstance> m_instance;
     std::optional<BasicMesh> m_grid_mesh;

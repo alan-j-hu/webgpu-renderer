@@ -64,6 +64,11 @@ LayerNode& LayerNode::operator=(LayerNode&& other)
     return *this;
 }
 
+LayerNode::~LayerNode()
+{
+    m_layer->listenable().remove_listener(*m_change_listener);
+}
+
 void LayerNode::render(Frame& frame)
 {
     frame.add(*m_grid_mesh, m_app_state->wireframe_material(), glm::mat4(1));

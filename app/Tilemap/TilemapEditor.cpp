@@ -1,6 +1,7 @@
 #include "TilemapEditor.h"
 #include "LayerNode.h"
 #include "../Commands/CreateLayerCommand.h"
+#include "../Commands/DeleteLayerCommand.h"
 #include "../Commands/PlaceTileCommand.h"
 #include "noworry/grid.h"
 
@@ -11,9 +12,9 @@ TilemapEditor::LayerListener::LayerListener(TilemapEditor& editor)
 {
 }
 
-void TilemapEditor::LayerListener::add_layer(Layer& layer)
+void TilemapEditor::LayerListener::add_layer(Layer& layer, int index)
 {
-    m_editor->add_layer(layer);
+    m_editor->add_layer(layer, index);
 }
 
 void TilemapEditor::LayerListener::remove_layer(int index)
@@ -163,7 +164,13 @@ void TilemapEditor::render()
     if (ImGui::BeginChild("Side Pane", ImVec2(200, 700))) {
         m_current_mode->draw_controls();
 
-        if (ImGui::Button("Add Layer")) {
+        if (ImGui::Button("-")) {
+            m_app_state.push_command(
+                std::make_unique<DeleteLayerCommand>(m_selected_layer));
+            m_selected_layer = std::max(-1, m_selected_layer - 1);
+        }
+        ImGui::SameLine();
+        if (ImGui::Button("+")) {
             m_app_state.push_command(std::make_unique<CreateLayerCommand>());
         }
         if (ImGui::BeginListBox("##Meshes", ImVec2(-FLT_MIN, 0))) {
@@ -206,15 +213,17 @@ void TilemapEditor::draw_toolbar()
     }
 }
 
-void TilemapEditor::add_layer(Layer& layer)
+void TilemapEditor::add_layer(Layer& layer, int index)
 {
     auto ptr = std::make_unique<LayerNode>(m_app_state, layer);
-    m_layer_nodes.emplace_back(ptr.get());
-    m_scene.children().push_back(std::move(ptr));
+    m_layer_nodes.insert(m_layer_nodes.begin() + index, ptr.get());
+    m_scene.children().insert(
+        m_scene.children().begin() + index,
+        std::move(ptr));
 }
 
 void TilemapEditor::remove_layer(int index)
 {
-    m_layer_nodes.erase(m_layer_nodes.begin() + index);
     m_scene.children().erase(m_scene.children().begin() + index);
+    m_layer_nodes.erase(m_layer_nodes.begin() + index);
 }

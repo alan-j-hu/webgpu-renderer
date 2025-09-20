@@ -50,7 +50,7 @@ private:
     public:
         LayerListener(TilemapEditor&);
 
-        virtual void add_layer(Layer&) override;
+        virtual void add_layer(Layer&, int index) override;
         virtual void remove_layer(int index) override;
 
     private:
@@ -88,7 +88,7 @@ private:
 
     void draw_toolbar();
 
-    void add_layer(Layer&);
+    void add_layer(Layer&, int index);
 
     void remove_layer(int index);
 };
