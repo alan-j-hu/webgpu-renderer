@@ -5,6 +5,7 @@
 #include "noworry/camera/orthographiccamera.h"
 #include "noworry/Draw2D/Spritesheet.h"
 #include "noworry/Gfx3D/Model.h"
+#include "noworry/Gfx3D/Renderable.h"
 #include "noworry/scene/scene.h"
 
 struct AppState;
@@ -13,6 +14,8 @@ class ThumbnailCapture
 {
 public:
     ThumbnailCapture(AppState&);
+
+    void capture(RenderTarget& target, Renderable&);
 
     void capture(
         RenderTarget& target,

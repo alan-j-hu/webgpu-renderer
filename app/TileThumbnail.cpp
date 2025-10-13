@@ -17,9 +17,35 @@ ThumbnailCapture::ThumbnailCapture(AppState& app_state)
 
 void ThumbnailCapture::capture(
     RenderTarget& target,
+    Renderable& renderable)
+{
+    m_camera.set_top(16);
+    m_camera.set_bottom(0);
+    m_camera.set_left(0);
+    m_camera.set_right(16);
+    m_camera.set_position(glm::vec3(0, 0, 1));
+    m_camera.set_target(glm::vec3(0, 0, 0));
+
+    m_scene.children().clear();
+    m_scene
+        .children()
+        .push_back(std::make_unique<RenderableRef>(renderable));
+
+    m_app_state->renderer().render(target, m_scene);
+}
+
+void ThumbnailCapture::capture(
+    RenderTarget& target,
     Transform& transform,
     const Model& model)
 {
+    m_camera.set_top(1);
+    m_camera.set_bottom(0);
+    m_camera.set_left(0);
+    m_camera.set_right(1);
+    m_camera.set_position(glm::vec3(0, 0, 1));
+    m_camera.set_target(glm::vec3(0, 0, 0));
+
     m_scene.children().clear();
     m_scene
         .children()

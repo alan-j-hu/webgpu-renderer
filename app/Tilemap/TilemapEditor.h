@@ -88,6 +88,10 @@ private:
 
     void draw_toolbar();
 
+    void draw_layer_list();
+
+    void draw_layer_item(int i);
+
     void add_layer(Layer&, int index);
 
     void remove_layer(int index);

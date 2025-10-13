@@ -46,6 +46,8 @@ public:
 
     void redo();
 
+    ThumbnailCapture& thumbnail_capture() { return m_capture; }
+
     TileThumbnail& tile_thumbnail(int i)
     {
         return m_thumbnail_cache.at(i);

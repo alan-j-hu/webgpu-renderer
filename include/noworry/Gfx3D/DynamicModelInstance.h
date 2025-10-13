@@ -6,7 +6,7 @@
 
 class DynamicModel;
 
-class DynamicModelInstance : Renderable
+class DynamicModelInstance : public Renderable
 {
 public:
     DynamicModelInstance(const DynamicModel&);

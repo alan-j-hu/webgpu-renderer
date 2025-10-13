@@ -7,6 +7,7 @@
 class RenderTarget
 {
 public:
+    RenderTarget() = default;
     RenderTarget(WGPUDevice device, int w, int h);
 
     Texture& texture() { return m_texture; }

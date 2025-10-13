@@ -147,8 +147,6 @@ void TilemapEditor::render()
         m_app_state.sprite_renderer().end();
     }
 
-    auto& project = m_app_state.project();
-
     if (ImGui::BeginChild("Map", ImVec2(500, 700))) {
         ImVec2 screen_pos = ImGui::GetCursorScreenPos();
         ImVec2 mouse_pos = ImGui::GetMousePos();
@@ -164,25 +162,7 @@ void TilemapEditor::render()
     if (ImGui::BeginChild("Side Pane", ImVec2(200, 700))) {
         m_current_mode->draw_controls();
 
-        if (ImGui::Button("-")) {
-            m_app_state.push_command(
-                std::make_unique<DeleteLayerCommand>(m_selected_layer));
-            m_selected_layer = std::max(-1, m_selected_layer - 1);
-        }
-        ImGui::SameLine();
-        if (ImGui::Button("+")) {
-            m_app_state.push_command(std::make_unique<CreateLayerCommand>());
-        }
-        if (ImGui::BeginListBox("##Meshes", ImVec2(-FLT_MIN, 0))) {
-            for (int i = 0; i < project.layer_count(); ++i) {
-                const Layer& layer = project.layer_at(i);
-                bool selected = i == m_selected_layer;
-                if (ImGui::Selectable(std::to_string(i).c_str(), selected)) {
-                    m_selected_layer = i;
-                }
-            }
-          ImGui::EndListBox();
-        }
+        draw_layer_list();
     }
     ImGui::EndChild();
 }
@@ -210,6 +190,49 @@ void TilemapEditor::draw_toolbar()
     ImGui::SameLine();
     if (ImGui::Button("Redo")) {
         m_app_state.redo();
+    }
+}
+
+void TilemapEditor::draw_layer_list()
+{
+    auto& project = m_app_state.project();
+
+    if (ImGui::Button("-")) {
+        m_app_state.push_command(
+            std::make_unique<DeleteLayerCommand>(m_selected_layer));
+        m_selected_layer = std::max(-1, m_selected_layer - 1);
+    }
+    ImGui::SameLine();
+    if (ImGui::Button("+")) {
+        m_app_state.push_command(std::make_unique<CreateLayerCommand>());
+    }
+
+    for (int i = 0; i < project.layer_count(); ++i) {
+        draw_layer_item(i);
+    }
+}
+
+void TilemapEditor::draw_layer_item(int i)
+{
+    auto& project = m_app_state.project();
+    const Layer& layer = project.layer_at(i);
+
+    const bool selected = i == m_selected_layer;
+    const ImVec4 bg_color =
+        selected ? ImVec4(1, 1, 1, 1) : ImVec4(0.5, 0.5, 0.5, 1);
+    const ImVec4 tint_color =
+        selected ? ImVec4(0.8, 0.8, 0.8, 1) : ImVec4(1, 1, 1, 1);
+
+    if (ImGui::ImageButton(
+            std::to_string(i).c_str(),
+            (ImTextureID)(intptr_t)m_layer_nodes[i]->thumbnail().view(),
+            ImVec2(100, 100),
+            ImVec2(0, 0),
+            ImVec2(1, 1),
+            bg_color,
+            tint_color)) {
+
+        m_selected_layer = i;
     }
 }
 

@@ -37,11 +37,13 @@ LayerNode::LayerNode(AppState& app_state, Layer& layer)
                       16,
                       glm::vec3(16, 0, 0),
                       glm::vec3(0, 16, 0))),
-      m_layer(&layer)
+      m_layer(&layer),
+      m_thumbnail(app_state.renderer().device(), 100, 100)
 {
     m_model = std::make_unique<DynamicModel>();
     m_instance = DynamicModelInstance(*m_model);
     m_change_listener = std::make_unique<LayerNode::ChangeListener>(*this);
+    m_thumbnail.set_clear_color(app_state.background_color());
 
     update();
 
@@ -71,7 +73,6 @@ LayerNode::~LayerNode()
 
 void LayerNode::render(Frame& frame)
 {
-    frame.add(*m_grid_mesh, m_app_state->wireframe_material(), glm::mat4(1));
     m_instance->render(frame);
 }
 
@@ -99,4 +100,6 @@ void LayerNode::update()
     }
 
     m_model->flush(m_app_state->renderer().device());
+
+    m_app_state->thumbnail_capture().capture(m_thumbnail, *m_instance);
 }

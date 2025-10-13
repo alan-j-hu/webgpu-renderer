@@ -10,6 +10,7 @@
 class Texture
 {
 public:
+    Texture();
     Texture(WGPUDevice device, int w, int h);
     Texture(WGPUDevice device, int w, int h,
             WGPUTextureFormat format, WGPUTextureUsage usage);

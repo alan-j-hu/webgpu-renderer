@@ -4,6 +4,11 @@
 
 namespace fs = std::filesystem;
 
+Texture::Texture()
+    : m_texture(nullptr), m_view(nullptr)
+{
+}
+
 Texture::Texture(WGPUDevice device, int w, int h)
 {
     init(device, w, h,
