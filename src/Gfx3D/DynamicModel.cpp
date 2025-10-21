@@ -7,10 +7,10 @@ void DynamicModel::add_model(const ModelData& data, const glm::mat4& transform)
     std::vector<Vertex> transformed;
     auto parts = data.parts();
     for (auto& part : parts) {
-        auto [it, inserted] = m_parts.try_emplace(part.material.get());
+        auto [it, inserted] = m_parts.try_emplace(part.material().get());
 
         transformed.clear();
-        auto vertices = part.vertices;
+        auto vertices = part.vertices();
         for (Vertex v : vertices) {
             glm::vec4 v4 = transform * glm::vec4(v.x, v.y, v.z, 1);
             Vertex new_v;
@@ -23,7 +23,7 @@ void DynamicModel::add_model(const ModelData& data, const glm::mat4& transform)
             transformed.push_back(new_v);
         }
 
-        it->second.append(transformed, part.indices);
+        it->second.append(transformed, part.indices());
     }
 }
 

@@ -25,11 +25,11 @@ Model::Model(WGPUDevice device, const ModelData& data)
         std::unique_ptr<Mesh> mesh = std::make_unique<BasicMesh>(
               device,
               WGPUPrimitiveTopology_TriangleList,
-              data_part.vertices,
-              data_part.indices,
-              data_part.index_count);
+              data_part.vertices(),
+              data_part.indices_with_padding(),
+              data_part.indices_with_padding().size());
 
-        Part part(std::move(mesh), data_part.material);
+        Part part(std::move(mesh), data_part.material());
         add_part(std::move(part));
     }
 }

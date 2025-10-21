@@ -14,6 +14,7 @@ public:
     };
 
     Command();
+    virtual ~Command() = default;
 
     virtual const char* name() = 0;
 

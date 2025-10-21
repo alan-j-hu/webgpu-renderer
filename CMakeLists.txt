@@ -18,14 +18,16 @@ FetchContent_MakeAvailable(Assimp)
 FetchContent_Declare(
   glm
   GIT_REPOSITORY https://github.com/g-truc/glm.git
-  GIT_TAG bf71a834948186f4097caa076cd2663c69a10e1e)
+  # 1.0.2
+  GIT_TAG c10f4f2352dec2bbf11678a6ee866797924cf2e7)
 
 FetchContent_MakeAvailable(glm)
 
 FetchContent_Declare(
   dawn
-  GIT_REPOSITORY https://dawn.googlesource.com/dawn
-  GIT_TAG 78fff7bf05e787a29cfd37a037c2cb63a55e923a
+  GIT_REPOSITORY https://github.com/google/dawn.git
+  # v20251015.200420
+  GIT_TAG 6c7ec7c76611d8a4ed243624604b08e2ef0fda2d
   GIT_SHALLOW ON
   GIT_PROGRESS TRUE
   GIT_SUBMODULES ""

@@ -38,7 +38,7 @@ fn fs_main(input: FragmentInput) -> @location(0) vec4f {
 )";
 
     // Shader
-    WGPUShaderModuleWGSLDescriptor wgsl_desc = { 0 };
+    WGPUShaderSourceWGSL wgsl_desc = { 0 };
     wgsl_desc.chain.sType = WGPUSType_ShaderSourceWGSL;
     wgsl_desc.code = {code, WGPU_STRLEN};
 

@@ -7,6 +7,8 @@
 class Effect
 {
 public:
+    virtual ~Effect() = default;
+
     virtual WGPUShaderModule fragment_shader() = 0;
     virtual WGPUBindGroupLayout layout() = 0;
 };

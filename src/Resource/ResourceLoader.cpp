@@ -173,18 +173,18 @@ bool ResourceLoader<ModelData>::load_node(
             }
         }
 
-        ModelData::Part part;
-        part.vertices = std::move(vertices);
-
-        part.index_count = indices.size();
-        if (part.index_count % 2 == 1) {
+        int index_count = indices.size();
+        if (index_count % 2 == 1) {
             // Padding
             indices.push_back(0);
         }
 
-        part.indices = std::move(indices);
-        part.material = mat ? std::move(*mat) : resources.default_material();
-        model.add_part(std::move(part));
+        auto material = mat ? std::move(*mat) : resources.default_material();
+        model.add_part(
+            ModelData::Part(std::move(vertices),
+                            std::move(indices),
+                            std::move(material),
+                            index_count));
     }
 
     for (int i = 0; i < ai_node->mNumChildren; ++i) {

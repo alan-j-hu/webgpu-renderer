@@ -121,5 +121,5 @@ void DynamicMesh::queue_write(WGPUDevice device)
                          m_index_buffer,
                          0,
                          m_indices.data(),
-                         sizeof(std::uint16_t) * m_indices.size());
+                         sizeof(std::uint16_t) * m_indices.capacity());
 }

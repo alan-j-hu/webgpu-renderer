@@ -70,7 +70,7 @@ fn vs_main(v: Vertex) -> FragmentInput {
 }
 )";
 
-    WGPUShaderModuleWGSLDescriptor vertex_wgsl_desc = { 0 };
+    WGPUShaderSourceWGSL vertex_wgsl_desc = { 0 };
     vertex_wgsl_desc.chain.sType = WGPUSType_ShaderSourceWGSL;
     vertex_wgsl_desc.code = {code, WGPU_STRLEN};
 
