@@ -5,6 +5,7 @@
 #include "Mode.h"
 #include "TileMode.h"
 #include "View3DMode.h"
+#include "ZPalette.h"
 #include "../AppState.h"
 #include "../TilePicker.h"
 
@@ -83,6 +84,8 @@ private:
 
     std::vector<LayerNode*> m_layer_nodes;
     LayerListener m_layer_listener;
+
+    ZPalette m_z_palette;
 
     void render_preview();
 

@@ -27,6 +27,7 @@ add_executable(demo
   Tilemap/TilemapEditor.cpp
   Tilemap/TileMode.cpp
   Tilemap/View3DMode.cpp
+  Tilemap/ZPalette.cpp
   Tileset/AddTile.cpp
   Tileset/RotationDropdown.cpp
   Tileset/TileDefinitionEditor.cpp
@@ -42,4 +43,11 @@ target_include_directories(demo PRIVATE
   ../include
   ${IMGUI_DIR}
   ${IMGUI_DIR}/backends)
-target_link_libraries(demo assimp noworry)
+
+add_custom_target(link_resources ALL
+  COMMAND ${CMAKE_COMMAND} -E create_symlink
+  "${CMAKE_CURRENT_SOURCE_DIR}/Resources"
+  "${CMAKE_CURRENT_BINARY_DIR}/Resources")
+add_dependencies(demo link_resources)
+
+target_link_libraries(demo noworry)

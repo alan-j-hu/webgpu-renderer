@@ -43,7 +43,8 @@ TilemapEditor::TilemapEditor(AppState& app_state)
                       16,
                       glm::vec3(16, 0, 0),
                       glm::vec3(0, 16, 0))),
-      m_layer_listener(*this)
+      m_layer_listener(*this),
+      m_z_palette(app_state)
 {
     app_state.connect_tilemap_editor(*this);
 
@@ -156,6 +157,10 @@ void TilemapEditor::render()
                      ImVec2(m_subwindow_2d.width(), m_subwindow_2d.height()));
     }
     ImGui::EndChild();
+
+    ImGui::SameLine();
+
+    m_z_palette.render();
 
     ImGui::SameLine();
 
