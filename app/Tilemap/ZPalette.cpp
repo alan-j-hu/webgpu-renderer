@@ -7,7 +7,7 @@
 
 ZPalette::ZPalette(AppState& app_state)
     : m_app_state(&app_state),
-      m_selected(0)
+      m_selected(16)
 {
     load(0, "Resources/height-16.png");
     load(1, "Resources/height-15.png");
@@ -41,6 +41,11 @@ ZPalette::ZPalette(AppState& app_state)
     load(29, "Resources/height13.png");
     load(30, "Resources/height14.png");
     load(31, "Resources/height15.png");
+}
+
+short ZPalette::selected_z() const
+{
+    return m_selected - 16;
 }
 
 void ZPalette::render()

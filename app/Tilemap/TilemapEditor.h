@@ -32,6 +32,8 @@ public:
 
     ~TilemapEditor();
 
+    const ZPalette& z_palette() const;
+
     void render();
 
     glm::vec3 map_2d_to_3d(const glm::vec2&) const;

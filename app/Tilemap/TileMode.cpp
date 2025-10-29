@@ -25,8 +25,10 @@ void TileMode::handle_input()
             int selected_layer = m_editor->selected_layer();
 
             if (selected_layer != -1 && m_selected_tile != -1) {
+                short z = m_editor->z_palette().selected_z();
+
                 m_app_state->push_command(std::make_unique<PlaceTileCommand>(
-                    selected_layer, x, y, 0,
+                    selected_layer, x, y, z,
                     project.tiledef_at(m_selected_tile)
                 ));
             }

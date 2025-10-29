@@ -13,6 +13,8 @@ class ZPalette
 public:
     ZPalette(AppState&);
 
+    short selected_z() const;
+
     void render();
 
 private:

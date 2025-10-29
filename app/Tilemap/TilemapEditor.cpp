@@ -72,6 +72,11 @@ TilemapEditor::~TilemapEditor()
     m_app_state.disconnect_tilemap_editor(*this);
 }
 
+const ZPalette& TilemapEditor::z_palette() const
+{
+    return m_z_palette;
+}
+
 glm::vec3 TilemapEditor::map_2d_to_3d(const glm::vec2& vec2d) const
 {
     glm::vec2 v = vec2d;
