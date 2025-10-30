@@ -1,7 +1,6 @@
 #include "noworry/scene/scene.h"
 
-Scene::Scene(Renderer& renderer, Camera& camera)
-    : m_camera(&camera)
+Scene::Scene(Renderer& renderer)
 {
     WGPUBufferDescriptor buffer_desc = { 0 };
     buffer_desc.nextInChain = nullptr;
@@ -18,7 +17,6 @@ Scene::Scene(Scene&& other)
 {
     m_buffer = nullptr;
     m_bind_group = nullptr;
-    m_camera = nullptr;
 
     *this = std::move(other);
 }
@@ -28,7 +26,6 @@ Scene& Scene::operator=(Scene&& other)
     std::swap(m_uniforms, other.m_uniforms);
     std::swap(m_buffer, other.m_buffer);
     std::swap(m_bind_group, other.m_bind_group);
-    std::swap(m_camera, other.m_camera);
 
     return *this;
 }
@@ -43,14 +40,9 @@ Scene::~Scene()
     }
 }
 
-void Scene::set_camera(Camera& camera)
+void Scene::render(Frame& frame, Camera& camera)
 {
-    m_camera = &camera;
-}
-
-void Scene::render(Frame& frame)
-{
-    m_camera->update_matrix(&m_uniforms.camera);
+    camera.update_matrix(&m_uniforms.camera);
     WGPUQueue queue = wgpuDeviceGetQueue(frame.renderer().device());
     wgpuQueueWriteBuffer(
         queue, m_buffer, 0, &m_uniforms, sizeof(GlobalUniforms));

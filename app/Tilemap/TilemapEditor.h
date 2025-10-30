@@ -2,6 +2,7 @@
 #define TILEMAPEDITOR_H
 
 #include "LayerNode.h"
+#include "HeightMode.h"
 #include "Mode.h"
 #include "TileMode.h"
 #include "View3DMode.h"
@@ -76,8 +77,10 @@ private:
     Scene m_scene;
     Transform m_transform;
     OrthographicCamera m_ortho_camera;
-    PerspectiveCamera m_camera;
+    PerspectiveCamera m_persp_camera;
+    Camera* m_current_camera;
 
+    HeightMode m_height_mode;
     TileMode m_tile_mode;
     View3DMode m_view_3d_mode;
     Mode* m_current_mode;

@@ -32,7 +32,8 @@ TilemapEditor::TilemapEditor(AppState& app_state)
                     app_state.sprite_renderer().pipeline(),
                     m_subwindow_3d.texture(),
                     app_state.renderer().default_sampler()),
-      m_scene(app_state.renderer(), m_camera),
+      m_scene(app_state.renderer()),
+      m_height_mode(app_state, *this),
       m_tile_mode(app_state, *this),
       m_view_3d_mode(app_state, *this),
       m_current_mode(&m_tile_mode),
@@ -51,11 +52,13 @@ TilemapEditor::TilemapEditor(AppState& app_state)
     //m_subwindow_2d.set_clear_color(app_state.background_color());
     m_subwindow_3d.set_clear_color(app_state.background_color());
 
-    m_camera.set_position(glm::vec3(8.0f, -1.0f, 10.0f));
-    m_camera.set_target(glm::vec3(8.0f, 8.0f, 0.0f));
+    m_persp_camera.set_position(glm::vec3(8.0f, -1.0f, 10.0f));
+    m_persp_camera.set_target(glm::vec3(8.0f, 8.0f, 0.0f));
 
     m_ortho_camera.set_position(glm::vec3(0.0f, 0.0f, 10.0f));
     m_ortho_camera.set_target(glm::vec3(0.0f, 0.0f, 0.0f));
+
+    m_current_camera = &m_persp_camera;
 
     Transform transform;
 
@@ -179,19 +182,24 @@ void TilemapEditor::render()
 
 void TilemapEditor::render_preview()
 {
-    m_app_state.renderer().render(m_subwindow_3d, m_scene);
+    m_app_state.renderer().render(m_subwindow_3d, m_scene, *m_current_camera);
 }
 
 void TilemapEditor::draw_toolbar()
 {
     if (ImGui::Button("View 3D")) {
-        m_scene.set_camera(m_camera);
         m_current_mode = &m_view_3d_mode;
+        m_current_camera = &m_persp_camera;
     }
     ImGui::SameLine();
     if (ImGui::Button("Edit Tiles")) {
-        m_scene.set_camera(m_ortho_camera);
         m_current_mode = &m_tile_mode;
+        m_current_camera = &m_ortho_camera;
+    }
+    ImGui::SameLine();
+    if (ImGui::Button("Edit Z")) {
+        m_current_mode = &m_height_mode;
+        m_current_camera = &m_ortho_camera;
     }
     ImGui::SameLine();
     if (ImGui::Button("Undo")) {

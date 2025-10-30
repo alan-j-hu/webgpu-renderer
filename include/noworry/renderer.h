@@ -25,14 +25,13 @@ class Transform;
 class Frame
 {
 public:
-    Frame(Renderer& renderer, Scene& scene);
+    Frame(Renderer& renderer);
     Frame& add(const Mesh&, const Material&, const glm::mat4&);
 
     Renderer& renderer() { return *m_renderer; }
 
 private:
     Renderer* m_renderer;
-    Scene* m_scene;
 };
 
 /// Renderer. The same renderer can be used for multiple scenes and
@@ -81,7 +80,7 @@ public:
 
     RenderBatcher& batcher() { return m_batcher; }
 
-    void render(RenderTarget&, Scene& scene);
+    void render(RenderTarget&, Scene& scene, Camera& camera);
 
 private:
     WGPUDevice m_device;
@@ -93,7 +92,7 @@ private:
     ObjectBindGroupPool m_object_group_pool;
     RenderBatcher m_batcher;
 
-    void do_render(Scene& scene, WGPURenderPassEncoder encoder);
+    void do_render(Scene&, Camera&, WGPURenderPassEncoder);
 };
 
 #endif

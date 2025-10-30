@@ -48,6 +48,24 @@ short ZPalette::selected_z() const
     return m_selected - 16;
 }
 
+std::shared_ptr<Texture> ZPalette::texture(short z) const
+{
+    if (z < -16 || z >= 16) {
+        return {};
+    }
+
+    return m_textures[z + 16];
+}
+
+const Spritesheet* ZPalette::spritesheet(short z) const
+{
+    if (z < -16 || z >= 16) {
+        return {};
+    }
+
+    return &m_spritesheets[z + 16];
+}
+
 void ZPalette::render()
 {
     if (ImGui::BeginChild("ZPal", ImVec2(40, 0))) {
@@ -73,6 +91,11 @@ void ZPalette::load(int index, const std::filesystem::path& path)
     auto opt = resources.load<Texture>("./app" / path);
     if (opt) {
         m_textures[index] = *opt;
+        m_spritesheets[index] = Spritesheet(
+            m_app_state->renderer().device(),
+            m_app_state->sprite_renderer().pipeline(),
+            **opt,
+            m_app_state->renderer().default_sampler());
     } else {
         throw std::runtime_error("Could not open " + path.string());
     }

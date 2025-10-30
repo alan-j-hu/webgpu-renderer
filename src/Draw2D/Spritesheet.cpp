@@ -12,37 +12,20 @@ Spritesheet::Spritesheet(WGPUDevice device,
 
 Spritesheet::Spritesheet(Spritesheet&& other)
 {
-    m_texture = other.m_texture;
-    m_bind_group = other.m_bind_group;
-
-    other.m_texture = nullptr;
-    other.m_bind_group = nullptr;
+    *this = std::move(other);
 }
 
 Spritesheet& Spritesheet::operator=(Spritesheet&& other)
 {
-    cleanup();
-    move(std::move(other));
+    m_texture = std::exchange(other.m_texture, {});
+    m_bind_group = std::exchange(other.m_bind_group, {});
+
     return *this;
 }
 
 Spritesheet::~Spritesheet()
 {
-    cleanup();
-}
-
-void Spritesheet::cleanup()
-{
     if (m_bind_group != nullptr) {
         wgpuBindGroupRelease(m_bind_group);
     }
-}
-
-void Spritesheet::move(Spritesheet&& other)
-{
-    m_texture = other.m_texture;
-    m_bind_group = other.m_bind_group;
-
-    other.m_texture = nullptr;
-    other.m_bind_group = nullptr;
 }

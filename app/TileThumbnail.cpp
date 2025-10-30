@@ -4,34 +4,29 @@
 
 ThumbnailCapture::ThumbnailCapture(AppState& app_state)
     : m_app_state(&app_state),
-      m_camera(),
-      m_scene(m_app_state->renderer(), m_camera)
+      m_scene(m_app_state->renderer())
 {
-    m_camera.set_top(1);
-    m_camera.set_bottom(0);
-    m_camera.set_left(0);
-    m_camera.set_right(1);
-    m_camera.set_position(glm::vec3(0, 0, 1));
-    m_camera.set_target(glm::vec3(0, 0, 0));
 }
 
 void ThumbnailCapture::capture(
     RenderTarget& target,
     Renderable& renderable)
 {
-    m_camera.set_top(16);
-    m_camera.set_bottom(0);
-    m_camera.set_left(0);
-    m_camera.set_right(16);
-    m_camera.set_position(glm::vec3(0, 0, 1));
-    m_camera.set_target(glm::vec3(0, 0, 0));
+    OrthographicCamera camera;
+
+    camera.set_top(16);
+    camera.set_bottom(0);
+    camera.set_left(0);
+    camera.set_right(16);
+    camera.set_position(glm::vec3(0, 0, 1));
+    camera.set_target(glm::vec3(0, 0, 0));
 
     m_scene.children().clear();
     m_scene
         .children()
         .push_back(std::make_unique<RenderableRef>(renderable));
 
-    m_app_state->renderer().render(target, m_scene);
+    m_app_state->renderer().render(target, m_scene, camera);
 }
 
 void ThumbnailCapture::capture(
@@ -39,19 +34,21 @@ void ThumbnailCapture::capture(
     Transform& transform,
     const Model& model)
 {
-    m_camera.set_top(1);
-    m_camera.set_bottom(0);
-    m_camera.set_left(0);
-    m_camera.set_right(1);
-    m_camera.set_position(glm::vec3(0, 0, 1));
-    m_camera.set_target(glm::vec3(0, 0, 0));
+    OrthographicCamera camera;
+
+    camera.set_top(1);
+    camera.set_bottom(0);
+    camera.set_left(0);
+    camera.set_right(1);
+    camera.set_position(glm::vec3(0, 0, 1));
+    camera.set_target(glm::vec3(0, 0, 0));
 
     m_scene.children().clear();
     m_scene
         .children()
         .push_back(std::make_unique<ModelInstance>(model));
 
-    m_app_state->renderer().render(target, m_scene);
+    m_app_state->renderer().render(target, m_scene, camera);
 }
 
 TileThumbnail::TileThumbnail(AppState& app_state)

@@ -8,6 +8,7 @@
 class Spritesheet
 {
 public:
+    Spritesheet() = default;
     Spritesheet(WGPUDevice device,
                 const SpritePipeline&,
                 const Texture&,
@@ -25,9 +26,6 @@ public:
 private:
     const Texture* m_texture;
     WGPUBindGroup m_bind_group;
-
-    void cleanup();
-    void move(Spritesheet&&);
 };
 
 #endif

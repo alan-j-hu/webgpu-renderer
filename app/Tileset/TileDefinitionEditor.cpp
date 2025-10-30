@@ -11,7 +11,7 @@ namespace fs = std::filesystem;
 TileDefinitionEditor::TileDefinitionEditor(AppState& app_state)
     : m_app_state(&app_state),
       m_preview(app_state.renderer().device(), 200, 200),
-      m_scene(app_state.renderer(), m_camera)
+      m_scene(app_state.renderer())
 {
     m_preview.set_clear_color(app_state.background_color());
 
@@ -76,5 +76,5 @@ TileDefinitionEditor::render(const TileDef& definition)
 
 void TileDefinitionEditor::render_preview()
 {
-    m_app_state->renderer().render(m_preview, m_scene);
+    m_app_state->renderer().render(m_preview, m_scene, m_camera);
 }

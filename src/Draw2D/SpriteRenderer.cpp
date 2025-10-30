@@ -95,7 +95,7 @@ void SpriteRenderer::end()
         return;
     }
 
-    m_current_draw_call.end = 6 * (m_draw_calls.size() + 1);
+    m_current_draw_call.end = 6 * (m_vertices.size() / 4 + 1);
     m_draw_calls.push_back(m_current_draw_call);
     flush();
     m_current_draw_call.bind_group = nullptr;
@@ -116,12 +116,14 @@ void SpriteRenderer::draw(
     WGPUBindGroup bind_group = spritesheet.bind_group();
     if (m_current_draw_call.bind_group == nullptr) {
         m_current_draw_call.bind_group = bind_group;
+        m_current_draw_call.begin = 0;
+        m_current_draw_call.end = 0;
     } else if (bind_group != m_current_draw_call.bind_group) {
-        m_current_draw_call.end = 6 * (m_draw_calls.size() + 1);
+        m_current_draw_call.end = 6 * (m_vertices.size() / 4 + 1);
         m_draw_calls.push_back(m_current_draw_call);
 
         m_current_draw_call.bind_group = spritesheet.bind_group();
-        m_current_draw_call.begin = 6 * m_draw_calls.size();
+        m_current_draw_call.begin = 6 * m_vertices.size() / 4;
     }
 
     m_vertices.push_back(glm::vec4(dest.x, dest.y,

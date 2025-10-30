@@ -6,10 +6,9 @@
 #include "noworry/scene/scene.h"
 #include <utility>
 
-Frame::Frame(Renderer& renderer, Scene& scene)
+Frame::Frame(Renderer& renderer)
 {
     m_renderer = &renderer;
-    m_scene = &scene;
 }
 
 Frame& Frame::add(const Mesh& mesh,
@@ -50,7 +49,7 @@ Renderer::~Renderer()
     wgpuSamplerRelease(m_sampler);
 }
 
-void Renderer::render(RenderTarget& target, Scene& scene)
+void Renderer::render(RenderTarget& target, Scene& scene, Camera& camera)
 {
     WGPUQueue queue = wgpuDeviceGetQueue(m_device);
 
@@ -85,7 +84,7 @@ void Renderer::render(RenderTarget& target, Scene& scene)
         encoder, &render_pass_desc);
     wgpuRenderPassEncoderSetBindGroup(
         pass, 0, scene.bind_group(), 0, nullptr);
-    do_render(scene, pass);
+    do_render(scene, camera, pass);
     wgpuRenderPassEncoderEnd(pass);
 
     WGPUCommandBufferDescriptor buffer_desc = { 0 };
@@ -100,9 +99,12 @@ void Renderer::render(RenderTarget& target, Scene& scene)
     m_object_group_pool.reset();
 }
 
-void Renderer::do_render(Scene& scene, WGPURenderPassEncoder encoder)
+void Renderer::do_render(
+    Scene& scene,
+    Camera& camera,
+    WGPURenderPassEncoder encoder)
 {
-    Frame frame(*this, scene);
-    scene.render(frame);
+    Frame frame(*this);
+    scene.render(frame, camera);
     m_batcher.draw(encoder);
 }

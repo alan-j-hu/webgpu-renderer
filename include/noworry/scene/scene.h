@@ -8,19 +8,17 @@
 #include "../camera/camera.h"
 #include "../Gfx3D/Renderable.h"
 
-class Scene : public Node, public Renderable
+class Scene : public Node
 {
 public:
-    Scene(Renderer&, Camera&);
+    Scene(Renderer&);
     Scene(const Scene&) = delete;
     Scene& operator=(const Scene&) = delete;
     Scene(Scene&&);
     Scene& operator=(Scene&&);
     virtual ~Scene();
 
-    void set_camera(Camera& camera);
-
-    void render(Frame&);
+    void render(Frame&, Camera&);
 
     WGPUBindGroup bind_group() { return m_bind_group; }
 
@@ -30,8 +28,6 @@ private:
     GlobalUniforms m_uniforms;
     WGPUBuffer m_buffer;
     WGPUBindGroup m_bind_group;
-
-    Camera* m_camera;
 };
 
 #endif

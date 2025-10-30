@@ -25,7 +25,6 @@ public:
 private:
     AppState* m_app_state;
     Scene m_scene;
-    OrthographicCamera m_camera;
 };
 
 class TileThumbnail
