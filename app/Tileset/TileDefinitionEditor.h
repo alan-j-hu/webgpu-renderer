@@ -5,6 +5,7 @@
 #include "noworry/rendertarget.h"
 #include "noworry/transform.h"
 #include "noworry/camera/perspectivecamera.h"
+#include "noworry/Gfx3D/ModelInstance.h"
 #include "noworry/Material/TextureMaterial.h"
 #include "noworry/scene/scene.h"
 #include <filesystem>
@@ -27,6 +28,7 @@ private:
     RenderTarget m_preview;
     PerspectiveCamera m_camera;
     Scene m_scene;
+    ModelInstance* m_instance;
 
     void render_preview();
 };

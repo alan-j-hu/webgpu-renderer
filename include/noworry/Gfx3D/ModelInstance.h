@@ -10,11 +10,14 @@ class Model;
 class ModelInstance : public Renderable
 {
 public:
+    ModelInstance();
     ModelInstance(const Model&);
 
     const glm::mat4& transform() const;
 
     glm::mat4& transform();
+
+    void set_model(const Model*);
 
     virtual void render(Frame& frame) override;
 
