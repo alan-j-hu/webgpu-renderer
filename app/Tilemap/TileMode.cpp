@@ -2,8 +2,6 @@
 #include "TilemapEditor.h"
 #include "../Commands/PlaceTileCommand.h"
 
-#include "imgui.h"
-
 TileMode::TileMode(AppState& app_state, TilemapEditor& editor)
     : View2DMode(app_state, editor),
       m_selected_tile(-1),
@@ -11,27 +9,17 @@ TileMode::TileMode(AppState& app_state, TilemapEditor& editor)
 {
 }
 
-void TileMode::handle_input()
+void TileMode::handle_click(int x, int y)
 {
     auto& project = app_state().project();
+    int selected_layer = editor().selected_layer();
 
-    if (ImGui::IsMouseDown(0)) {
-        auto cell_opt = editor().mouseover_cell();
-        if (cell_opt) {
-            int x = cell_opt->first;
-            int y = cell_opt->second;
+    if (selected_layer != -1 && m_selected_tile != -1) {
+        short z = editor().z_palette().selected_z();
 
-            int selected_layer = editor().selected_layer();
-
-            if (selected_layer != -1 && m_selected_tile != -1) {
-                short z = editor().z_palette().selected_z();
-
-                app_state().push_command(std::make_unique<PlaceTileCommand>(
-                    selected_layer, x, y, z,
-                    project.tiledef_at(m_selected_tile)
-                ));
-            }
-        }
+        app_state().push_command(std::make_unique<PlaceTileCommand>(
+            selected_layer, x, y, z,
+            project.tiledef_at(m_selected_tile)));
     }
 }
 

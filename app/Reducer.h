@@ -44,7 +44,7 @@ struct TileInst
 public:
     TileInst(std::shared_ptr<TileDef>, int);
 
-    const TileDef& def() const { return *m_def; }
+    std::shared_ptr<TileDef> def() const { return m_def; }
     int z() const { return m_z; }
 
 private:

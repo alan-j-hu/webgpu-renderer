@@ -11,11 +11,12 @@ class HeightMode : public View2DMode
 public:
     HeightMode(AppState&, TilemapEditor&);
 
-    virtual void handle_input() override;
-
     virtual void draw_overlay(RenderTarget&, SpriteRenderer&) override;
 
     virtual void draw_controls() override;
+
+protected:
+    virtual void handle_click(int tile_x, int tile_y) override;
 
 private:
 };

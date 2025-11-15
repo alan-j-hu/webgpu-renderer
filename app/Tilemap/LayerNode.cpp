@@ -88,14 +88,14 @@ void LayerNode::update()
             }
 
             auto& inst = opt.value();
-            if (!inst.def().model_data) {
+            if (!inst.def()->model_data) {
                 continue;
             }
 
             glm::mat4 transform =
                 glm::translate(glm::mat4(1), glm::vec3(x, y, inst.z()));
 
-            m_model->add_model(**inst.def().model_data, transform);
+            m_model->add_model(**inst.def()->model_data, transform);
         }
     }
 

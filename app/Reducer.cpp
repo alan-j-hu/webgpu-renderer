@@ -8,7 +8,7 @@ TileInst::TileInst(std::shared_ptr<TileDef> def, int z)
 
 bool operator==(const TileInst& lhs, const TileInst& rhs)
 {
-    return lhs.z() == rhs.z() && &lhs.def() == &rhs.def();
+    return lhs.z() == rhs.z() && lhs.def().get() == rhs.def().get();
 }
 
 Layer::Layer()
