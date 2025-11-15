@@ -35,6 +35,25 @@ TilemapEditor& View2DMode::editor()
     return *m_editor;
 }
 
+Region View2DMode::region(int tile_x, int tile_y, float w, float h)
+{
+    glm::vec3 pos_3d(tile_x, tile_y, 0);
+    // Top-left in 2D space
+    glm::vec2 pos_tl = editor().map_3d_to_2d(pos_3d + glm::vec3(0, h, 0));
+    // Bottom-right in 2D space
+    glm::vec2 pos_br = editor().map_3d_to_2d(pos_3d + glm::vec3(w, 0, 0));
+    // Beware, +1 goes towards the top of the screen in 3D, but towards
+    // the bottom in 2D
+
+    Region r;
+    r.x = pos_tl.x;
+    r.y = pos_tl.y;
+    r.w = pos_br.x - pos_tl.x;
+    r.h = pos_br.y - pos_tl.y;
+
+    return r;
+}
+
 void View2DMode::handle_click(int tile_x, int tile_y)
 {
 }

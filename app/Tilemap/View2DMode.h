@@ -18,6 +18,8 @@ protected:
 
     TilemapEditor& editor();
 
+    Region region(int tile_x, int tile_y, float w, float h);
+
     virtual void handle_click(int tile_x, int tile_y);
 
 private:
