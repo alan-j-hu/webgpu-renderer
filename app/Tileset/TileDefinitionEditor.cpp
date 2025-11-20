@@ -40,16 +40,16 @@ TileDefinitionEditor::render(const TileDef& definition)
             std::make_unique<FileDialog>(fs::current_path(), m_sink));
     }
 
-    auto model_opt = definition.model;
-    auto model_data_opt = definition.model_data;
+    auto model_opt = definition.model();
+    auto model_data_opt = definition.model_data();
 
     if (m_sink.size() > 0) {
         std::filesystem::path& path = m_sink[0];
         model_opt = m_app_state->resources().load<Model>(path);
         model_data_opt = m_app_state->resources().load<ModelData>(path);
 
-        new_definition.model = model_opt;
-        new_definition.model_data = model_data_opt;
+        new_definition.set_model(model_opt);
+        new_definition.set_model_data(model_data_opt);
         changed = true;
 
         m_sink.clear();
@@ -59,6 +59,16 @@ TileDefinitionEditor::render(const TileDef& definition)
         m_model = model_opt;
         m_instance->set_model(model_opt->get());
     }
+
+    int width = definition.width();
+    ImGui::InputInt("Width", &width, 1);
+    new_definition.set_width(width);
+    changed = changed || (new_definition.width() != definition.width());
+
+    int depth = definition.depth();
+    ImGui::InputInt("Depth", &depth, 1);
+    new_definition.set_depth(depth);
+    changed = changed || (new_definition.depth() != definition.depth());
 
     ImGui::Image((ImTextureID)(intptr_t)
                  m_preview.texture().view(),

@@ -19,6 +19,7 @@ public:
 
     void capture(
         RenderTarget& target,
+        Camera& camera,
         Transform& transform,
         const Model& model);
 

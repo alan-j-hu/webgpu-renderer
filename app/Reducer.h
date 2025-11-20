@@ -33,9 +33,26 @@ struct TextureRef
 /// TileInsts.
 struct TileDef
 {
-    std::optional<std::shared_ptr<ModelData>> model_data;
-    std::optional<std::shared_ptr<Model>> model;
-    RotationTag rotation;
+    TileDef();
+
+    const std::optional<std::shared_ptr<ModelData>>& model_data() const;
+    const std::optional<std::shared_ptr<Model>>& model() const;
+
+    short width() const;
+    short depth() const;
+
+    void set_model_data(std::optional<std::shared_ptr<ModelData>>);
+    void set_model(std::optional<std::shared_ptr<Model>>);
+
+    void set_width(short width);
+    void set_depth(short depth);
+
+private:
+    std::optional<std::shared_ptr<ModelData>> m_model_data;
+    std::optional<std::shared_ptr<Model>> m_model;
+
+    short m_width;
+    short m_depth;
 };
 
 /// A TileInst instances a tile definition on the map.

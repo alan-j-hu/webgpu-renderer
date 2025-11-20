@@ -29,19 +29,25 @@ void TileMode::draw_overlay(
 {
     const Project& project = app_state().project();
     TileThumbnail* thumb = nullptr;
+    TileDef* tiledef = nullptr;
     if (m_selected_tile != -1) {
         thumb = &app_state().tile_thumbnail(m_selected_tile);
+        tiledef = project.tiledef_at(m_selected_tile).get();
     }
 
     std::optional<std::pair<int, int>> cell_opt = editor().mouseover_cell();
     if (cell_opt && thumb != nullptr) {
         Region src;
         src.x = 0;
-        src.y = 0;
-        src.w = 1;
-        src.h = 1;
+        src.y = 1 - tiledef->depth() / 5.0;
+        src.w = tiledef->width() / 5.0;
+        src.h = tiledef->depth() / 5.0;
 
-        Region dest = region(cell_opt->first, cell_opt->second, 1, 1);
+        Region dest = region(
+            cell_opt->first,
+            cell_opt->second,
+            tiledef->width(),
+            tiledef->depth());
 
         sprite_renderer.draw(thumb->spritesheet(), dest, src);
     }

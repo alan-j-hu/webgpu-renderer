@@ -57,6 +57,15 @@ void AppState::redo()
 
 void AppState::refresh_thumbnails()
 {
+    OrthographicCamera camera;
+
+    camera.set_top(5);
+    camera.set_bottom(0);
+    camera.set_left(0);
+    camera.set_right(5);
+    camera.set_position(glm::vec3(0, 0, 1));
+    camera.set_target(glm::vec3(0, 0, 0));
+
     while (m_thumbnail_cache.size() < m_project.tiledef_count()) {
         m_thumbnail_cache.emplace_back(*this);
     }
@@ -64,9 +73,9 @@ void AppState::refresh_thumbnails()
         RenderTarget& target = m_thumbnail_cache.at(i).render_target();
         auto def = m_project.tiledef_at(i);
 
-        if (def->model) {
+        if (def->model()) {
             Transform transform;
-            m_capture.capture(target, transform, **def->model);
+            m_capture.capture(target, camera, transform, **def->model());
         }
     }
 }

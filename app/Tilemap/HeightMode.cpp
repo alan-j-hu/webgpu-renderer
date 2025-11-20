@@ -26,7 +26,7 @@ void HeightMode::draw_overlay(RenderTarget&, SpriteRenderer& sprite_renderer)
             }
 
             auto& inst = opt.value();
-            if (!inst.def()->model_data) {
+            if (!inst.def()->model_data()) {
                 continue;
             }
             short z = opt.value().z();

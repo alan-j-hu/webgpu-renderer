@@ -1,5 +1,53 @@
 #include "Reducer.h"
+#include <algorithm>
 #include <utility>
+
+TileDef::TileDef()
+{
+    m_width = 1;
+    m_depth = 1;
+}
+
+const std::optional<std::shared_ptr<ModelData>>& TileDef::model_data() const
+{
+    return m_model_data;
+}
+
+const std::optional<std::shared_ptr<Model>>& TileDef::model() const
+{
+    return m_model;
+}
+
+short TileDef::width() const
+{
+    return m_width;
+}
+
+short TileDef::depth() const
+{
+    return m_depth;
+}
+
+void TileDef::set_model_data(
+    std::optional<std::shared_ptr<ModelData>> model_data)
+{
+    m_model_data = model_data;
+}
+
+void TileDef::set_model(std::optional<std::shared_ptr<Model>> model)
+{
+    m_model = model;
+}
+
+void TileDef::set_width(short width)
+{
+    m_width = std::clamp<short>(width, 1, 5);
+}
+
+void TileDef::set_depth(short depth)
+{
+    m_depth = std::clamp<short>(depth, 1, 5);
+}
 
 TileInst::TileInst(std::shared_ptr<TileDef> def, int z)
     : m_def(std::move(def)), m_z(z)
