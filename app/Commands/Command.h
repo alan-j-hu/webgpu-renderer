@@ -1,7 +1,7 @@
 #ifndef COMMAND_H
 #define COMMAND_H
 
-#include "../Reducer.h"
+#include "../Project.h"
 
 /// Abstract class for undo/redo functionality.
 class Command

@@ -1,5 +1,4 @@
 #include "TileDefinitionEditor.h"
-#include "RotationDropdown.h"
 #include "../FileDialog.h"
 #include "noworry/Resource/ResourceLoader.h"
 #include "noworry/resourcetable.h"

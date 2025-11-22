@@ -14,7 +14,7 @@ add_executable(demo
   main.cpp
   Modal.cpp
   Pane.cpp
-  Reducer.cpp
+  Project.cpp
   TilePicker.cpp
   TileThumbnail.cpp
   Commands/Command.cpp
@@ -31,11 +31,8 @@ add_executable(demo
   Tilemap/View3DMode.cpp
   Tilemap/ZPalette.cpp
   Tileset/AddTile.cpp
-  Tileset/RotationDropdown.cpp
   Tileset/TileDefinitionEditor.cpp
   Tileset/TileList.cpp
-  Tileset/TileMesh.cpp
-  Tileset/TileRotations.cpp
   Tileset/TilesetPane.cpp
   ${IMGUI_SRC})
 set_property(TARGET demo PROPERTY CXX_STANDARD 23)

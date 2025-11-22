@@ -2,12 +2,9 @@
 #define APPSTATE_H
 
 #include "Modal.h"
-#include "Reducer.h"
+#include "Project.h"
 #include "TileThumbnail.h"
 #include "Commands/Command.h"
-#include "Tileset/RotationDropdown.h"
-#include "Tileset/TileMesh.h"
-#include "Tileset/TileRotations.h"
 
 #include "noworry/renderer.h"
 #include "noworry/Draw2D/SpriteRenderer.h"
