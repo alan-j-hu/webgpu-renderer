@@ -87,9 +87,14 @@ std::shared_ptr<TileDef> Project::tiledef_at(int idx) const
     return m_tile_defs.at(idx);
 }
 
+void Project::set_tiledef(int idx, TileDef tiledef)
+{
+    m_tile_defs.at(idx) = std::make_shared<TileDef>(std::move(tiledef));
+}
+
 void Project::add_tiledef(TileDef tiledef)
 {
-    m_tile_defs.push_back(std::make_shared<TileDef>(tiledef));
+    m_tile_defs.push_back(std::make_shared<TileDef>(std::move(tiledef)));
 }
 
 std::size_t Project::layer_count() const

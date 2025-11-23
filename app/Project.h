@@ -113,6 +113,7 @@ public:
 
     std::size_t tiledef_count() const;
     std::shared_ptr<TileDef> tiledef_at(int idx) const;
+    void set_tiledef(int idx, TileDef tiledef);
 
     void add_tiledef(TileDef tiledef);
     void remove_tiledef(int idx);
