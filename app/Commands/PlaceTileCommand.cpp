@@ -1,9 +1,14 @@
 #include "PlaceTileCommand.h"
 
 PlaceTileCommand::PlaceTileCommand(
-    int idx, int x, int y, int z, std::shared_ptr<TileDef> def)
-    : m_layer_idx(idx), m_x(x), m_y(y),
-      m_inst(std::make_optional<TileInst>(def, z))
+    int layer,
+    int x,
+    int y,
+    int z,
+    Rotation rotation,
+    std::shared_ptr<TileDef> tiledef)
+    : m_layer_idx(layer), m_x(x), m_y(y),
+      m_inst(std::make_optional<TileInst>(tiledef, z, rotation))
 {
 }
 

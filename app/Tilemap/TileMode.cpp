@@ -21,7 +21,7 @@ void TileMode::handle_click(int x, int y)
         short z = editor().z_palette().selected_z();
 
         app_state().push_command(std::make_unique<PlaceTileCommand>(
-            selected_layer, x, y, z,
+            selected_layer, x, y, z, m_rotation,
             project.tiledef_at(m_selected_tile)));
     }
 }

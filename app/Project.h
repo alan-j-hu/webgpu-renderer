@@ -59,14 +59,16 @@ private:
 struct TileInst
 {
 public:
-    TileInst(std::shared_ptr<TileDef>, int);
+    TileInst(std::shared_ptr<TileDef>, int, Rotation);
 
     std::shared_ptr<TileDef> def() const { return m_def; }
     int z() const { return m_z; }
+    Rotation rotation() const { return m_rotation; }
 
 private:
     std::shared_ptr<TileDef> m_def;
     short m_z;
+    Rotation m_rotation;
 };
 
 bool operator==(const TileInst&, const TileInst&);

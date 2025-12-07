@@ -2,13 +2,20 @@
 #define PLACETILECOMMAND_H
 
 #include "Command.h"
+#include "../Project.h"
 #include <optional>
 #include <memory>
 
 class PlaceTileCommand : public Command
 {
 public:
-    PlaceTileCommand(int idx, int x, int y, int z, std::shared_ptr<TileDef>);
+    PlaceTileCommand(
+        int layer,
+        int x,
+        int y,
+        int z,
+        Rotation rotation,
+        std::shared_ptr<TileDef> tiledef);
 
     const char* name() override;
 

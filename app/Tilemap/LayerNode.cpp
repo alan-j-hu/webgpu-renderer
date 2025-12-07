@@ -2,8 +2,50 @@
 #include "noworry/grid.h"
 #include "noworry/Gfx3D/ModelInstance.h"
 
-#include <utility>
 #include "glm/ext/matrix_transform.hpp"
+#include <numbers>
+#include <utility>
+
+glm::mat4 transform(
+    float x, float y, float z,
+    float width, float depth, Rotation rotation)
+{
+    static constexpr glm::vec3 XY_PLANE = glm::vec3(0, 0, 1);
+
+    switch (rotation) {
+    case Rotation::Rotate0:
+        return glm::translate(glm::mat4(1), glm::vec3(x, y, z));
+    case Rotation::Rotate90: {
+        glm::mat4 translation = glm::translate(
+            glm::mat4(1),
+            glm::vec3(x + depth, y, z));
+        return glm::rotate(
+            translation,
+            0.5f * std::numbers::pi_v<float>,
+            XY_PLANE);
+    }
+    case Rotation::Rotate180: {
+        glm::mat4 translation = glm::translate(
+            glm::mat4(1),
+            glm::vec3(x + width, y + depth, z));
+        return glm::rotate(
+            translation,
+            std::numbers::pi_v<float>,
+            XY_PLANE);
+    }
+    case Rotation::Rotate270: {
+        glm::mat4 translation = glm::translate(
+            glm::mat4(1),
+            glm::vec3(x, y + width, z));
+        return glm::rotate(
+            translation,
+            1.5f * std::numbers::pi_v<float>,
+            XY_PLANE);
+    }
+    default:
+        return glm::mat4(1);
+    }
+}
 
 LayerNode::ChangeListener::ChangeListener(LayerNode& node)
     : m_node(&node)
@@ -88,14 +130,16 @@ void LayerNode::update()
             }
 
             auto& inst = opt.value();
-            if (!inst.def()->model_data()) {
+            auto def = inst.def();
+            if (!def->model_data()) {
                 continue;
             }
 
-            glm::mat4 transform =
-                glm::translate(glm::mat4(1), glm::vec3(x, y, inst.z()));
-
-            m_model->add_model(**inst.def()->model_data(), transform);
+            m_model->add_model(**inst.def()->model_data(),
+                               transform(x, y, inst.z(),
+                                         def->width(),
+                                         def->depth(),
+                                         inst.rotation()));
         }
     }
 

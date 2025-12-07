@@ -65,6 +65,6 @@ void HeightMode::handle_click(int tile_x, int tile_y)
 
         app_state().push_command(std::make_unique<PlaceTileCommand>(
             selected_layer, tile_x, tile_y, z,
-            inst_opt->def()));
+            inst_opt->rotation(), inst_opt->def()));
     }
 }

@@ -49,8 +49,8 @@ void TileDef::set_depth(short depth)
     m_depth = std::clamp<short>(depth, 1, 5);
 }
 
-TileInst::TileInst(std::shared_ptr<TileDef> def, int z)
-    : m_def(std::move(def)), m_z(z)
+TileInst::TileInst(std::shared_ptr<TileDef> def, int z, Rotation rotation)
+    : m_def(std::move(def)), m_z(z), m_rotation(rotation)
 {
 }
 
