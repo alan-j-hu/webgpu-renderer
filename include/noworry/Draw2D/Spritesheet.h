@@ -21,6 +21,7 @@ public:
 
     virtual ~Spritesheet();
 
+    const Texture& texture() const { return *m_texture; }
     WGPUBindGroup bind_group() const { return m_bind_group; }
 
 private:

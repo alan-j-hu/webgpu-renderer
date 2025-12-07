@@ -1,6 +1,12 @@
 #include "noworry/Draw2D/SpriteRenderer.h"
-#include <cstdint>
 #include <glm/mat4x4.hpp>
+#include <cmath>
+#include <cstdint>
+
+glm::vec2 rotate(glm::vec2 p, float sin, float cos)
+{
+    return glm::vec2(p.x * cos + p.y * sin, p.y * cos - p.x * sin);
+}
 
 SpriteRenderer::SpriteRenderer(WGPUDevice device, std::size_t max)
     : m_capacity(max),
@@ -106,8 +112,12 @@ void SpriteRenderer::end()
 
 void SpriteRenderer::draw(
     const Spritesheet& spritesheet,
-    const Region& dest,
-    const Region& src)
+    glm::vec2 pos,
+    float dest_width,
+    float dest_height,
+    const Region& src,
+    float rotation,
+    glm::vec2 origin)
 {
     if (!m_frame) {
         return;
@@ -126,14 +136,31 @@ void SpriteRenderer::draw(
         m_current_draw_call.begin = 6 * m_vertices.size() / 4;
     }
 
-    m_vertices.push_back(glm::vec4(dest.x, dest.y,
-                                   src.x, src.y));
-    m_vertices.push_back(glm::vec4(dest.x, dest.y + dest.h,
-                                   src.x, src.y + src.h));
-    m_vertices.push_back(glm::vec4(dest.x + dest.w, dest.y + dest.h,
-                                   src.x + src.w, src.y + src.h));
-    m_vertices.push_back(glm::vec4(dest.x + dest.w, dest.y,
-                                   src.x + src.w, src.y));
+    // Start with a rectangle in local space about the given origin
+    glm::vec2 p1 = -origin;
+    glm::vec2 p2 = p1 + glm::vec2(0, dest_height);
+    glm::vec2 p3 = p1 + glm::vec2(dest_width, dest_height);
+    glm::vec2 p4 = p1 + glm::vec2(dest_width, 0);
+
+    // Rotate the rectangle, still in local space
+    const float sin = std::sin(rotation);
+    const float cos = std::cos(rotation);
+
+    p1 = rotate(p1, sin, cos);
+    p2 = rotate(p2, sin, cos);
+    p3 = rotate(p3, sin, cos);
+    p4 = rotate(p4, sin, cos);
+
+    // Translate by the position offset to convert rectangle to screen space
+    p1 += pos;
+    p2 += pos;
+    p3 += pos;
+    p4 += pos;
+
+    m_vertices.push_back(glm::vec4(p1.x, p1.y, src.x, src.y));
+    m_vertices.push_back(glm::vec4(p2.x, p2.y, src.x, src.y + src.h));
+    m_vertices.push_back(glm::vec4(p3.x, p3.y, src.x + src.w, src.y + src.h));
+    m_vertices.push_back(glm::vec4(p4.x, p4.y, src.x + src.w, src.y));
 }
 
 void SpriteRenderer::flush()

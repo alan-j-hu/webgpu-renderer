@@ -135,19 +135,11 @@ void TilemapEditor::render()
     {
         m_app_state.sprite_renderer().begin(m_subwindow_2d);
 
-        Region src;
-        src.x = 0;
-        src.y = 0;
-        src.w = 1;
-        src.h = 1;
-
-        Region dest;
-        dest.x = 0;
-        dest.y = 0;
-        dest.w = m_subwindow_2d.width();
-        dest.h = m_subwindow_2d.height();
-
-        m_app_state.sprite_renderer().draw(m_spritesheet, dest, src);
+        m_app_state.sprite_renderer().draw(
+            m_spritesheet,
+            glm::vec2(0, 0),
+            m_spritesheet.texture().width(),
+            m_spritesheet.texture().height());
 
         m_current_mode->draw_overlay(
             m_subwindow_2d,

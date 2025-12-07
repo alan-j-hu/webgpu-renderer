@@ -9,6 +9,7 @@
 #include <optional>
 #include <vector>
 
+#include <glm/vec2.hpp>
 #include <glm/vec4.hpp>
 #include <webgpu/webgpu.h>
 
@@ -36,7 +37,14 @@ public:
 
     void end();
 
-    void draw(const Spritesheet&, const Region& dest, const Region& src);
+    void draw(
+        const Spritesheet& spritesheet,
+        glm::vec2 pos,
+        float width,
+        float height,
+        const Region& src = { 0.0, 0.0, 1.0, 1.0 },
+        float rotation = 0.0,
+        glm::vec2 origin = glm::vec2(0.0, 0.0));
 
 private:
     std::size_t m_capacity;

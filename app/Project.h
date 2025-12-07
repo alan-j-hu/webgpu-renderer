@@ -14,7 +14,7 @@
 
 class TileRotations;
 
-enum class RotationTag
+enum class Rotation
 {
     Rotate0,
     Rotate90,

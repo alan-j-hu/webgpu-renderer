@@ -31,18 +31,18 @@ void HeightMode::draw_overlay(RenderTarget&, SpriteRenderer& sprite_renderer)
             }
             short z = opt.value().z();
 
-            Region src;
-            src.x = 0;
-            src.y = 0;
-            src.w = 1;
-            src.h = 1;
-
             Region dest = region(x, y, 0.5, 0.5);
-
             const Spritesheet* spritesheet =
                 editor().z_palette().spritesheet(z);
 
-            sprite_renderer.draw(*spritesheet, dest, src);
+            sprite_renderer.draw(
+                *spritesheet,
+                glm::vec2(dest.x, dest.y),
+                dest.w,
+                dest.h,
+                { 0.0, 0.0, 1.0, 1.0 },
+                0,
+                glm::vec2(0, dest.h));
         }
     }
 }

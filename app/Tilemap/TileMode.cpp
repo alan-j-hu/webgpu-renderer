@@ -1,10 +1,13 @@
 #include "TileMode.h"
 #include "TilemapEditor.h"
 #include "../Commands/PlaceTileCommand.h"
+#include <imgui.h>
+#include <numbers>
 
 TileMode::TileMode(AppState& app_state, TilemapEditor& editor)
     : View2DMode(app_state, editor),
       m_selected_tile(-1),
+      m_rotation(Rotation::Rotate0),
       m_tile_picker(app_state)
 {
 }
@@ -37,23 +40,67 @@ void TileMode::draw_overlay(
 
     std::optional<std::pair<int, int>> cell_opt = editor().mouseover_cell();
     if (cell_opt && thumb != nullptr) {
+        const float MAX_LENGTH = 5.0;
+
         Region src;
         src.x = 0;
-        src.y = 1 - tiledef->depth() / 5.0;
-        src.w = tiledef->width() / 5.0;
-        src.h = tiledef->depth() / 5.0;
+        src.y = 1 - tiledef->depth() / MAX_LENGTH;
+        src.w = tiledef->width() / MAX_LENGTH;
+        src.h = tiledef->depth() / MAX_LENGTH;
+
+        float radians = 0;
+        int dest_x = cell_opt->first;
+        int dest_y = cell_opt->second;
+        switch (m_rotation) {
+        case Rotation::Rotate90:
+            radians = 0.5 * std::numbers::pi;
+            dest_x += tiledef->depth();
+            break;
+        case Rotation::Rotate180:
+            radians = std::numbers::pi;
+            dest_x += tiledef->width();
+            dest_y += tiledef->depth();
+            break;
+        case Rotation::Rotate270:
+            radians = 1.5 * std::numbers::pi;
+            dest_y += tiledef->width();
+            break;
+        }
 
         Region dest = region(
-            cell_opt->first,
-            cell_opt->second,
+            dest_x,
+            dest_y,
             tiledef->width(),
             tiledef->depth());
 
-        sprite_renderer.draw(thumb->spritesheet(), dest, src);
+        sprite_renderer.draw(
+            thumb->spritesheet(),
+            glm::vec2(dest.x, dest.y),
+            dest.w,
+            dest.h,
+            src,
+            radians,
+            glm::vec2(0, dest.h));
     }
 }
 
 void TileMode::draw_controls()
 {
+    if (ImGui::RadioButton("0°", m_rotation == Rotation::Rotate0)) {
+        m_rotation = Rotation::Rotate0;
+    }
+    ImGui::SameLine();
+    if (ImGui::RadioButton("90°", m_rotation == Rotation::Rotate90)) {
+        m_rotation = Rotation::Rotate90;
+    }
+    ImGui::SameLine();
+    if (ImGui::RadioButton("180°", m_rotation == Rotation::Rotate180)) {
+        m_rotation = Rotation::Rotate180;
+    }
+    ImGui::SameLine();
+    if (ImGui::RadioButton("270°", m_rotation == Rotation::Rotate270)) {
+        m_rotation = Rotation::Rotate270;
+    }
+
     m_tile_picker.render(m_selected_tile);
 }

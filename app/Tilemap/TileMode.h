@@ -24,6 +24,7 @@ protected:
 private:
     TilePicker m_tile_picker;
     int m_selected_tile;
+    Rotation m_rotation;
 };
 
 #endif
