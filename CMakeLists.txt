@@ -26,8 +26,8 @@ FetchContent_MakeAvailable(glm)
 FetchContent_Declare(
   dawn
   GIT_REPOSITORY https://github.com/google/dawn.git
-  # v20251015.200420
-  GIT_TAG 6c7ec7c76611d8a4ed243624604b08e2ef0fda2d
+  # v20251218.170355
+  GIT_TAG e78ae5f0450857eb95217ef469fbb173a3cf103d
   GIT_SHALLOW ON
   GIT_PROGRESS TRUE
   GIT_SUBMODULES ""
