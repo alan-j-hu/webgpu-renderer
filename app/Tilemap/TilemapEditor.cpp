@@ -7,21 +7,6 @@
 
 #include "imgui.h"
 
-TilemapEditor::LayerListener::LayerListener(TilemapEditor& editor)
-    : m_editor(&editor)
-{
-}
-
-void TilemapEditor::LayerListener::add_layer(Layer& layer, int index)
-{
-    m_editor->add_layer(layer, index);
-}
-
-void TilemapEditor::LayerListener::remove_layer(int index)
-{
-    m_editor->remove_layer(index);
-}
-
 TilemapEditor::TilemapEditor(AppState& app_state)
     : m_camera_selection(0),
       m_app_state(app_state),
@@ -44,8 +29,8 @@ TilemapEditor::TilemapEditor(AppState& app_state)
                       16,
                       glm::vec3(16, 0, 0),
                       glm::vec3(0, 16, 0))),
-      m_layer_listener(*this),
-      m_z_palette(app_state)
+      m_z_palette(app_state),
+      m_level_node(app_state)
 {
     app_state.connect_tilemap_editor(*this);
 
@@ -67,6 +52,9 @@ TilemapEditor::TilemapEditor(AppState& app_state)
         transform,
         m_grid_mesh,
         app_state.wireframe_material()
+    ));
+    m_scene.children().push_back(std::make_unique<RenderableRef>(
+        m_level_node
     ));
 }
 
@@ -217,7 +205,7 @@ void TilemapEditor::draw_layer_list()
         m_app_state.push_command(std::make_unique<CreateLayerCommand>());
     }
 
-    for (int i = 0; i < project.layer_count(); ++i) {
+    for (int i = 0; i < project.level().layer_count(); ++i) {
         draw_layer_item(i);
     }
 }
@@ -225,7 +213,7 @@ void TilemapEditor::draw_layer_list()
 void TilemapEditor::draw_layer_item(int i)
 {
     auto& project = m_app_state.project();
-    const Layer& layer = project.layer_at(i);
+    const Layer& layer = project.level().layer_at(i);
 
     const bool selected = i == m_selected_layer;
     const ImVec4 bg_color =
@@ -233,9 +221,12 @@ void TilemapEditor::draw_layer_item(int i)
     const ImVec4 tint_color =
         selected ? ImVec4(0.8, 0.8, 0.8, 1) : ImVec4(1, 1, 1, 1);
 
+    ImTextureID tex_id =
+        (ImTextureID)(intptr_t)m_level_node.layer_at(i).thumbnail().view();
+
     if (ImGui::ImageButton(
             std::to_string(i).c_str(),
-            (ImTextureID)(intptr_t)m_layer_nodes[i]->thumbnail().view(),
+            tex_id,
             ImVec2(100, 100),
             ImVec2(0, 0),
             ImVec2(1, 1),
@@ -244,19 +235,4 @@ void TilemapEditor::draw_layer_item(int i)
 
         m_selected_layer = i;
     }
-}
-
-void TilemapEditor::add_layer(Layer& layer, int index)
-{
-    auto ptr = std::make_unique<LayerNode>(m_app_state, layer);
-    m_layer_nodes.insert(m_layer_nodes.begin() + index, ptr.get());
-    m_scene.children().insert(
-        m_scene.children().begin() + index,
-        std::move(ptr));
-}
-
-void TilemapEditor::remove_layer(int index)
-{
-    m_scene.children().erase(m_scene.children().begin() + index);
-    m_layer_nodes.erase(m_layer_nodes.begin() + index);
 }

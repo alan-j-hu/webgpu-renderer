@@ -82,12 +82,16 @@ void AppState::refresh_thumbnails()
 
 void AppState::connect_tilemap_editor(TilemapEditor& editor)
 {
-    m_project.add_layer_listenable().add_listener(editor.add_layer_listener());
+    m_project
+        .level()
+        .listenable()
+        .add_listener(editor.level_node().listener());
 }
 
 void AppState::disconnect_tilemap_editor(TilemapEditor& editor)
 {
     m_project
-        .add_layer_listenable()
-        .remove_listener(editor.add_layer_listener());
+        .level()
+        .listenable()
+        .remove_listener(editor.level_node().listener());
 }

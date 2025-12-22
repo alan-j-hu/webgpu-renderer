@@ -16,7 +16,7 @@ void HeightMode::draw_overlay(RenderTarget&, SpriteRenderer& sprite_renderer)
     }
 
     const Project& project = app_state().project();
-    const Layer& layer = project.layer_at(layer_idx);
+    const Layer& layer = project.level().layer_at(layer_idx);
 
     for (int y = 0; y < 16; ++y) {
         for (int x = 0; x < 16; ++x) {
@@ -57,6 +57,7 @@ void HeightMode::handle_click(int tile_x, int tile_y)
     int selected_layer = editor().selected_layer();
 
     std::optional<TileInst> inst_opt = project
+        .level()
         .layer_at(selected_layer)
         .at(tile_x, tile_y);
 

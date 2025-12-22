@@ -25,6 +25,7 @@ add_executable(demo
   Commands/UpdateTileCommand.cpp
   Tilemap/HeightMode.cpp
   Tilemap/LayerNode.cpp
+  Tilemap/LevelNode.cpp
   Tilemap/TilemapEditor.cpp
   Tilemap/TileMode.cpp
   Tilemap/View2DMode.cpp

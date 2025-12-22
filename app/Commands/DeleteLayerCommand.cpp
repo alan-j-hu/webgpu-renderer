@@ -12,7 +12,7 @@ const char* DeleteLayerCommand::name()
 
 Command::Outcome DeleteLayerCommand::up(Project& project)
 {
-    m_layer = project.remove_layer(m_index);
+    m_layer = project.level().remove_layer(m_index);
     if (m_layer == nullptr) {
         return Outcome::CANCELED;
     }
@@ -21,6 +21,6 @@ Command::Outcome DeleteLayerCommand::up(Project& project)
 
 void DeleteLayerCommand::down(Project& project)
 {
-    project.add_layer(std::move(*m_layer), m_index);
+    project.level().add_layer(std::move(*m_layer), m_index);
     m_layer = std::nullopt;
 }

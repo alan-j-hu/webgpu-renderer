@@ -1,8 +1,9 @@
 #ifndef TILEMAPEDITOR_H
 #define TILEMAPEDITOR_H
 
-#include "LayerNode.h"
 #include "HeightMode.h"
+#include "LayerNode.h"
+#include "LevelNode.h"
 #include "Mode.h"
 #include "TileMode.h"
 #include "View3DMode.h"
@@ -46,21 +47,9 @@ public:
 
     int selected_layer() const { return m_selected_layer; }
 
-    Project::Listener& add_layer_listener() { return m_layer_listener; }
+    LevelNode& level_node() { return m_level_node; }
 
 private:
-    class LayerListener : public Project::Listener
-    {
-    public:
-        LayerListener(TilemapEditor&);
-
-        virtual void add_layer(Layer&, int index) override;
-        virtual void remove_layer(int index) override;
-
-    private:
-        TilemapEditor* m_editor;
-    };
-
     int m_camera_selection;
 
     AppState& m_app_state;
@@ -87,10 +76,9 @@ private:
 
     BasicMesh m_grid_mesh;
 
-    std::vector<LayerNode*> m_layer_nodes;
-    LayerListener m_layer_listener;
-
     ZPalette m_z_palette;
+
+    LevelNode m_level_node;
 
     void render_preview();
 
@@ -99,10 +87,6 @@ private:
     void draw_layer_list();
 
     void draw_layer_item(int i);
-
-    void add_layer(Layer&, int index);
-
-    void remove_layer(int index);
 };
 
 #endif

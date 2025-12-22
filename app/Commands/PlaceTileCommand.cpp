@@ -14,7 +14,7 @@ PlaceTileCommand::PlaceTileCommand(
 
 Command::Outcome PlaceTileCommand::up(Project& project)
 {
-    Layer& layer = project.layer_at(m_layer_idx);
+    Layer& layer = project.level().layer_at(m_layer_idx);
     std::optional<TileInst> old = layer.at(m_x, m_y);
     if (m_inst == old) {
         return Outcome::CANCELED;

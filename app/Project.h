@@ -98,8 +98,7 @@ private:
     Listenable<Listener> m_listenable;
 };
 
-/// A top-level Project.
-class Project
+class Level
 {
 public:
     class Listener
@@ -109,6 +108,28 @@ public:
         virtual void remove_layer(int index) = 0;
     };
 
+    std::size_t layer_count() const;
+    const Layer& layer_at(int idx) const;
+    Layer& layer_at(int idx);
+
+    void add_layer();
+    void add_layer(std::unique_ptr<Layer>, int idx);
+    std::unique_ptr<Layer> remove_layer(int idx);
+
+    Listenable<Listener>& listenable()
+    {
+        return m_listenable;
+    }
+
+private:
+    std::vector<std::unique_ptr<Layer>> m_layers;
+    Listenable<Listener> m_listenable;
+};
+
+/// A top-level Project.
+class Project
+{
+public:
     Project() = default;
     Project(Project&&) = default;
     Project& operator=(Project&&) = default;
@@ -120,23 +141,12 @@ public:
     void add_tiledef(TileDef tiledef);
     void remove_tiledef(int idx);
 
-    std::size_t layer_count() const;
-    const Layer& layer_at(int idx) const;
-    Layer& layer_at(int idx);
-
-    void add_layer();
-    void add_layer(std::unique_ptr<Layer>, int idx);
-    std::unique_ptr<Layer> remove_layer(int idx);
-
-    Listenable<Listener>& add_layer_listenable()
-    {
-        return m_add_layer_listenable;
-    }
+    Level& level() { return m_level; }
+    const Level& level() const { return m_level; }
 
 private:
     std::vector<std::shared_ptr<TileDef>> m_tile_defs;
-    std::vector<std::unique_ptr<Layer>> m_layers;
-    Listenable<Listener> m_add_layer_listenable;
+    Level m_level;
 };
 
 #endif
