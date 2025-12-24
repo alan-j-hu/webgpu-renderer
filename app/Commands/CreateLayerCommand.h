@@ -2,11 +2,12 @@
 #define CREATELAYERCOMMAND_H
 
 #include "Command.h"
+#include "../Project.h"
 
 class CreateLayerCommand : public Command
 {
 public:
-    CreateLayerCommand();
+    CreateLayerCommand(LayerLocation);
 
     virtual const char* name() override;
 
@@ -15,6 +16,7 @@ protected:
     virtual void down(Project&) override;
 
 private:
+    LayerLocation m_loc;
 };
 
 #endif

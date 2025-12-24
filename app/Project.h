@@ -6,10 +6,15 @@
 #include "noworry/Gfx3D/Model.h"
 #include "noworry/Material/TextureMaterial.h"
 
+#include <glm/ext/vector_int2.hpp>
+#define GLM_ENABLE_EXPERIMENTAL
+#include "glm/gtx/hash.hpp"
+
 #include <filesystem>
 #include <memory>
 #include <optional>
 #include <string>
+#include <unordered_map>
 #include <vector>
 
 class TileRotations;
@@ -20,6 +25,15 @@ enum class Rotation
     Rotate90,
     Rotate180,
     Rotate270
+};
+
+struct LayerLocation
+{
+    LayerLocation();
+
+    int world;
+    glm::ivec2 level;
+    int layer;
 };
 
 /// A TextureRef consists of a file path and a material for the texture.
@@ -91,11 +105,11 @@ public:
 
     void set(int x, int y, std::optional<TileInst> option);
 
-    Listenable<Listener>& listenable() { return m_listenable; }
+    Listenable<Listener>& listenable() const { return m_listenable; }
 
 private:
     std::vector<std::optional<TileInst>> m_tiles;
-    Listenable<Listener> m_listenable;
+    mutable Listenable<Listener> m_listenable;
 };
 
 class Level
@@ -108,6 +122,8 @@ public:
         virtual void remove_layer(int index) = 0;
     };
 
+    Level();
+
     std::size_t layer_count() const;
     const Layer& layer_at(int idx) const;
     Layer& layer_at(int idx);
@@ -116,21 +132,32 @@ public:
     void add_layer(std::unique_ptr<Layer>, int idx);
     std::unique_ptr<Layer> remove_layer(int idx);
 
-    Listenable<Listener>& listenable()
+    Listenable<Listener>& listenable() const
     {
         return m_listenable;
     }
 
 private:
     std::vector<std::unique_ptr<Layer>> m_layers;
-    Listenable<Listener> m_listenable;
+    mutable Listenable<Listener> m_listenable;
+};
+
+class World
+{
+public:
+    World();
+    Level& level_at(int x, int y);
+    const Level& level_at(int x, int y) const;
+
+private:
+    std::unordered_map<glm::ivec2, std::unique_ptr<Level>> m_levels;
 };
 
 /// A top-level Project.
 class Project
 {
 public:
-    Project() = default;
+    Project();
     Project(Project&&) = default;
     Project& operator=(Project&&) = default;
 
@@ -144,9 +171,15 @@ public:
     Level& level() { return m_level; }
     const Level& level() const { return m_level; }
 
+    World& world_at(int idx);
+    const World& world_at(int idx) const;
+    void add_world(std::unique_ptr<World>, int idx);
+    std::unique_ptr<World> remove_world(int idx);
+
 private:
     std::vector<std::shared_ptr<TileDef>> m_tile_defs;
     Level m_level;
+    std::vector<std::unique_ptr<World>> m_worlds;
 };
 
 #endif

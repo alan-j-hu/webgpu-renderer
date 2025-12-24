@@ -36,7 +36,7 @@ private:
     std::vector<std::unique_ptr<LayerNode>> m_layer_nodes;
     LevelListener m_level_listener;
 
-    void add_layer(Layer&, int index);
+    void add_layer(const Layer&, int index);
 
     void remove_layer(int index);
 };

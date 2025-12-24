@@ -14,7 +14,7 @@ class LayerNode;
 class LayerNode : public Renderable
 {
 public:
-    LayerNode(AppState&, Layer&);
+    LayerNode(AppState&, const Layer&);
     LayerNode(LayerNode&&);
     LayerNode& operator=(LayerNode&&);
     ~LayerNode();
@@ -38,7 +38,7 @@ private:
     };
 
     AppState* m_app_state;
-    Layer* m_layer;
+    const Layer* m_layer;
     std::unique_ptr<DynamicModel> m_model;
     std::optional<DynamicModelInstance> m_instance;
     std::optional<BasicMesh> m_grid_mesh;

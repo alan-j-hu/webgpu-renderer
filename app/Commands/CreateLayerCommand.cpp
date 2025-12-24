@@ -1,6 +1,7 @@
 #include "CreateLayerCommand.h"
 
-CreateLayerCommand::CreateLayerCommand()
+CreateLayerCommand::CreateLayerCommand(LayerLocation loc)
+    : m_loc(loc)
 {
 }
 

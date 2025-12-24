@@ -70,7 +70,7 @@ void LayerNode::ChangeListener::notify(const Layer& layer)
     m_node->update();
 }
 
-LayerNode::LayerNode(AppState& app_state, Layer& layer)
+LayerNode::LayerNode(AppState& app_state, const Layer& layer)
     : m_app_state(&app_state),
       m_grid_mesh(
           create_grid(app_state.renderer().device(),

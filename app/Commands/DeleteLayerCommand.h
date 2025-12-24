@@ -2,13 +2,14 @@
 #define DELETELAYERCOMMAND_H
 
 #include "Command.h"
+#include "../Project.h"
 #include <memory>
 #include <optional>
 
 class DeleteLayerCommand : public Command
 {
 public:
-    DeleteLayerCommand(int index);
+    DeleteLayerCommand(LayerLocation);
 
     virtual const char* name() override;
 
@@ -17,7 +18,7 @@ protected:
     virtual void down(Project&) override;
 
 private:
-    int m_index;
+    LayerLocation m_loc;
     std::optional<std::unique_ptr<Layer>> m_layer;
 };
 

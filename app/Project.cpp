@@ -2,6 +2,11 @@
 #include <algorithm>
 #include <utility>
 
+LayerLocation::LayerLocation()
+    : world(0), level(0, 0), layer(0)
+{
+}
+
 TileDef::TileDef()
 {
     m_width = 1;
@@ -77,7 +82,10 @@ void Layer::set(int x, int y, std::optional<TileInst> option)
     m_listenable.notify(&Layer::Listener::notify, *this);
 }
 
-//
+Level::Level()
+{
+    m_layers.push_back(std::make_unique<Layer>());
+}
 
 std::size_t Level::layer_count() const
 {
@@ -120,14 +128,36 @@ std::unique_ptr<Layer> Level::remove_layer(int idx)
     if (idx < 0 || idx >= m_layers.size()) {
         return nullptr;
     }
+
+    if (m_layers.size() < 2) {
+        return nullptr;
+    }
+
     std::unique_ptr<Layer> layer = std::move(m_layers.at(idx));
     m_layers.erase(m_layers.begin() + idx);
     m_listenable.notify(&Level::Listener::remove_layer, idx);
     return layer;
 }
 
+World::World()
+{
+    m_levels.insert(std::pair(glm::ivec2(0, 0), std::make_unique<Level>()));
+}
 
-//
+Level& World::level_at(int x, int y)
+{
+    return *m_levels.at(glm::ivec2(x, y));
+}
+
+const Level& World::level_at(int x, int y) const
+{
+    return *m_levels.at(glm::ivec2(x, y));
+}
+
+Project::Project()
+{
+    m_worlds.emplace_back();
+}
 
 std::size_t Project::tiledef_count() const
 {
@@ -155,4 +185,37 @@ void Project::remove_tiledef(int idx)
         return;
     }
     m_tile_defs.erase(m_tile_defs.begin() + idx);
+}
+
+World& Project::world_at(int idx)
+{
+    return *m_worlds.at(idx);
+}
+
+const World& Project::world_at(int idx) const
+{
+    return *m_worlds.at(idx);
+}
+
+void Project::add_world(std::unique_ptr<World> world, int idx)
+{
+    if (idx < 0 || idx > m_worlds.size()) {
+        return;
+    }
+    m_worlds.insert(m_worlds.begin() + idx, std::move(world));
+}
+
+std::unique_ptr<World> Project::remove_world(int idx)
+{
+    if (idx < 0 || idx >= m_worlds.size()) {
+        return nullptr;
+    }
+
+    if (m_worlds.size() < 2) {
+        return nullptr;
+    }
+
+    std::unique_ptr<World> world = std::move(m_worlds.at(idx));
+    m_worlds.erase(m_worlds.begin() + idx);
+    return world;
 }

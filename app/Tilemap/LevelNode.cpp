@@ -19,6 +19,10 @@ LevelNode::LevelNode(AppState& app_state)
     : m_app_state(&app_state),
       m_level_listener(*this)
 {
+    auto& project = app_state.project();
+    for (int i = 0; i < project.level().layer_count(); ++i) {
+        add_layer(project.level().layer_at(i), i);
+    }
 }
 
 void LevelNode::render(Frame& frame)
@@ -38,7 +42,7 @@ LayerNode& LevelNode::layer_at(int i)
     return *m_layer_nodes.at(i);
 }
 
-void LevelNode::add_layer(Layer& layer, int index)
+void LevelNode::add_layer(const Layer& layer, int index)
 {
     auto ptr = std::make_unique<LayerNode>(*m_app_state, layer);
     m_layer_nodes.insert(m_layer_nodes.begin() + index, std::move(ptr));

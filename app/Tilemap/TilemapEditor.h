@@ -45,7 +45,7 @@ public:
 
     glm::vec2 mouse_pos() const;
 
-    int selected_layer() const { return m_selected_layer; }
+    const LayerLocation& selected_layer() const { return m_selected_layer; }
 
     LevelNode& level_node() { return m_level_node; }
 
@@ -58,7 +58,7 @@ private:
     RenderTarget m_subwindow_3d;
     Spritesheet m_spritesheet;
 
-    int m_selected_layer;
+    LayerLocation m_selected_layer;
 
     float m_mouse_rel_x;
     float m_mouse_rel_y;

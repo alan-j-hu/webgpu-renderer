@@ -10,7 +10,6 @@
 TilemapEditor::TilemapEditor(AppState& app_state)
     : m_camera_selection(0),
       m_app_state(app_state),
-      m_selected_layer {-1},
       m_subwindow_2d(app_state.renderer().device(), 500, 500),
       m_subwindow_3d(app_state.renderer().device(), 500, 500),
       m_spritesheet(app_state.renderer().device(),
@@ -198,11 +197,12 @@ void TilemapEditor::draw_layer_list()
     if (ImGui::Button("-")) {
         m_app_state.push_command(
             std::make_unique<DeleteLayerCommand>(m_selected_layer));
-        m_selected_layer = std::max(-1, m_selected_layer - 1);
+        m_selected_layer.layer = std::max(-1, m_selected_layer.layer - 1);
     }
     ImGui::SameLine();
     if (ImGui::Button("+")) {
-        m_app_state.push_command(std::make_unique<CreateLayerCommand>());
+        m_app_state.push_command(
+            std::make_unique<CreateLayerCommand>(m_selected_layer));
     }
 
     for (int i = 0; i < project.level().layer_count(); ++i) {
@@ -215,7 +215,7 @@ void TilemapEditor::draw_layer_item(int i)
     auto& project = m_app_state.project();
     const Layer& layer = project.level().layer_at(i);
 
-    const bool selected = i == m_selected_layer;
+    const bool selected = i == m_selected_layer.layer;
     const ImVec4 bg_color =
         selected ? ImVec4(1, 1, 1, 1) : ImVec4(0.5, 0.5, 0.5, 1);
     const ImVec4 tint_color =
@@ -233,6 +233,6 @@ void TilemapEditor::draw_layer_item(int i)
             bg_color,
             tint_color)) {
 
-        m_selected_layer = i;
+        m_selected_layer.layer = i;
     }
 }

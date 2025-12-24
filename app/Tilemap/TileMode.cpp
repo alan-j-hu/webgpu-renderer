@@ -15,13 +15,13 @@ TileMode::TileMode(AppState& app_state, TilemapEditor& editor)
 void TileMode::handle_click(int x, int y)
 {
     auto& project = app_state().project();
-    int selected_layer = editor().selected_layer();
+    auto& selected = editor().selected_layer();
 
-    if (selected_layer != -1 && m_selected_tile != -1) {
+    if (selected.layer != -1 && m_selected_tile != -1) {
         short z = editor().z_palette().selected_z();
 
         app_state().push_command(std::make_unique<PlaceTileCommand>(
-            selected_layer, x, y, z, m_rotation,
+            selected, x, y, z, m_rotation,
             project.tiledef_at(m_selected_tile)));
     }
 }

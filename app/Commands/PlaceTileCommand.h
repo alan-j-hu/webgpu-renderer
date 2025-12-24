@@ -10,7 +10,7 @@ class PlaceTileCommand : public Command
 {
 public:
     PlaceTileCommand(
-        int layer,
+        LayerLocation,
         int x,
         int y,
         int z,
@@ -24,7 +24,7 @@ protected:
     void down(Project&) override;
 
 private:
-    int m_layer_idx;
+    LayerLocation m_loc;
     int m_x;
     int m_y;
     std::optional<TileInst> m_inst;
