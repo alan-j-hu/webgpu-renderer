@@ -15,13 +15,14 @@ void LevelNode::LevelListener::remove_layer(int index)
     m_level_node->remove_layer(index);
 }
 
-LevelNode::LevelNode(AppState& app_state)
+LevelNode::LevelNode(AppState& app_state, const LayerLocation& location)
     : m_app_state(&app_state),
       m_level_listener(*this)
 {
     auto& project = app_state.project();
-    for (int i = 0; i < project.level().layer_count(); ++i) {
-        add_layer(project.level().layer_at(i), i);
+    auto& level = project.level_at(location);
+    for (int i = 0; i < level.layer_count(); ++i) {
+        add_layer(level.layer_at(i), i);
     }
 }
 

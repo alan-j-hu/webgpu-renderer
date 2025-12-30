@@ -10,7 +10,7 @@ class AppState;
 class LevelNode : public Renderable
 {
 public:
-    LevelNode(AppState&);
+    LevelNode(AppState&, const LayerLocation&);
     virtual ~LevelNode() = default;
 
     virtual void render(Frame& frame) override;

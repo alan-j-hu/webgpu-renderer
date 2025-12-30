@@ -156,7 +156,7 @@ const Level& World::level_at(int x, int y) const
 
 Project::Project()
 {
-    m_worlds.emplace_back();
+    m_worlds.push_back(std::make_unique<World>());
 }
 
 std::size_t Project::tiledef_count() const
@@ -185,6 +185,11 @@ void Project::remove_tiledef(int idx)
         return;
     }
     m_tile_defs.erase(m_tile_defs.begin() + idx);
+}
+
+std::size_t Project::world_count() const
+{
+    return m_worlds.size();
 }
 
 World& Project::world_at(int idx)
@@ -218,4 +223,30 @@ std::unique_ptr<World> Project::remove_world(int idx)
     std::unique_ptr<World> world = std::move(m_worlds.at(idx));
     m_worlds.erase(m_worlds.begin() + idx);
     return world;
+}
+
+Level& Project::level_at(const LayerLocation& location)
+{
+    return world_at(location.world)
+        .level_at(location.level.x, location.level.y);
+}
+
+const Level& Project::level_at(const LayerLocation& location) const
+{
+    return world_at(location.world)
+        .level_at(location.level.x, location.level.y);
+}
+
+Layer& Project::layer_at(const LayerLocation& location)
+{
+    return world_at(location.world)
+        .level_at(location.level.x, location.level.y)
+        .layer_at(location.layer);
+}
+
+const Layer& Project::layer_at(const LayerLocation& location) const
+{
+    return world_at(location.world)
+        .level_at(location.level.x, location.level.y)
+        .layer_at(location.layer);
 }

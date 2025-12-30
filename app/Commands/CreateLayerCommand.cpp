@@ -7,13 +7,15 @@ CreateLayerCommand::CreateLayerCommand(LayerLocation loc)
 
 Command::Outcome CreateLayerCommand::up(Project& project)
 {
-    project.level().add_layer();
+    project.level_at(m_loc).add_layer();
     return Outcome::COMPLETED;
 }
 
 void CreateLayerCommand::down(Project& project)
 {
-    project.level().remove_layer(project.level().layer_count() - 1);
+    project
+        .level_at(m_loc)
+        .remove_layer(project.level_at(m_loc).layer_count() - 1);
 }
 
 const char* CreateLayerCommand::name()

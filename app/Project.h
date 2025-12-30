@@ -145,12 +145,25 @@ private:
 class World
 {
 public:
+    class Listener
+    {
+    public:
+        virtual void add_level(Level&, glm::ivec2) = 0;
+        virtual void remove_level(glm::ivec2) = 0;
+    };
+
     World();
     Level& level_at(int x, int y);
     const Level& level_at(int x, int y) const;
 
+    Listenable<Listener>& listenable() const
+    {
+        return m_listenable;
+    }
+
 private:
     std::unordered_map<glm::ivec2, std::unique_ptr<Level>> m_levels;
+    mutable Listenable<Listener> m_listenable;
 };
 
 /// A top-level Project.
@@ -168,17 +181,20 @@ public:
     void add_tiledef(TileDef tiledef);
     void remove_tiledef(int idx);
 
-    Level& level() { return m_level; }
-    const Level& level() const { return m_level; }
-
+    std::size_t world_count() const;
     World& world_at(int idx);
     const World& world_at(int idx) const;
     void add_world(std::unique_ptr<World>, int idx);
     std::unique_ptr<World> remove_world(int idx);
 
+    Level& level_at(const LayerLocation&);
+    const Level& level_at(const LayerLocation&) const;
+
+    Layer& layer_at(const LayerLocation&);
+    const Layer& layer_at(const LayerLocation&) const;
+
 private:
     std::vector<std::shared_ptr<TileDef>> m_tile_defs;
-    Level m_level;
     std::vector<std::unique_ptr<World>> m_worlds;
 };
 

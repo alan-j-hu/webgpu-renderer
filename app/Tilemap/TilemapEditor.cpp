@@ -29,7 +29,7 @@ TilemapEditor::TilemapEditor(AppState& app_state)
                       glm::vec3(16, 0, 0),
                       glm::vec3(0, 16, 0))),
       m_z_palette(app_state),
-      m_level_node(app_state)
+      m_level_node(app_state, m_selected_layer)
 {
     app_state.connect_tilemap_editor(*this);
 
@@ -193,6 +193,7 @@ void TilemapEditor::draw_toolbar()
 void TilemapEditor::draw_layer_list()
 {
     auto& project = m_app_state.project();
+    auto& level = project.level_at(m_selected_layer);
 
     if (ImGui::Button("-")) {
         m_app_state.push_command(
@@ -205,7 +206,7 @@ void TilemapEditor::draw_layer_list()
             std::make_unique<CreateLayerCommand>(m_selected_layer));
     }
 
-    for (int i = 0; i < project.level().layer_count(); ++i) {
+    for (int i = 0; i < level.layer_count(); ++i) {
         draw_layer_item(i);
     }
 }
@@ -213,7 +214,7 @@ void TilemapEditor::draw_layer_list()
 void TilemapEditor::draw_layer_item(int i)
 {
     auto& project = m_app_state.project();
-    const Layer& layer = project.level().layer_at(i);
+    const Layer& layer = project.level_at(m_selected_layer).layer_at(i);
 
     const bool selected = i == m_selected_layer.layer;
     const ImVec4 bg_color =
