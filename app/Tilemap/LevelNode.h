@@ -10,35 +10,21 @@ class AppState;
 class LevelNode : public Renderable
 {
 public:
-    LevelNode(AppState&, const LayerLocation&);
+    LevelNode(AppState&, const Level&);
     virtual ~LevelNode() = default;
 
     virtual void render(Frame& frame) override;
 
-    LayerNode& layer_at(int i);
+    LayerNode& layer_at(int idx);
 
-    Level::Listener& listener();
+    void add_layer(int idx);
+
+    void remove_layer(int idx);
 
 private:
-    class LevelListener : public Level::Listener
-    {
-    public:
-        LevelListener(LevelNode&);
-
-        virtual void add_layer(Layer&, int index) override;
-        virtual void remove_layer(int index) override;
-
-    private:
-        LevelNode* m_level_node;
-    };
-
     AppState* m_app_state;
+    const Level* m_level;
     std::vector<std::unique_ptr<LayerNode>> m_layer_nodes;
-    LevelListener m_level_listener;
-
-    void add_layer(const Layer&, int index);
-
-    void remove_layer(int index);
 };
 
 #endif

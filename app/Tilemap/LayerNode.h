@@ -21,31 +21,17 @@ public:
 
     const Texture& thumbnail() { return m_thumbnail.texture(); }
 
+    void update();
+
     virtual void render(Frame& frame) override;
 
 private:
-    class ChangeListener : public Layer::Listener
-    {
-    public:
-        ChangeListener(LayerNode&);
-        ChangeListener(ChangeListener&&);
-        ChangeListener& operator=(ChangeListener&&);
-
-        virtual void notify(const Layer&) override;
-
-    private:
-        LayerNode* m_node;
-    };
-
     AppState* m_app_state;
     const Layer* m_layer;
     std::unique_ptr<DynamicModel> m_model;
     std::optional<DynamicModelInstance> m_instance;
     std::optional<BasicMesh> m_grid_mesh;
     RenderTarget m_thumbnail;
-    std::unique_ptr<ChangeListener> m_change_listener;
-
-    void update();
 };
 
 #endif

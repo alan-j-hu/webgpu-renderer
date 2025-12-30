@@ -47,29 +47,6 @@ glm::mat4 transform(
     }
 }
 
-LayerNode::ChangeListener::ChangeListener(LayerNode& node)
-    : m_node(&node)
-{
-}
-
-LayerNode::ChangeListener::ChangeListener(LayerNode::ChangeListener&& other)
-{
-    m_node = nullptr;
-    *this = std::move(other);
-}
-
-LayerNode::ChangeListener&
-LayerNode::ChangeListener::operator=(LayerNode::ChangeListener&& other)
-{
-    std::swap(m_node, other.m_node);
-    return *this;
-}
-
-void LayerNode::ChangeListener::notify(const Layer& layer)
-{
-    m_node->update();
-}
-
 LayerNode::LayerNode(AppState& app_state, const Layer& layer)
     : m_app_state(&app_state),
       m_grid_mesh(
@@ -84,12 +61,9 @@ LayerNode::LayerNode(AppState& app_state, const Layer& layer)
 {
     m_model = std::make_unique<DynamicModel>();
     m_instance = DynamicModelInstance(*m_model);
-    m_change_listener = std::make_unique<LayerNode::ChangeListener>(*this);
     m_thumbnail.set_clear_color(app_state.background_color());
 
     update();
-
-    layer.listenable().add_listener(*m_change_listener);
 }
 
 LayerNode::LayerNode(LayerNode&& other)
@@ -104,13 +78,11 @@ LayerNode& LayerNode::operator=(LayerNode&& other)
     std::swap(m_model, other.m_model);
     std::swap(m_grid_mesh, other.m_grid_mesh);
     std::swap(m_instance, other.m_instance);
-    std::swap(m_change_listener, other.m_change_listener);
     return *this;
 }
 
 LayerNode::~LayerNode()
 {
-    m_layer->listenable().remove_listener(*m_change_listener);
 }
 
 void LayerNode::render(Frame& frame)

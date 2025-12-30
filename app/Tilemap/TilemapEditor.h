@@ -21,6 +21,7 @@
 #include "noworry/scene/scene.h"
 
 #include <memory>
+#include <unordered_map>
 #include <vector>
 
 #include <glm/vec2.hpp>
@@ -47,9 +48,26 @@ public:
 
     const LayerLocation& selected_layer() const { return m_selected_layer; }
 
-    LevelNode& level_node() { return m_level_node; }
+    Project::Listener& listener() { return m_listener; }
 
 private:
+    class Listener : public Project::Listener
+    {
+    public:
+        Listener(TilemapEditor& editor);
+
+        void layer_changed(World&, Level&, const Layer&) override;
+
+        void layer_added(World&, Level&, int idx) override;
+        void layer_removed(World&, Level&, Layer&, int idx) override;
+
+        void level_added(World&, Level&) override;
+        void level_removed(World&, Level&) override;
+
+    private:
+        TilemapEditor* m_editor;
+    } m_listener;
+
     int m_camera_selection;
 
     AppState& m_app_state;
@@ -78,7 +96,7 @@ private:
 
     ZPalette m_z_palette;
 
-    LevelNode m_level_node;
+    std::unordered_map<const Level*, std::unique_ptr<LevelNode>> m_level_nodes;
 
     void render_preview();
 

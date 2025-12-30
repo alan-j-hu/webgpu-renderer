@@ -7,8 +7,49 @@
 
 #include "imgui.h"
 
+TilemapEditor::Listener::Listener(TilemapEditor& editor)
+    : m_editor(&editor)
+{
+}
+
+void TilemapEditor::Listener::layer_changed(
+    World&,
+    Level& level,
+    const Layer& layer)
+{
+    for (int i = 0; i < level.layer_count(); ++i) {
+        if (&layer == &level.layer_at(i)) {
+            m_editor->m_level_nodes.at(&level)->layer_at(i).update();
+            return;
+        }
+    }
+}
+
+void TilemapEditor::Listener::layer_added(World&, Level& level, int idx)
+{
+    m_editor->m_level_nodes.at(&level)->add_layer(idx);
+}
+
+void TilemapEditor::Listener::layer_removed(
+    World&,
+    Level& level,
+    Layer& layer,
+    int idx)
+{
+    m_editor->m_level_nodes.at(&level)->remove_layer(idx);
+}
+
+void TilemapEditor::Listener::level_added(World&, Level&)
+{
+}
+
+void TilemapEditor::Listener::level_removed(World&, Level&)
+{
+}
+
 TilemapEditor::TilemapEditor(AppState& app_state)
-    : m_camera_selection(0),
+    : m_listener(*this),
+      m_camera_selection(0),
       m_app_state(app_state),
       m_subwindow_2d(app_state.renderer().device(), 500, 500),
       m_subwindow_3d(app_state.renderer().device(), 500, 500),
@@ -28,9 +69,16 @@ TilemapEditor::TilemapEditor(AppState& app_state)
                       16,
                       glm::vec3(16, 0, 0),
                       glm::vec3(0, 16, 0))),
-      m_z_palette(app_state),
-      m_level_node(app_state, m_selected_layer)
+      m_z_palette(app_state)
 {
+    auto& project = app_state.project();
+    auto& world = project.world_at(0);
+    for (auto it = world.begin(); it != world.end(); ++it) {
+        m_level_nodes.emplace(
+            it->second.get(),
+            std::make_unique<LevelNode>(app_state, *it->second));
+    }
+
     app_state.connect_tilemap_editor(*this);
 
     //m_subwindow_2d.set_clear_color(app_state.background_color());
@@ -53,7 +101,7 @@ TilemapEditor::TilemapEditor(AppState& app_state)
         app_state.wireframe_material()
     ));
     m_scene.children().push_back(std::make_unique<RenderableRef>(
-        m_level_node
+        *m_level_nodes.at(&world.level_at(0, 0))
     ));
 }
 
@@ -222,8 +270,9 @@ void TilemapEditor::draw_layer_item(int i)
     const ImVec4 tint_color =
         selected ? ImVec4(0.8, 0.8, 0.8, 1) : ImVec4(1, 1, 1, 1);
 
+    auto& level_node = *m_level_nodes.at(&project.world_at(0).level_at(0, 0));
     ImTextureID tex_id =
-        (ImTextureID)(intptr_t)m_level_node.layer_at(i).thumbnail().view();
+        (ImTextureID)(intptr_t)level_node.layer_at(i).thumbnail().view();
 
     if (ImGui::ImageButton(
             std::to_string(i).c_str(),

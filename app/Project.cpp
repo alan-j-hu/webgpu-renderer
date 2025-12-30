@@ -64,7 +64,8 @@ bool operator==(const TileInst& lhs, const TileInst& rhs)
     return lhs.z() == rhs.z() && lhs.def().get() == rhs.def().get();
 }
 
-Layer::Layer()
+Layer::Layer(Level& level)
+    : m_level(&level)
 {
     for (int i = 0; i < 16 * 16; ++i) {
         m_tiles.push_back(std::nullopt);
@@ -79,12 +80,19 @@ const std::optional<TileInst>& Layer::at(int x, int y) const
 void Layer::set(int x, int y, std::optional<TileInst> option)
 {
     m_tiles[y * 16 + x] = std::move(option);
-    m_listenable.notify(&Layer::Listener::notify, *this);
+    m_level->world()
+        .project()
+        .listenable().notify(
+            &Project::Listener::layer_changed,
+            m_level->world(),
+            *m_level,
+            *this);
 }
 
-Level::Level()
+Level::Level(World& world)
+    : m_world(&world)
 {
-    m_layers.push_back(std::make_unique<Layer>());
+    m_layers.push_back(std::make_unique<Layer>(*this));
 }
 
 std::size_t Level::layer_count() const
@@ -104,11 +112,13 @@ Layer& Level::layer_at(int idx)
 
 void Level::add_layer()
 {
-    m_layers.push_back(std::make_unique<Layer>());
-    m_listenable.notify(
-        &Level::Listener::add_layer,
-        *m_layers.at(m_layers.size() - 1),
-        m_layers.size() - 1);
+    m_layers.push_back(std::make_unique<Layer>(*this));
+    int idx = m_layers.size() - 1;
+    m_world->project().listenable().notify(
+            &Project::Listener::layer_added,
+            *m_world,
+            *this,
+            idx);
 }
 
 void Level::add_layer(std::unique_ptr<Layer> layer, int idx)
@@ -117,10 +127,12 @@ void Level::add_layer(std::unique_ptr<Layer> layer, int idx)
         return;
     }
     m_layers.insert(m_layers.begin() + idx, std::move(layer));
-    m_listenable.notify(
-        &Level::Listener::add_layer,
-        *m_layers.at(idx),
-        idx);
+    m_world->project()
+        .listenable().notify(
+            &Project::Listener::layer_added,
+            *m_world,
+            *this,
+            idx);
 }
 
 std::unique_ptr<Layer> Level::remove_layer(int idx)
@@ -135,13 +147,42 @@ std::unique_ptr<Layer> Level::remove_layer(int idx)
 
     std::unique_ptr<Layer> layer = std::move(m_layers.at(idx));
     m_layers.erase(m_layers.begin() + idx);
-    m_listenable.notify(&Level::Listener::remove_layer, idx);
+    m_world->project()
+        .listenable().notify(
+            &Project::Listener::layer_removed,
+            *m_world,
+            *this,
+            *layer,
+            idx);
     return layer;
 }
 
-World::World()
+World::World(Project& project)
+    : m_project(&project)
 {
-    m_levels.insert(std::pair(glm::ivec2(0, 0), std::make_unique<Level>()));
+    m_levels.insert(
+        std::pair(glm::ivec2(0, 0),
+                  std::make_unique<Level>(*this)));
+}
+
+World::LevelTable::iterator World::begin()
+{
+    return m_levels.begin();
+}
+
+World::LevelTable::const_iterator World::begin() const
+{
+    return m_levels.begin();
+}
+
+World::LevelTable::iterator World::end()
+{
+    return m_levels.end();
+}
+
+World::LevelTable::const_iterator World::end() const
+{
+    return m_levels.end();
 }
 
 Level& World::level_at(int x, int y)
@@ -156,7 +197,7 @@ const Level& World::level_at(int x, int y) const
 
 Project::Project()
 {
-    m_worlds.push_back(std::make_unique<World>());
+    m_worlds.push_back(std::make_unique<World>(*this));
 }
 
 std::size_t Project::tiledef_count() const
