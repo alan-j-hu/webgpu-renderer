@@ -8,8 +8,8 @@
 TileMode::TileMode(AppState& app_state, Editor& editor)
     : View2DMode(app_state, editor),
       m_selected_tile(-1),
-      m_rotation(Rotation::Rotate0),
-      m_tile_picker(app_state)
+      m_tile_picker(app_state, editor),
+      m_rotation(Rotation::Rotate0)
 {
 }
 
@@ -40,7 +40,7 @@ void TileMode::draw_overlay(
     const TileDef* tiledef = nullptr;
 
     if (m_selected_tile != -1) {
-        thumb = &app_state().tile_thumbnail(m_selected_tile);
+        thumb = &editor().tileset_thumbnails(0).at(m_selected_tile);
         tiledef = world.tileset()->at(m_selected_tile).get();
     }
 

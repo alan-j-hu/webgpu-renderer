@@ -2,7 +2,7 @@
 #define APPSTATE_H
 
 #include "Project.h"
-#include "TileThumbnail.h"
+#include "ThumbnailUtil.h"
 #include "Commands/Command.h"
 #include "Editor/Modal.h"
 
@@ -41,14 +41,7 @@ public:
 
     void redo();
 
-    ThumbnailCapture& thumbnail_capture() { return m_capture; }
-
-    TileThumbnail& tile_thumbnail(int i)
-    {
-        return m_thumbnail_cache.at(i);
-    }
-
-    void refresh_thumbnails();
+    ThumbnailUtil& thumbnail_util() { return m_thumbnail_util; }
 
 private:
     std::vector<std::unique_ptr<Command>> m_history;
@@ -66,8 +59,7 @@ private:
 
     Project m_project;
 
-    ThumbnailCapture m_capture;
-    std::vector<TileThumbnail> m_thumbnail_cache;
+    ThumbnailUtil m_thumbnail_util;
 };
 
 #endif

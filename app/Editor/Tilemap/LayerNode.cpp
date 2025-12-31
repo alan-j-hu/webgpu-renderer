@@ -132,5 +132,5 @@ void LayerNode::update()
 
     m_model->flush(m_app_state->renderer().device());
 
-    m_app_state->thumbnail_capture().capture(m_thumbnail, *m_instance);
+    m_app_state->thumbnail_util().capture(m_thumbnail, *m_instance);
 }

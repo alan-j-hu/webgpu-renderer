@@ -9,6 +9,7 @@
 #include "Tilemap/View3DMode.h"
 #include "Tilemap/ZPalette.h"
 #include "Tileset/TileList.h"
+#include "Tileset/TilesetThumbnails.h"
 #include "../AppState.h"
 #include "../TilePicker.h"
 
@@ -50,6 +51,11 @@ public:
     const LayerLocation& selected_layer() const { return m_selected_layer; }
 
     Project::Listener& listener() { return m_listener; }
+
+    TilesetThumbnails& tileset_thumbnails(int idx)
+    {
+        return *m_tileset_thumbnails.at(idx);
+    }
 
 private:
     class Listener : public Project::Listener
@@ -95,6 +101,7 @@ private:
 
     ZPalette m_z_palette;
 
+    std::vector<std::unique_ptr<TilesetThumbnails>> m_tileset_thumbnails;
     std::unordered_map<const Level*, std::unique_ptr<LevelNode>> m_level_nodes;
 
     void render_preview();

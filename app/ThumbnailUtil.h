@@ -1,5 +1,5 @@
-#ifndef TILE_THUMBNAIL_H
-#define TILE_THUMBNAIL_H
+#ifndef THUMBNAIL_UTIL_H
+#define THUMBNAIL_UTIL_H
 
 #include "noworry/rendertarget.h"
 #include "noworry/camera/orthographiccamera.h"
@@ -10,10 +10,10 @@
 
 struct AppState;
 
-class ThumbnailCapture
+class ThumbnailUtil
 {
 public:
-    ThumbnailCapture(AppState&);
+    ThumbnailUtil(AppState&);
 
     void capture(RenderTarget& target, Renderable&);
 
@@ -26,20 +26,6 @@ public:
 private:
     AppState* m_app_state;
     Scene m_scene;
-};
-
-class TileThumbnail
-{
-public:
-    TileThumbnail(AppState&);
-
-    RenderTarget& render_target() { return m_render_target; }
-    Spritesheet& spritesheet() { return m_spritesheet; }
-    WGPUTextureView texture_view() { return m_render_target.texture().view(); }
-
-private:
-    RenderTarget m_render_target;
-    Spritesheet m_spritesheet;
 };
 
 #endif

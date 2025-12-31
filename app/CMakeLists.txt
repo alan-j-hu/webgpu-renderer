@@ -13,7 +13,7 @@ add_executable(demo
   main.cpp
   Project.cpp
   TilePicker.cpp
-  TileThumbnail.cpp
+  ThumbnailUtil.cpp
   Commands/Command.cpp
   Commands/CreateLayerCommand.cpp
   Commands/CreateTileCommand.cpp
@@ -33,6 +33,8 @@ add_executable(demo
   Editor/Tileset/AddTile.cpp
   Editor/Tileset/TileDefinitionEditor.cpp
   Editor/Tileset/TileList.cpp
+  Editor/Tileset/TileThumbnail.cpp
+  Editor/Tileset/TilesetThumbnails.cpp
   ${IMGUI_SRC})
 set_property(TARGET demo PROPERTY CXX_STANDARD 23)
 set_property(TARGET demo PROPERTY C_STANDARD 23)

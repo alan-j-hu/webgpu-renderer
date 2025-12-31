@@ -49,8 +49,15 @@ struct TextureRef
 
 /// A TileDefinition has a mesh, rotation, and texture and is referenced by
 /// TileInsts.
-struct TileDef
+class TileDef
 {
+public:
+    class Listener
+    {
+    public:
+        virtual void changed();
+    };
+
     TileDef();
 
     const std::optional<std::shared_ptr<ModelData>>& model_data() const;
@@ -76,6 +83,14 @@ private:
 class Tileset
 {
 public:
+    class Listener
+    {
+    public:
+        virtual void tile_added(int idx) = 0;
+        virtual void tile_removed(TileDef&, int idx) = 0;
+        virtual void tile_replaced(int idx) = 0;
+    };
+
     std::size_t count() const;
     std::shared_ptr<TileDef> at(int idx);
     std::shared_ptr<const TileDef> at(int idx) const;
@@ -84,8 +99,11 @@ public:
     void add(TileDef tiledef);
     std::shared_ptr<TileDef> remove(int idx);
 
+    Listenable<Listener>& listenable() const { return m_listenable; }
+
 private:
     std::vector<std::shared_ptr<TileDef>> m_tiles;
+    mutable Listenable<Listener> m_listenable;
 };
 
 /// A TileInst instances a tile definition on the map.

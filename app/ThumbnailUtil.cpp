@@ -1,14 +1,14 @@
-#include "TileThumbnail.h"
+#include "ThumbnailUtil.h"
 #include "AppState.h"
 #include "noworry/Gfx3D/ModelInstance.h"
 
-ThumbnailCapture::ThumbnailCapture(AppState& app_state)
+ThumbnailUtil::ThumbnailUtil(AppState& app_state)
     : m_app_state(&app_state),
       m_scene(m_app_state->renderer())
 {
 }
 
-void ThumbnailCapture::capture(
+void ThumbnailUtil::capture(
     RenderTarget& target,
     Renderable& renderable)
 {
@@ -29,7 +29,7 @@ void ThumbnailCapture::capture(
     m_app_state->renderer().render(target, m_scene, camera);
 }
 
-void ThumbnailCapture::capture(
+void ThumbnailUtil::capture(
     RenderTarget& target,
     Camera& camera,
     Transform& transform,
@@ -41,13 +41,4 @@ void ThumbnailCapture::capture(
         .push_back(std::make_unique<ModelInstance>(model));
 
     m_app_state->renderer().render(target, m_scene, camera);
-}
-
-TileThumbnail::TileThumbnail(AppState& app_state)
-    : m_render_target(app_state.renderer().device(), 256, 256),
-      m_spritesheet(app_state.renderer().device(),
-                    app_state.sprite_renderer().pipeline(),
-                    m_render_target.texture(),
-                    app_state.renderer().default_sampler())
-{
 }

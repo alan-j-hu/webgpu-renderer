@@ -24,7 +24,7 @@ Editor::Editor(AppState& app_state)
     : m_listener(*this),
       m_camera_selection(0),
       m_app_state(&app_state),
-      m_tile_list(app_state),
+      m_tile_list(app_state, *this),
       m_subwindow_2d(app_state.renderer().device(), 500, 500),
       m_subwindow_3d(app_state.renderer().device(), 500, 500),
       m_spritesheet(app_state.renderer().device(),
@@ -46,6 +46,13 @@ Editor::Editor(AppState& app_state)
       m_z_palette(app_state)
 {
     auto& project = app_state.project();
+
+    for (int i = 0; i < project.tileset_count(); ++i) {
+        m_tileset_thumbnails.push_back(std::make_unique<TilesetThumbnails>(
+            app_state,
+            *project.tileset_at(i)));
+    }
+
     auto& world = project.world_at(0);
     for (auto it = world.begin(); it != world.end(); ++it) {
         m_level_nodes.emplace(

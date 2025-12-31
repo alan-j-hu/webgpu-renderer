@@ -72,11 +72,13 @@ std::shared_ptr<const TileDef> Tileset::at(int idx) const
 void Tileset::set(int idx, TileDef tiledef)
 {
     m_tiles.at(idx) = std::make_shared<TileDef>(std::move(tiledef));
+    m_listenable.notify(&Tileset::Listener::tile_replaced, idx);
 }
 
 void Tileset::add(TileDef tiledef)
 {
     m_tiles.push_back(std::make_shared<TileDef>(std::move(tiledef)));
+    m_listenable.notify(&Tileset::Listener::tile_added, m_tiles.size() - 1);
 }
 
 std::shared_ptr<TileDef> Tileset::remove(int idx)
@@ -86,6 +88,9 @@ std::shared_ptr<TileDef> Tileset::remove(int idx)
     }
     auto ptr = m_tiles.at(idx);
     m_tiles.erase(m_tiles.begin() + idx);
+
+    m_listenable.notify(&Tileset::Listener::tile_removed, *ptr, idx);
+
     return ptr;
 }
 

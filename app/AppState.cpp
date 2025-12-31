@@ -17,7 +17,7 @@ AppState::AppState(WGPUDevice device)
                       5,
                       glm::vec3(5, 0, 0),
                       glm::vec3(0, 5, 0))),
-      m_capture(*this),
+      m_thumbnail_util(*this),
       m_history_cursor(0)
 {
     m_background_color = {0.0f, 0.5f, 0.5f, 1.0f};
@@ -52,31 +52,4 @@ void AppState::redo()
     }
     m_history[m_history_cursor]->redo(m_project);
     ++m_history_cursor;
-}
-
-void AppState::refresh_thumbnails()
-{
-    OrthographicCamera camera;
-
-    camera.set_top(5);
-    camera.set_bottom(0);
-    camera.set_left(0);
-    camera.set_right(5);
-    camera.set_position(glm::vec3(0, 0, 1));
-    camera.set_target(glm::vec3(0, 0, 0));
-
-    std::shared_ptr<Tileset> tileset = m_project.tileset_at(0);
-
-    while (m_thumbnail_cache.size() < tileset->count()) {
-        m_thumbnail_cache.emplace_back(*this);
-    }
-    for (int i = 0; i < tileset->count(); ++i) {
-        RenderTarget& target = m_thumbnail_cache.at(i).render_target();
-        auto def = tileset->at(i);
-
-        if (def->model()) {
-            Transform transform;
-            m_capture.capture(target, camera, transform, **def->model());
-        }
-    }
 }

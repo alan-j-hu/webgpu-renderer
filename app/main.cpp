@@ -122,8 +122,6 @@ private:
         ImGui::SetNextWindowSize(viewport->Size);
         ImGui::Begin("Window", nullptr, WINDOW_FLAGS);
 
-        m_app_state.refresh_thumbnails();
-
         m_editor.draw();
 
         ImGui::End();

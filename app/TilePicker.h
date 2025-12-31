@@ -3,15 +3,18 @@
 
 #include "AppState.h"
 
+class Editor;
+
 class TilePicker
 {
 public:
-    TilePicker(AppState&);
+    TilePicker(AppState&, Editor&);
 
     void render(int& selected_tile);
 
 private:
     AppState* m_app_state;
+    Editor* m_editor;
 };
 
 #endif

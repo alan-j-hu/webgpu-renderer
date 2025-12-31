@@ -1,9 +1,10 @@
 #include "TilePicker.h"
+#include "Editor/Editor.h"
 #include "imgui.h"
 #include <webgpu/webgpu.h>
 
-TilePicker::TilePicker(AppState& app_state)
-    : m_app_state(&app_state)
+TilePicker::TilePicker(AppState& app_state, Editor& editor)
+    : m_app_state(&app_state), m_editor(&editor)
 {
 }
 
@@ -17,7 +18,7 @@ void TilePicker::render(int& selected_tile)
             auto def = tileset->at(i);
 
             WGPUTextureView view =
-                m_app_state->tile_thumbnail(i).texture_view();
+                m_editor->tileset_thumbnails(0).at(i).texture_view();
             ImGui::PushID(i);
 
             ImVec2 uv_tl = ImVec2(0, 1 - def->depth() / 5.0);
