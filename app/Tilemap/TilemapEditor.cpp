@@ -12,38 +12,11 @@ TilemapEditor::Listener::Listener(TilemapEditor& editor)
 {
 }
 
-void TilemapEditor::Listener::layer_changed(
-    World&,
-    Level& level,
-    const Layer& layer)
-{
-    for (int i = 0; i < level.layer_count(); ++i) {
-        if (&layer == &level.layer_at(i)) {
-            m_editor->m_level_nodes.at(&level)->layer_at(i).update();
-            return;
-        }
-    }
-}
-
-void TilemapEditor::Listener::layer_added(World&, Level& level, int idx)
-{
-    m_editor->m_level_nodes.at(&level)->add_layer(idx);
-}
-
-void TilemapEditor::Listener::layer_removed(
-    World&,
-    Level& level,
-    Layer& layer,
-    int idx)
-{
-    m_editor->m_level_nodes.at(&level)->remove_layer(idx);
-}
-
-void TilemapEditor::Listener::level_added(World&, Level&)
+void TilemapEditor::Listener::world_added(World&, int idx)
 {
 }
 
-void TilemapEditor::Listener::level_removed(World&, Level&)
+void TilemapEditor::Listener::world_removed(World&, int idx)
 {
 }
 

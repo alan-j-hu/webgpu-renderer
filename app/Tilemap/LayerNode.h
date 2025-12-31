@@ -26,12 +26,22 @@ public:
     virtual void render(Frame& frame) override;
 
 private:
+    struct Listener : public Layer::Listener
+    {
+        Listener(LayerNode&);
+        virtual void layer_changed() override;
+
+        LayerNode* m_layer_node;
+    };
+
     AppState* m_app_state;
     const Layer* m_layer;
     std::unique_ptr<DynamicModel> m_model;
     std::optional<DynamicModelInstance> m_instance;
     std::optional<BasicMesh> m_grid_mesh;
     RenderTarget m_thumbnail;
+
+    std::unique_ptr<Listener> m_listener;
 };
 
 #endif

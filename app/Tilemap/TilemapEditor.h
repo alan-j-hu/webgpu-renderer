@@ -56,13 +56,8 @@ private:
     public:
         Listener(TilemapEditor& editor);
 
-        void layer_changed(World&, Level&, const Layer&) override;
-
-        void layer_added(World&, Level&, int idx) override;
-        void layer_removed(World&, Level&, Layer&, int idx) override;
-
-        void level_added(World&, Level&) override;
-        void level_removed(World&, Level&) override;
+        void world_added(World&, int idx) override;
+        void world_removed(World&, int idx) override;
 
     private:
         TilemapEditor* m_editor;

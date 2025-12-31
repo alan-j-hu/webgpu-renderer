@@ -80,13 +80,7 @@ const std::optional<TileInst>& Layer::at(int x, int y) const
 void Layer::set(int x, int y, std::optional<TileInst> option)
 {
     m_tiles[y * 16 + x] = std::move(option);
-    m_level->world()
-        .project()
-        .listenable().notify(
-            &Project::Listener::layer_changed,
-            m_level->world(),
-            *m_level,
-            *this);
+    m_listenable.notify(&Layer::Listener::layer_changed);
 }
 
 Level::Level(World& world)
@@ -114,11 +108,7 @@ void Level::add_layer()
 {
     m_layers.push_back(std::make_unique<Layer>(*this));
     int idx = m_layers.size() - 1;
-    m_world->project().listenable().notify(
-            &Project::Listener::layer_added,
-            *m_world,
-            *this,
-            idx);
+    m_listenable.notify(&Level::Listener::layer_added, idx);
 }
 
 void Level::add_layer(std::unique_ptr<Layer> layer, int idx)
@@ -127,12 +117,7 @@ void Level::add_layer(std::unique_ptr<Layer> layer, int idx)
         return;
     }
     m_layers.insert(m_layers.begin() + idx, std::move(layer));
-    m_world->project()
-        .listenable().notify(
-            &Project::Listener::layer_added,
-            *m_world,
-            *this,
-            idx);
+    m_listenable.notify(&Level::Listener::layer_added, idx);
 }
 
 std::unique_ptr<Layer> Level::remove_layer(int idx)
@@ -147,13 +132,7 @@ std::unique_ptr<Layer> Level::remove_layer(int idx)
 
     std::unique_ptr<Layer> layer = std::move(m_layers.at(idx));
     m_layers.erase(m_layers.begin() + idx);
-    m_world->project()
-        .listenable().notify(
-            &Project::Listener::layer_removed,
-            *m_world,
-            *this,
-            *layer,
-            idx);
+    m_listenable.notify(&Level::Listener::layer_removed, *layer, idx);
     return layer;
 }
 

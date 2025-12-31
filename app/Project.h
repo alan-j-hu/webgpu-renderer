@@ -95,6 +95,12 @@ bool operator==(const TileInst&, const TileInst&);
 struct Layer
 {
 public:
+    class Listener
+    {
+    public:
+        virtual void layer_changed() = 0;
+    };
+
     Layer(Level&);
     Layer(Layer&&) noexcept = delete;
     Layer& operator=(Layer&&) noexcept = delete;
@@ -106,9 +112,15 @@ public:
     Level& level() { return *m_level; }
     const Level& level() const { return *m_level; }
 
+    Listenable<Listener>& listenable() const
+    {
+        return m_listenable;
+    }
+
 private:
     Level* m_level;
     std::vector<std::optional<TileInst>> m_tiles;
+    mutable Listenable<Listener> m_listenable;
 };
 
 class Level
@@ -117,8 +129,8 @@ public:
     class Listener
     {
     public:
-        virtual void add_layer(Layer&, int index) = 0;
-        virtual void remove_layer(int index) = 0;
+        virtual void layer_added(int idx) = 0;
+        virtual void layer_removed(Layer&, int idx) = 0;
     };
 
     Level(World&);
@@ -150,6 +162,13 @@ class World
 {
     using LevelTable = std::unordered_map<glm::ivec2, std::unique_ptr<Level>>;
 public:
+    class Listener
+    {
+    public:
+        virtual void level_added(Level&, int x, int y) = 0;
+        virtual void level_removed(Level&, int x, int y) = 0;
+    };
+
     World(Project& project);
     World(World&&) = delete;
     World& operator=(World&&) = delete;
@@ -166,9 +185,15 @@ public:
     Project& project() { return *m_project; }
     const Project& project() const { return *m_project; }
 
+    Listenable<Listener>& listenable() const
+    {
+        return m_listenable;
+    }
+
 private:
     Project* m_project;
     LevelTable m_levels;
+    mutable Listenable<Listener> m_listenable;
 };
 
 /// A top-level Project.
@@ -178,13 +203,8 @@ public:
     class Listener
     {
     public:
-        virtual void layer_changed(World&, Level&, const Layer&) = 0;
-
-        virtual void layer_added(World&, Level&, int idx) = 0;
-        virtual void layer_removed(World&, Level&, Layer&, int idx) = 0;
-
-        virtual void level_added(World&, Level&) = 0;
-        virtual void level_removed(World&, Level&) = 0;
+        virtual void world_added(World&, int idx) = 0;
+        virtual void world_removed(World&, int idx) = 0;
     };
 
     Project();
