@@ -54,7 +54,45 @@ void TileDef::set_depth(short depth)
     m_depth = std::clamp<short>(depth, 1, 5);
 }
 
-TileInst::TileInst(std::shared_ptr<TileDef> def, int z, Rotation rotation)
+std::size_t Tileset::count() const
+{
+    return m_tiles.size();
+}
+
+std::shared_ptr<TileDef> Tileset::at(int idx)
+{
+    return m_tiles.at(idx);
+}
+
+std::shared_ptr<const TileDef> Tileset::at(int idx) const
+{
+    return m_tiles.at(idx);
+}
+
+void Tileset::set(int idx, TileDef tiledef)
+{
+    m_tiles.at(idx) = std::make_shared<TileDef>(std::move(tiledef));
+}
+
+void Tileset::add(TileDef tiledef)
+{
+    m_tiles.push_back(std::make_shared<TileDef>(std::move(tiledef)));
+}
+
+std::shared_ptr<TileDef> Tileset::remove(int idx)
+{
+    if (idx < 0 || idx >= m_tiles.size()) {
+        return nullptr;
+    }
+    auto ptr = m_tiles.at(idx);
+    m_tiles.erase(m_tiles.begin() + idx);
+    return ptr;
+}
+
+TileInst::TileInst(
+    std::shared_ptr<const TileDef> def,
+    int z,
+    Rotation rotation)
     : m_def(std::move(def)), m_z(z), m_rotation(rotation)
 {
 }
@@ -136,12 +174,17 @@ std::unique_ptr<Layer> Level::remove_layer(int idx)
     return layer;
 }
 
-World::World(Project& project)
-    : m_project(&project)
+World::World(Project& project, std::shared_ptr<const Tileset> tileset)
+    : m_project(&project), m_tileset(std::move(tileset))
 {
     m_levels.insert(
         std::pair(glm::ivec2(0, 0),
                   std::make_unique<Level>(*this)));
+}
+
+std::shared_ptr<const Tileset> World::tileset() const
+{
+    return m_tileset;
 }
 
 World::LevelTable::iterator World::begin()
@@ -176,35 +219,28 @@ const Level& World::level_at(int x, int y) const
 
 Project::Project()
 {
-    m_worlds.push_back(std::make_unique<World>(*this));
+    m_tilesets.push_back(std::make_shared<Tileset>());
+    m_worlds.push_back(std::make_unique<World>(*this, m_tilesets[0]));
 }
 
-std::size_t Project::tiledef_count() const
+std::size_t Project::tileset_count() const
 {
-    return m_tile_defs.size();
+    return m_tilesets.size();
 }
 
-std::shared_ptr<TileDef> Project::tiledef_at(int idx) const
+std::shared_ptr<Tileset> Project::tileset_at(int idx)
 {
-    return m_tile_defs.at(idx);
+    return m_tilesets.at(idx);
 }
 
-void Project::set_tiledef(int idx, TileDef tiledef)
+std::shared_ptr<const Tileset> Project::tileset_at(int idx) const
 {
-    m_tile_defs.at(idx) = std::make_shared<TileDef>(std::move(tiledef));
+    return m_tilesets.at(idx);
 }
 
-void Project::add_tiledef(TileDef tiledef)
+void Project::add_tileset(std::shared_ptr<Tileset> tileset)
 {
-    m_tile_defs.push_back(std::make_shared<TileDef>(std::move(tiledef)));
-}
-
-void Project::remove_tiledef(int idx)
-{
-    if (idx < 0 || idx >= m_tile_defs.size()) {
-        return;
-    }
-    m_tile_defs.erase(m_tile_defs.begin() + idx);
+    m_tilesets.push_back(std::move(tileset));
 }
 
 std::size_t Project::world_count() const

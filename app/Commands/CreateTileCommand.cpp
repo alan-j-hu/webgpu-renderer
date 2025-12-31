@@ -8,13 +8,13 @@ CreateTileCommand::CreateTileCommand(TileDef tile_def)
 
 Command::Outcome CreateTileCommand::up(Project& project)
 {
-    project.add_tiledef(m_tile_def);
+    project.tileset_at(0)->add(m_tile_def);
     return Outcome::COMPLETED;
 }
 
 void CreateTileCommand::down(Project& project)
 {
-    project.remove_tiledef(project.tiledef_count() - 1);
+    project.tileset_at(0)->remove(project.tileset_at(0)->count() - 1);
 }
 
 const char* CreateTileCommand::name()

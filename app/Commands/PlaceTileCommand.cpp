@@ -6,7 +6,7 @@ PlaceTileCommand::PlaceTileCommand(
     int y,
     int z,
     Rotation rotation,
-    std::shared_ptr<TileDef> tiledef)
+    std::shared_ptr<const TileDef> tiledef)
     : m_loc(loc), m_x(x), m_y(y),
       m_inst(std::make_optional<TileInst>(tiledef, z, rotation))
 {

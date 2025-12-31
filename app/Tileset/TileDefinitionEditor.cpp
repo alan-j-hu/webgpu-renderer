@@ -26,12 +26,13 @@ TileDefinitionEditor::TileDefinitionEditor(AppState& app_state)
     m_instance = dynamic_cast<ModelInstance*>(m_scene.children()[1].get());
 }
 
-std::optional<TileDef>
+std::optional<std::shared_ptr<TileDef>>
 TileDefinitionEditor::render(const TileDef& definition)
 {
     render_preview();
 
-    TileDef new_definition = definition;
+    std::shared_ptr<TileDef> new_definition =
+        std::make_shared<TileDef>(definition);
     bool changed = false;
 
     if (ImGui::Button("Choose File")) {
@@ -47,8 +48,8 @@ TileDefinitionEditor::render(const TileDef& definition)
         model_opt = m_app_state->resources().load<Model>(path);
         model_data_opt = m_app_state->resources().load<ModelData>(path);
 
-        new_definition.set_model(model_opt);
-        new_definition.set_model_data(model_data_opt);
+        new_definition->set_model(model_opt);
+        new_definition->set_model_data(model_data_opt);
         changed = true;
 
         m_sink.clear();
@@ -61,20 +62,20 @@ TileDefinitionEditor::render(const TileDef& definition)
 
     int width = definition.width();
     ImGui::InputInt("Width", &width, 1);
-    new_definition.set_width(width);
-    changed = changed || (new_definition.width() != definition.width());
+    new_definition->set_width(width);
+    changed = changed || (new_definition->width() != definition.width());
 
     int depth = definition.depth();
     ImGui::InputInt("Depth", &depth, 1);
-    new_definition.set_depth(depth);
-    changed = changed || (new_definition.depth() != definition.depth());
+    new_definition->set_depth(depth);
+    changed = changed || (new_definition->depth() != definition.depth());
 
     ImGui::Image((ImTextureID)(intptr_t)
                  m_preview.texture().view(),
                  ImVec2(150, 150));
 
     if (changed) {
-        return std::make_optional<TileDef>(new_definition);
+        return std::make_optional<std::shared_ptr<TileDef>>(new_definition);
     }
     return std::nullopt;
 }

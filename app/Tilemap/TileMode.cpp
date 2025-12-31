@@ -15,14 +15,15 @@ TileMode::TileMode(AppState& app_state, TilemapEditor& editor)
 void TileMode::handle_click(int x, int y)
 {
     auto& project = app_state().project();
-    auto& selected = editor().selected_layer();
+    auto selected = editor().selected_layer();
+    auto& world = project.world_at(selected.world);
 
     if (selected.layer != -1 && m_selected_tile != -1) {
         short z = editor().z_palette().selected_z();
 
         app_state().push_command(std::make_unique<PlaceTileCommand>(
             selected, x, y, z, m_rotation,
-            project.tiledef_at(m_selected_tile)));
+            world.tileset()->at(m_selected_tile)));
     }
 }
 
@@ -31,11 +32,15 @@ void TileMode::draw_overlay(
     SpriteRenderer& sprite_renderer)
 {
     const Project& project = app_state().project();
+    auto selected = editor().selected_layer();
+    auto& world = project.world_at(selected.world);
+
     TileThumbnail* thumb = nullptr;
-    TileDef* tiledef = nullptr;
+    const TileDef* tiledef = nullptr;
+
     if (m_selected_tile != -1) {
         thumb = &app_state().tile_thumbnail(m_selected_tile);
-        tiledef = project.tiledef_at(m_selected_tile).get();
+        tiledef = world.tileset()->at(m_selected_tile).get();
     }
 
     std::optional<std::pair<int, int>> cell_opt = editor().mouseover_cell();

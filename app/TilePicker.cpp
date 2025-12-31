@@ -10,9 +10,11 @@ TilePicker::TilePicker(AppState& app_state)
 void TilePicker::render(int& selected_tile)
 {
     auto& project = m_app_state->project();
+    std::shared_ptr<const Tileset> tileset = project.tileset_at(0);
+
     if (ImGui::BeginChild("Tiles ##Tiles", ImVec2(100, 250))) {
-        for (int i = 0; i < project.tiledef_count(); ++i) {
-            auto def = project.tiledef_at(i);
+        for (int i = 0; i < tileset->count(); ++i) {
+            auto def = tileset->at(i);
 
             WGPUTextureView view =
                 m_app_state->tile_thumbnail(i).texture_view();

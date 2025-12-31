@@ -18,7 +18,7 @@ class TileDefinitionEditor
 public:
     TileDefinitionEditor(AppState&);
 
-    std::optional<TileDef> render(const TileDef& definition);
+    std::optional<std::shared_ptr<TileDef>> render(const TileDef& definition);
 
 private:
     AppState* m_app_state;

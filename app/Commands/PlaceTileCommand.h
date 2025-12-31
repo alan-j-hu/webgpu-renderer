@@ -15,7 +15,7 @@ public:
         int y,
         int z,
         Rotation rotation,
-        std::shared_ptr<TileDef> tiledef);
+        std::shared_ptr<const TileDef> tiledef);
 
     const char* name() override;
 

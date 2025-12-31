@@ -2,11 +2,12 @@
 #define UPDATETILECOMMAND_H
 
 #include "Command.h"
+#include <memory>
 
 class UpdateTileCommand : public Command
 {
 public:
-    UpdateTileCommand(int, TileDef);
+    UpdateTileCommand(int, std::shared_ptr<TileDef>);
 
     const char* name() override;
 
@@ -15,7 +16,7 @@ protected:
     void down(Project&) override;
 
 private:
-    TileDef m_tiledef;
+    std::shared_ptr<TileDef> m_tiledef;
     int m_idx;
 };
 

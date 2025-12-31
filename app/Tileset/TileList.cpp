@@ -15,6 +15,9 @@ TileList::TileList(std::string name, int flex, AppState& state)
 
 void TileList::content()
 {
+    std::shared_ptr<const Tileset> tileset =
+        m_app_state->project().tileset_at(0);
+
     if (ImGui::Button("Add New Tile")) {
         m_app_state->modals().push(std::make_unique<AddTile>(*m_app_state));
     }
@@ -23,7 +26,7 @@ void TileList::content()
     m_tile_picker.render(m_selected);
 
     if (m_selected != -1) {
-        auto optional = m_editor.render(*project.tiledef_at(m_selected));
+        auto optional = m_editor.render(*tileset->at(m_selected));
         if (optional) {
             m_app_state->push_command(std::make_unique<UpdateTileCommand>(
                 m_selected,

@@ -73,18 +73,33 @@ private:
     short m_depth;
 };
 
+class Tileset
+{
+public:
+    std::size_t count() const;
+    std::shared_ptr<TileDef> at(int idx);
+    std::shared_ptr<const TileDef> at(int idx) const;
+    void set(int idx, TileDef tiledef);
+
+    void add(TileDef tiledef);
+    std::shared_ptr<TileDef> remove(int idx);
+
+private:
+    std::vector<std::shared_ptr<TileDef>> m_tiles;
+};
+
 /// A TileInst instances a tile definition on the map.
 struct TileInst
 {
 public:
-    TileInst(std::shared_ptr<TileDef>, int, Rotation);
+    TileInst(std::shared_ptr<const TileDef>, int, Rotation);
 
-    std::shared_ptr<TileDef> def() const { return m_def; }
+    std::shared_ptr<const TileDef> def() const { return m_def; }
     int z() const { return m_z; }
     Rotation rotation() const { return m_rotation; }
 
 private:
-    std::shared_ptr<TileDef> m_def;
+    std::shared_ptr<const TileDef> m_def;
     short m_z;
     Rotation m_rotation;
 };
@@ -169,9 +184,11 @@ public:
         virtual void level_removed(Level&, int x, int y) = 0;
     };
 
-    World(Project& project);
+    World(Project& project, std::shared_ptr<const Tileset>);
     World(World&&) = delete;
     World& operator=(World&&) = delete;
+
+    std::shared_ptr<const Tileset> tileset() const;
 
     LevelTable::iterator begin();
     LevelTable::const_iterator begin() const;
@@ -192,6 +209,7 @@ public:
 
 private:
     Project* m_project;
+    std::shared_ptr<const Tileset> m_tileset;
     LevelTable m_levels;
     mutable Listenable<Listener> m_listenable;
 };
@@ -211,12 +229,10 @@ public:
     Project(Project&&) = delete;
     Project& operator=(Project&&) = delete;
 
-    std::size_t tiledef_count() const;
-    std::shared_ptr<TileDef> tiledef_at(int idx) const;
-    void set_tiledef(int idx, TileDef tiledef);
-
-    void add_tiledef(TileDef tiledef);
-    void remove_tiledef(int idx);
+    std::size_t tileset_count() const;
+    std::shared_ptr<Tileset> tileset_at(int idx);
+    std::shared_ptr<const Tileset> tileset_at(int idx) const;
+    void add_tileset(std::shared_ptr<Tileset>);
 
     std::size_t world_count() const;
     World& world_at(int idx);
@@ -236,7 +252,7 @@ public:
     }
 
 private:
-    std::vector<std::shared_ptr<TileDef>> m_tile_defs;
+    std::vector<std::shared_ptr<Tileset>> m_tilesets;
     std::vector<std::unique_ptr<World>> m_worlds;
     mutable Listenable<Listener> m_listenable;
 };

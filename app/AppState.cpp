@@ -66,12 +66,14 @@ void AppState::refresh_thumbnails()
     camera.set_position(glm::vec3(0, 0, 1));
     camera.set_target(glm::vec3(0, 0, 0));
 
-    while (m_thumbnail_cache.size() < m_project.tiledef_count()) {
+    std::shared_ptr<Tileset> tileset = m_project.tileset_at(0);
+
+    while (m_thumbnail_cache.size() < tileset->count()) {
         m_thumbnail_cache.emplace_back(*this);
     }
-    for (int i = 0; i < m_project.tiledef_count(); ++i) {
+    for (int i = 0; i < tileset->count(); ++i) {
         RenderTarget& target = m_thumbnail_cache.at(i).render_target();
-        auto def = m_project.tiledef_at(i);
+        auto def = tileset->at(i);
 
         if (def->model()) {
             Transform transform;
