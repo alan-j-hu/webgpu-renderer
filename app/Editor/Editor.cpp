@@ -1,5 +1,5 @@
-#include "TilemapEditor.h"
-#include "LayerNode.h"
+#include "Editor.h"
+#include "Tilemap/LayerNode.h"
 #include "../Commands/CreateLayerCommand.h"
 #include "../Commands/DeleteLayerCommand.h"
 #include "../Commands/PlaceTileCommand.h"
@@ -7,23 +7,24 @@
 
 #include "imgui.h"
 
-TilemapEditor::Listener::Listener(TilemapEditor& editor)
+Editor::Listener::Listener(Editor& editor)
     : m_editor(&editor)
 {
 }
 
-void TilemapEditor::Listener::world_added(World&, int idx)
+void Editor::Listener::world_added(World&, int idx)
 {
 }
 
-void TilemapEditor::Listener::world_removed(World&, int idx)
+void Editor::Listener::world_removed(World&, int idx)
 {
 }
 
-TilemapEditor::TilemapEditor(AppState& app_state)
+Editor::Editor(AppState& app_state)
     : m_listener(*this),
       m_camera_selection(0),
-      m_app_state(app_state),
+      m_app_state(&app_state),
+      m_tile_list(app_state),
       m_subwindow_2d(app_state.renderer().device(), 500, 500),
       m_subwindow_3d(app_state.renderer().device(), 500, 500),
       m_spritesheet(app_state.renderer().device(),
@@ -52,7 +53,7 @@ TilemapEditor::TilemapEditor(AppState& app_state)
             std::make_unique<LevelNode>(app_state, *it->second));
     }
 
-    app_state.connect_tilemap_editor(*this);
+    project.listenable().add_listener(m_listener);
 
     //m_subwindow_2d.set_clear_color(app_state.background_color());
     m_subwindow_3d.set_clear_color(app_state.background_color());
@@ -78,17 +79,18 @@ TilemapEditor::TilemapEditor(AppState& app_state)
     ));
 }
 
-TilemapEditor::~TilemapEditor()
+Editor::~Editor()
 {
-    m_app_state.disconnect_tilemap_editor(*this);
+    auto& project = m_app_state->project();
+    project.listenable().remove_listener(m_listener);
 }
 
-const ZPalette& TilemapEditor::z_palette() const
+const ZPalette& Editor::z_palette() const
 {
     return m_z_palette;
 }
 
-glm::vec3 TilemapEditor::map_2d_to_3d(const glm::vec2& vec2d) const
+glm::vec3 Editor::map_2d_to_3d(const glm::vec2& vec2d) const
 {
     glm::vec2 v = vec2d;
     v.x /= m_subwindow_2d.width() / 2;
@@ -99,7 +101,7 @@ glm::vec3 TilemapEditor::map_2d_to_3d(const glm::vec2& vec2d) const
     return m_ortho_camera.unproject(glm::vec3(v, 0));
 }
 
-glm::vec2 TilemapEditor::map_3d_to_2d(const glm::vec3& vec3d) const
+glm::vec2 Editor::map_3d_to_2d(const glm::vec3& vec3d) const
 {
     glm::vec2 v = m_ortho_camera.project(vec3d);
     v.y *= -1;
@@ -110,7 +112,7 @@ glm::vec2 TilemapEditor::map_3d_to_2d(const glm::vec3& vec3d) const
     return v;
 }
 
-std::optional<std::pair<int, int>> TilemapEditor::mouseover_cell()
+std::optional<std::pair<int, int>> Editor::mouseover_cell()
 {
     glm::vec2 pos = mouse_pos();
     glm::vec3 pos_3d = map_2d_to_3d(pos);
@@ -128,12 +130,45 @@ std::optional<std::pair<int, int>> TilemapEditor::mouseover_cell()
     return std::optional(std::pair<int, int>(x, y));
 }
 
-glm::vec2 TilemapEditor::mouse_pos() const
+glm::vec2 Editor::mouse_pos() const
 {
     return glm::vec2(m_mouse_rel_x, m_mouse_rel_y);
 }
 
-void TilemapEditor::render()
+void Editor::draw()
+{
+    draw_menubar();
+    draw_main_pane();
+}
+
+void Editor::draw_menubar()
+{
+    if (!ImGui::BeginMenuBar()) return;
+    ImGui::MenuItem("File");
+    ImGui::MenuItem("Edit");
+    ImGui::EndMenuBar();
+}
+
+void Editor::draw_main_pane()
+{
+    if (ImGui::BeginTabBar("Tabs")) {
+        if (ImGui::BeginTabItem("Tilemap Editor")) {
+            draw_tilemap_editor();
+            ImGui::EndTabItem();
+        }
+        if (ImGui::BeginTabItem("Tileset Editor")) {
+            m_tile_list.draw();
+            ImGui::EndTabItem();
+        }
+        ImGui::EndTabBar();
+    }
+}
+
+void Editor::draw_tileset_editor()
+{
+}
+
+void Editor::draw_tilemap_editor()
 {
     draw_toolbar();
 
@@ -141,9 +176,9 @@ void TilemapEditor::render()
     render_preview();
 
     {
-        m_app_state.sprite_renderer().begin(m_subwindow_2d);
+        m_app_state->sprite_renderer().begin(m_subwindow_2d);
 
-        m_app_state.sprite_renderer().draw(
+        m_app_state->sprite_renderer().draw(
             m_spritesheet,
             glm::vec2(0, 0),
             m_spritesheet.texture().width(),
@@ -151,9 +186,9 @@ void TilemapEditor::render()
 
         m_current_mode->draw_overlay(
             m_subwindow_2d,
-            m_app_state.sprite_renderer());
+            m_app_state->sprite_renderer());
 
-        m_app_state.sprite_renderer().end();
+        m_app_state->sprite_renderer().end();
     }
 
     if (ImGui::BeginChild("Map", ImVec2(500, 700))) {
@@ -180,12 +215,12 @@ void TilemapEditor::render()
     ImGui::EndChild();
 }
 
-void TilemapEditor::render_preview()
+void Editor::render_preview()
 {
-    m_app_state.renderer().render(m_subwindow_3d, m_scene, *m_current_camera);
+    m_app_state->renderer().render(m_subwindow_3d, m_scene, *m_current_camera);
 }
 
-void TilemapEditor::draw_toolbar()
+void Editor::draw_toolbar()
 {
     if (ImGui::Button("View 3D")) {
         m_current_mode = &m_view_3d_mode;
@@ -203,27 +238,27 @@ void TilemapEditor::draw_toolbar()
     }
     ImGui::SameLine();
     if (ImGui::Button("Undo")) {
-        m_app_state.undo();
+        m_app_state->undo();
     }
     ImGui::SameLine();
     if (ImGui::Button("Redo")) {
-        m_app_state.redo();
+        m_app_state->redo();
     }
 }
 
-void TilemapEditor::draw_layer_list()
+void Editor::draw_layer_list()
 {
-    auto& project = m_app_state.project();
+    auto& project = m_app_state->project();
     auto& level = project.level_at(m_selected_layer);
 
     if (ImGui::Button("-")) {
-        m_app_state.push_command(
+        m_app_state->push_command(
             std::make_unique<DeleteLayerCommand>(m_selected_layer));
         m_selected_layer.layer = std::max(-1, m_selected_layer.layer - 1);
     }
     ImGui::SameLine();
     if (ImGui::Button("+")) {
-        m_app_state.push_command(
+        m_app_state->push_command(
             std::make_unique<CreateLayerCommand>(m_selected_layer));
     }
 
@@ -232,9 +267,9 @@ void TilemapEditor::draw_layer_list()
     }
 }
 
-void TilemapEditor::draw_layer_item(int i)
+void Editor::draw_layer_item(int i)
 {
-    auto& project = m_app_state.project();
+    auto& project = m_app_state->project();
     const Layer& layer = project.level_at(m_selected_layer).layer_at(i);
 
     const bool selected = i == m_selected_layer.layer;

@@ -1,7 +1,7 @@
 #ifndef TILEDEFINITIONEDITOR_H
 #define TILEDEFINITIONEDITOR_H
 
-#include "../AppState.h"
+#include "../../AppState.h"
 #include "noworry/rendertarget.h"
 #include "noworry/transform.h"
 #include "noworry/camera/perspectivecamera.h"

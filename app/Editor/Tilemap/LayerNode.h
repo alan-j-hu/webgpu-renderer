@@ -1,7 +1,7 @@
 #ifndef LAYER_NODE_H
 #define LAYER_NODE_H
 
-#include "../AppState.h"
+#include "../../AppState.h"
 #include "noworry/rendertarget.h"
 #include "noworry/Gfx3D/DynamicModel.h"
 #include "noworry/Gfx3D/DynamicModelInstance.h"

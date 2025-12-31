@@ -1,8 +1,8 @@
 #include "HeightMode.h"
-#include "TilemapEditor.h"
-#include "../Commands/PlaceTileCommand.h"
+#include "../Editor.h"
+#include "../../Commands/PlaceTileCommand.h"
 
-HeightMode::HeightMode(AppState& app_state, TilemapEditor& editor)
+HeightMode::HeightMode(AppState& app_state, Editor& editor)
     : View2DMode(app_state, editor)
 {
 }

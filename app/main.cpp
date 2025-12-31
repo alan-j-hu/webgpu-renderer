@@ -1,6 +1,5 @@
 #include "AppState.h"
-#include "Tilemap/TilemapEditor.h"
-#include "Tileset/TilesetPane.h"
+#include "Editor/Editor.h"
 
 #include "noworry/application.h"
 #include "noworry/renderer.h"
@@ -25,8 +24,7 @@ public:
         : Application(width, height, WGPUTextureFormat_BGRA8Unorm),
           m_subwindow(device(), 500, 500),
           m_app_state(device()),
-          m_tileset_editor(1, m_app_state),
-          m_tilemap_editor(m_app_state)
+          m_editor(m_app_state)
     {
         init_imgui();
 
@@ -88,8 +86,7 @@ private:
 
     AppState m_app_state;
 
-    TilesetPane m_tileset_editor;
-    TilemapEditor m_tilemap_editor;
+    Editor m_editor;
 
     void init_imgui()
     {
@@ -127,9 +124,7 @@ private:
 
         m_app_state.refresh_thumbnails();
 
-        draw_menubar();
-
-        draw_main_pane();
+        m_editor.draw();
 
         ImGui::End();
 
@@ -138,31 +133,6 @@ private:
         m_app_state.modals().render();
 
         ImGui::Render();
-    }
-
-    bool draw_menubar()
-    {
-        if (!ImGui::BeginMenuBar()) return false;
-        ImGui::MenuItem("File");
-        ImGui::MenuItem("Edit");
-        ImGui::EndMenuBar();
-        return true;
-    };
-
-    void draw_main_pane()
-    {
-        if (ImGui::BeginTabBar("Tabs")) {
-            if (ImGui::BeginTabItem("Tilemap Editor")) {
-                m_tilemap_editor.render();
-                ImGui::EndTabItem();
-            }
-            if (ImGui::BeginTabItem("Tileset Editor")) {
-                m_tileset_editor.resize(500, 500);
-                m_tileset_editor.render();
-                ImGui::EndTabItem();
-            }
-            ImGui::EndTabBar();
-          }
     }
 };
 

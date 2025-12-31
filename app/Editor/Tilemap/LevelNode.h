@@ -2,7 +2,7 @@
 #define LEVEL_NODE_H
 
 #include "LayerNode.h"
-#include "../Project.h"
+#include "../../Project.h"
 #include <memory>
 
 class AppState;

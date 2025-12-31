@@ -2,14 +2,14 @@
 #define VIEW_3D_MODE_H
 
 #include "Mode.h"
-#include "../AppState.h"
+#include "../../AppState.h"
 
-class TilemapEditor;
+class Editor;
 
 class View3DMode : public Mode
 {
 public:
-    View3DMode(AppState&, TilemapEditor&);
+    View3DMode(AppState&, Editor&);
 
     virtual void handle_input() override;
 
@@ -19,7 +19,7 @@ public:
 
 private:
     AppState* m_app_state;
-    TilemapEditor* m_editor;
+    Editor* m_editor;
 };
 
 #endif

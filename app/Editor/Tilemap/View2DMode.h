@@ -4,19 +4,19 @@
 #include "Mode.h"
 
 class AppState;
-class TilemapEditor;
+class Editor;
 
 class View2DMode : public Mode
 {
 public:
-    View2DMode(AppState&, TilemapEditor&);
+    View2DMode(AppState&, Editor&);
 
     virtual void handle_input() override;
 
 protected:
     AppState& app_state();
 
-    TilemapEditor& editor();
+    Editor& editor();
 
     Region region(int tile_x, int tile_y, float w, float h);
 
@@ -24,7 +24,7 @@ protected:
 
 private:
     AppState* m_app_state;
-    TilemapEditor* m_editor;
+    Editor* m_editor;
 };
 
 #endif

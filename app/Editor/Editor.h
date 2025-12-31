@@ -1,13 +1,14 @@
-#ifndef TILEMAPEDITOR_H
-#define TILEMAPEDITOR_H
+#ifndef EDITOR_H
+#define EDITOR_H
 
-#include "HeightMode.h"
-#include "LayerNode.h"
-#include "LevelNode.h"
-#include "Mode.h"
-#include "TileMode.h"
-#include "View3DMode.h"
-#include "ZPalette.h"
+#include "Tilemap/HeightMode.h"
+#include "Tilemap/LayerNode.h"
+#include "Tilemap/LevelNode.h"
+#include "Tilemap/Mode.h"
+#include "Tilemap/TileMode.h"
+#include "Tilemap/View3DMode.h"
+#include "Tilemap/ZPalette.h"
+#include "Tileset/TileList.h"
 #include "../AppState.h"
 #include "../TilePicker.h"
 
@@ -28,16 +29,16 @@
 #include <glm/vec3.hpp>
 
 /// Level map editor.
-class TilemapEditor
+class Editor
 {
 public:
-    TilemapEditor(AppState&);
+    Editor(AppState&);
 
-    ~TilemapEditor();
+    ~Editor();
 
     const ZPalette& z_palette() const;
 
-    void render();
+    void draw();
 
     glm::vec3 map_2d_to_3d(const glm::vec2&) const;
     glm::vec2 map_3d_to_2d(const glm::vec3&) const;
@@ -54,18 +55,21 @@ private:
     class Listener : public Project::Listener
     {
     public:
-        Listener(TilemapEditor& editor);
+        Listener(Editor& editor);
 
         void world_added(World&, int idx) override;
         void world_removed(World&, int idx) override;
 
     private:
-        TilemapEditor* m_editor;
+        Editor* m_editor;
     } m_listener;
 
     int m_camera_selection;
 
-    AppState& m_app_state;
+    AppState* m_app_state;
+
+    TileList m_tile_list;
+
     // Must initialize RenderTarget before spritesheet
     RenderTarget m_subwindow_2d;
     RenderTarget m_subwindow_3d;
@@ -94,6 +98,14 @@ private:
     std::unordered_map<const Level*, std::unique_ptr<LevelNode>> m_level_nodes;
 
     void render_preview();
+
+    void draw_menubar();
+
+    void draw_main_pane();
+
+    void draw_tileset_editor();
+
+    void draw_tilemap_editor();
 
     void draw_toolbar();
 

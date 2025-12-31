@@ -1,6 +1,6 @@
 #include "View3DMode.h"
 
-View3DMode::View3DMode(AppState& app_state, TilemapEditor& editor)
+View3DMode::View3DMode(AppState& app_state, Editor& editor)
     : m_app_state(&app_state),
       m_editor(&editor)
 {

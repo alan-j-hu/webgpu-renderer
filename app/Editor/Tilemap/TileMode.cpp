@@ -1,10 +1,11 @@
 #include "TileMode.h"
-#include "TilemapEditor.h"
-#include "../Commands/PlaceTileCommand.h"
+#include "../Editor.h"
+#include "../../Commands/PlaceTileCommand.h"
+
 #include <imgui.h>
 #include <numbers>
 
-TileMode::TileMode(AppState& app_state, TilemapEditor& editor)
+TileMode::TileMode(AppState& app_state, Editor& editor)
     : View2DMode(app_state, editor),
       m_selected_tile(-1),
       m_rotation(Rotation::Rotate0),

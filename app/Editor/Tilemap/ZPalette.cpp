@@ -1,5 +1,5 @@
 #include "ZPalette.h"
-#include "../AppState.h"
+#include "../../AppState.h"
 #include "noworry/Resource/ResourceLoader.h"
 
 #include <stdexcept>

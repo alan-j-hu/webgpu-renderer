@@ -2,14 +2,14 @@
 #define HEIGHT_MODE_H
 
 #include "View2DMode.h"
-#include "../AppState.h"
+#include "../../AppState.h"
 
-class TilemapEditor;
+class Editor;
 
 class HeightMode : public View2DMode
 {
 public:
-    HeightMode(AppState&, TilemapEditor&);
+    HeightMode(AppState&, Editor&);
 
     virtual void draw_overlay(RenderTarget&, SpriteRenderer&) override;
 

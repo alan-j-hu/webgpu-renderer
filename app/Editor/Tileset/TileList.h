@@ -2,18 +2,16 @@
 #define TILELIST_H
 
 #include "TileDefinitionEditor.h"
-#include "../AppState.h"
-#include "../TilePicker.h"
-#include "../Pane.h"
+#include "../../AppState.h"
+#include "../../TilePicker.h"
 
 /// Edits the list of tiles.
-class TileList : public Pane
+class TileList
 {
 public:
-    TileList(std::string name, int flex, AppState&);
+    TileList(AppState&);
 
-protected:
-    virtual void content() override;
+    void draw();
 
 private:
     AppState* m_app_state;

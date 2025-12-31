@@ -1,5 +1,4 @@
 #include "AppState.h"
-#include "Tilemap/TilemapEditor.h"
 #include "noworry/grid.h"
 
 #include <utility>
@@ -80,14 +79,4 @@ void AppState::refresh_thumbnails()
             m_capture.capture(target, camera, transform, **def->model());
         }
     }
-}
-
-void AppState::connect_tilemap_editor(TilemapEditor& editor)
-{
-    m_project.listenable().add_listener(editor.listener());
-}
-
-void AppState::disconnect_tilemap_editor(TilemapEditor& editor)
-{
-    m_project.listenable().remove_listener(editor.listener());
 }

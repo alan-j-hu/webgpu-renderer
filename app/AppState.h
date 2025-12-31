@@ -1,10 +1,10 @@
 #ifndef APPSTATE_H
 #define APPSTATE_H
 
-#include "Modal.h"
 #include "Project.h"
 #include "TileThumbnail.h"
 #include "Commands/Command.h"
+#include "Editor/Modal.h"
 
 #include "noworry/renderer.h"
 #include "noworry/Draw2D/SpriteRenderer.h"
@@ -15,8 +15,6 @@
 
 #include <vector>
 #include <webgpu/webgpu.h>
-
-class TilemapEditor;
 
 /// Helper class containing data used by multiple sub-editors.
 class AppState
@@ -49,11 +47,8 @@ public:
     {
         return m_thumbnail_cache.at(i);
     }
+
     void refresh_thumbnails();
-
-    void connect_tilemap_editor(TilemapEditor&);
-
-    void disconnect_tilemap_editor(TilemapEditor&);
 
 private:
     std::vector<std::unique_ptr<Command>> m_history;

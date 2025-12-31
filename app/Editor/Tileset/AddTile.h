@@ -2,7 +2,7 @@
 #define ADDTILE_H
 
 #include "TileDefinitionEditor.h"
-#include "../AppState.h"
+#include "../../AppState.h"
 #include "../Modal.h"
 
 /// Modal for adding a new tile.

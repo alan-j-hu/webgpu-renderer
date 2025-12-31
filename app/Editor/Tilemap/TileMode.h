@@ -2,17 +2,17 @@
 #define TILE_MODE_H
 
 #include "View2DMode.h"
-#include "../AppState.h"
-#include "../TilePicker.h"
+#include "../../AppState.h"
+#include "../../TilePicker.h"
 #include "noworry/rendertarget.h"
 #include "noworry/Draw2D/SpriteRenderer.h"
 
-class TilemapEditor;
+class Editor;
 
 class TileMode : public View2DMode
 {
 public:
-    TileMode(AppState&, TilemapEditor&);
+    TileMode(AppState&, Editor&);
 
     virtual void draw_overlay(RenderTarget&, SpriteRenderer&) override;
 

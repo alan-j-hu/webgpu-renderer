@@ -1,10 +1,10 @@
 #include "View2DMode.h"
-#include "TilemapEditor.h"
-#include "../AppState.h"
+#include "../Editor.h"
+#include "../../AppState.h"
 
 #include "imgui.h"
 
-View2DMode::View2DMode(AppState& app_state, TilemapEditor& editor)
+View2DMode::View2DMode(AppState& app_state, Editor& editor)
     : m_app_state(&app_state),
       m_editor(&editor)
 {
@@ -30,7 +30,7 @@ AppState& View2DMode::app_state()
     return *m_app_state;
 }
 
-TilemapEditor& View2DMode::editor()
+Editor& View2DMode::editor()
 {
     return *m_editor;
 }

@@ -10,10 +10,7 @@ set(IMGUI_SRC
 
 add_executable(demo
   AppState.cpp
-  FileDialog.cpp
   main.cpp
-  Modal.cpp
-  Pane.cpp
   Project.cpp
   TilePicker.cpp
   TileThumbnail.cpp
@@ -23,18 +20,19 @@ add_executable(demo
   Commands/DeleteLayerCommand.cpp
   Commands/PlaceTileCommand.cpp
   Commands/UpdateTileCommand.cpp
-  Tilemap/HeightMode.cpp
-  Tilemap/LayerNode.cpp
-  Tilemap/LevelNode.cpp
-  Tilemap/TilemapEditor.cpp
-  Tilemap/TileMode.cpp
-  Tilemap/View2DMode.cpp
-  Tilemap/View3DMode.cpp
-  Tilemap/ZPalette.cpp
-  Tileset/AddTile.cpp
-  Tileset/TileDefinitionEditor.cpp
-  Tileset/TileList.cpp
-  Tileset/TilesetPane.cpp
+  Editor/Editor.cpp
+  Editor/FileDialog.cpp
+  Editor/Modal.cpp
+  Editor/Tilemap/HeightMode.cpp
+  Editor/Tilemap/LayerNode.cpp
+  Editor/Tilemap/LevelNode.cpp
+  Editor/Tilemap/TileMode.cpp
+  Editor/Tilemap/View2DMode.cpp
+  Editor/Tilemap/View3DMode.cpp
+  Editor/Tilemap/ZPalette.cpp
+  Editor/Tileset/AddTile.cpp
+  Editor/Tileset/TileDefinitionEditor.cpp
+  Editor/Tileset/TileList.cpp
   ${IMGUI_SRC})
 set_property(TARGET demo PROPERTY CXX_STANDARD 23)
 set_property(TARGET demo PROPERTY C_STANDARD 23)

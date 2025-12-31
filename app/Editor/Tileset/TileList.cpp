@@ -1,19 +1,18 @@
 #include "TileList.h"
 #include "AddTile.h"
-#include "../Commands/UpdateTileCommand.h"
+#include "../../Commands/UpdateTileCommand.h"
 #include <utility>
 #include "imgui.h"
 
-TileList::TileList(std::string name, int flex, AppState& state)
-    : Pane(std::move(name), flex),
-      m_app_state(&state),
+TileList::TileList(AppState& state)
+    : m_app_state(&state),
       m_tile_picker(state),
       m_editor(state),
       m_selected{-1}
 {
 }
 
-void TileList::content()
+void TileList::draw()
 {
     std::shared_ptr<const Tileset> tileset =
         m_app_state->project().tileset_at(0);
