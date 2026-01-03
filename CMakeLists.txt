@@ -37,8 +37,12 @@ set(DAWN_BUILD_MONOLITHIC_LIBRARY STATIC)
 set(DAWN_ENABLE_INSTALL ON)
 set(TINT_BUILD_CMD_TOOLS OFF)
 set(TINT_BUILD_TESTS OFF)
-
 FetchContent_MakeAvailable(dawn)
+
+FetchContent_Declare(
+  json
+  URL https://github.com/nlohmann/json/releases/download/v3.12.0/json.tar.xz)
+FetchContent_MakeAvailable(json)
 
 add_subdirectory(src)
 add_subdirectory(app)

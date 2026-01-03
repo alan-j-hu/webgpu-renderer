@@ -13,6 +13,11 @@ TileDef::TileDef()
     m_depth = 1;
 }
 
+const std::filesystem::path& TileDef::model_path() const
+{
+    return m_model_path;
+}
+
 const std::optional<std::shared_ptr<ModelData>>& TileDef::model_data() const
 {
     return m_model_data;
@@ -31,6 +36,11 @@ short TileDef::width() const
 short TileDef::depth() const
 {
     return m_depth;
+}
+
+void TileDef::set_model_path(std::filesystem::path path)
+{
+    m_model_path = std::move(path);
 }
 
 void TileDef::set_model_data(
@@ -107,8 +117,7 @@ bool operator==(const TileInst& lhs, const TileInst& rhs)
     return lhs.z() == rhs.z() && lhs.def().get() == rhs.def().get();
 }
 
-Layer::Layer(Level& level)
-    : m_level(&level)
+Layer::Layer()
 {
     for (int i = 0; i < 16 * 16; ++i) {
         m_tiles.push_back(std::nullopt);
@@ -126,10 +135,9 @@ void Layer::set(int x, int y, std::optional<TileInst> option)
     m_listenable.notify(&Layer::Listener::layer_changed);
 }
 
-Level::Level(World& world)
-    : m_world(&world)
+Level::Level()
 {
-    m_layers.push_back(std::make_unique<Layer>(*this));
+    m_layers.push_back(std::make_unique<Layer>());
 }
 
 std::size_t Level::layer_count() const
@@ -149,7 +157,7 @@ Layer& Level::layer_at(int idx)
 
 void Level::add_layer()
 {
-    m_layers.push_back(std::make_unique<Layer>(*this));
+    m_layers.push_back(std::make_unique<Layer>());
     int idx = m_layers.size() - 1;
     m_listenable.notify(&Level::Listener::layer_added, idx);
 }
@@ -179,12 +187,10 @@ std::unique_ptr<Layer> Level::remove_layer(int idx)
     return layer;
 }
 
-World::World(Project& project, std::shared_ptr<const Tileset> tileset)
-    : m_project(&project), m_tileset(std::move(tileset))
+World::World(std::shared_ptr<const Tileset> tileset)
+    : m_tileset(std::move(tileset))
 {
-    m_levels.insert(
-        std::pair(glm::ivec2(0, 0),
-                  std::make_unique<Level>(*this)));
+    m_levels.insert(std::pair(glm::ivec2(0, 0), std::make_unique<Level>()));
 }
 
 std::shared_ptr<const Tileset> World::tileset() const
@@ -225,7 +231,7 @@ const Level& World::level_at(int x, int y) const
 Project::Project()
 {
     m_tilesets.push_back(std::make_shared<Tileset>());
-    m_worlds.push_back(std::make_unique<World>(*this, m_tilesets[0]));
+    m_worlds.push_back(std::make_unique<World>(m_tilesets[0]));
 }
 
 std::size_t Project::tileset_count() const

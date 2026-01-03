@@ -1,5 +1,6 @@
 #include "Editor.h"
 #include "Tilemap/LayerNode.h"
+#include "../Json.h"
 #include "../Commands/CreateLayerCommand.h"
 #include "../Commands/DeleteLayerCommand.h"
 #include "../Commands/PlaceTileCommand.h"

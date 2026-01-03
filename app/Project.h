@@ -47,8 +47,6 @@ struct TextureRef
     std::shared_ptr<TextureMaterial> material;
 };
 
-/// A TileDefinition has a mesh, rotation, and texture and is referenced by
-/// TileInsts.
 class TileDef
 {
 public:
@@ -60,12 +58,14 @@ public:
 
     TileDef();
 
+    const std::filesystem::path& model_path() const;
     const std::optional<std::shared_ptr<ModelData>>& model_data() const;
     const std::optional<std::shared_ptr<Model>>& model() const;
 
     short width() const;
     short depth() const;
 
+    void set_model_path(std::filesystem::path);
     void set_model_data(std::optional<std::shared_ptr<ModelData>>);
     void set_model(std::optional<std::shared_ptr<Model>>);
 
@@ -73,6 +73,7 @@ public:
     void set_depth(short depth);
 
 private:
+    std::filesystem::path m_model_path;
     std::optional<std::shared_ptr<ModelData>> m_model_data;
     std::optional<std::shared_ptr<Model>> m_model;
 
@@ -134,16 +135,13 @@ public:
         virtual void layer_changed() = 0;
     };
 
-    Layer(Level&);
-    Layer(Layer&&) noexcept = delete;
-    Layer& operator=(Layer&&) noexcept = delete;
+    Layer();
+    Layer(Layer&&) = default;
+    Layer& operator=(Layer&&) = default;
 
     const std::optional<TileInst>& at(int x, int y) const;
 
     void set(int x, int y, std::optional<TileInst> option);
-
-    Level& level() { return *m_level; }
-    const Level& level() const { return *m_level; }
 
     Listenable<Listener>& listenable() const
     {
@@ -151,7 +149,6 @@ public:
     }
 
 private:
-    Level* m_level;
     std::vector<std::optional<TileInst>> m_tiles;
     mutable Listenable<Listener> m_listenable;
 };
@@ -166,9 +163,22 @@ public:
         virtual void layer_removed(Layer&, int idx) = 0;
     };
 
-    Level(World&);
-    Level(Level&&) = delete;
-    Level& operator=(Level&&) = delete;
+    Level();
+
+    template<class It>
+    Level(It it, It end)
+    {
+        for (; it != end; ++it) {
+            m_layers.push_back(std::make_unique<Layer>(std::move(*it)));
+        }
+        if (m_layers.size() == 0) {
+            m_layers.push_back(std::make_unique<Layer>());
+        }
+    }
+
+    Level(Level&&) = default;
+
+    Level& operator=(Level&&) = default;
 
     std::size_t layer_count() const;
     const Layer& layer_at(int idx) const;
@@ -178,15 +188,12 @@ public:
     void add_layer(std::unique_ptr<Layer>, int idx);
     std::unique_ptr<Layer> remove_layer(int idx);
 
-    World& world() { return *m_world; }
-    const World& world() const { return *m_world; }
     Listenable<Listener>& listenable() const
     {
         return m_listenable;
     }
 
 private:
-    World* m_world;
     std::vector<std::unique_ptr<Layer>> m_layers;
     mutable Listenable<Listener> m_listenable;
 };
@@ -202,9 +209,26 @@ public:
         virtual void level_removed(Level&, int x, int y) = 0;
     };
 
-    World(Project& project, std::shared_ptr<const Tileset>);
-    World(World&&) = delete;
-    World& operator=(World&&) = delete;
+    World(std::shared_ptr<const Tileset>);
+
+    template<class It>
+    World(std::shared_ptr<const Tileset> tileset, It it, It end)
+        : m_tileset(std::move(tileset))
+    {
+        for (; it != end; ++it) {
+            m_levels.emplace(
+                it->first,
+                std::make_unique<Level>(std::move(it->second)));
+        }
+
+        if (m_levels.size() == 0) {
+            m_levels.emplace(glm::ivec2(0, 0), std::make_unique<Level>());
+        }
+    }
+
+    World(World&&) = default;
+
+    World& operator=(World&&) = default;
 
     std::shared_ptr<const Tileset> tileset() const;
 
@@ -217,16 +241,12 @@ public:
     Level& level_at(int x, int y);
     const Level& level_at(int x, int y) const;
 
-    Project& project() { return *m_project; }
-    const Project& project() const { return *m_project; }
-
     Listenable<Listener>& listenable() const
     {
         return m_listenable;
     }
 
 private:
-    Project* m_project;
     std::shared_ptr<const Tileset> m_tileset;
     LevelTable m_levels;
     mutable Listenable<Listener> m_listenable;
@@ -244,6 +264,24 @@ public:
     };
 
     Project();
+
+    template<class TilesetIt, class WorldIt>
+    Project(TilesetIt it1, TilesetIt end1, WorldIt it2, WorldIt end2) {
+        for (; it1 != end1; ++it1) {
+            m_tilesets.push_back(std::move(*it1));
+        }
+        if (m_tilesets.size() == 0) {
+            m_tilesets.push_back(std::make_shared<Tileset>());
+        }
+
+        for (; it2 != end2; ++it2) {
+            m_worlds.push_back(std::move(*it2));
+        }
+        if (m_worlds.size() == 0) {
+            m_worlds.push_back(std::make_unique<World>(m_tilesets.at(0)));
+        }
+    }
+
     Project(Project&&) = delete;
     Project& operator=(Project&&) = delete;
 

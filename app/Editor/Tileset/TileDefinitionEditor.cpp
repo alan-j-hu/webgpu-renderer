@@ -48,6 +48,7 @@ TileDefinitionEditor::render(const TileDef& definition)
         model_opt = m_app_state->resources().load<Model>(path);
         model_data_opt = m_app_state->resources().load<ModelData>(path);
 
+        new_definition->set_model_path(std::move(path));
         new_definition->set_model(model_opt);
         new_definition->set_model_data(model_data_opt);
         changed = true;

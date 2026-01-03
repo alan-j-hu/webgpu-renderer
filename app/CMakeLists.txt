@@ -11,6 +11,7 @@ set(IMGUI_SRC
 add_executable(demo
   AppState.cpp
   main.cpp
+  Json.cpp
   Project.cpp
   TilePicker.cpp
   ThumbnailUtil.cpp
@@ -50,4 +51,4 @@ add_custom_target(link_resources ALL
   "${CMAKE_CURRENT_BINARY_DIR}/Resources")
 add_dependencies(demo link_resources)
 
-target_link_libraries(demo noworry)
+target_link_libraries(demo noworry nlohmann_json::nlohmann_json)
