@@ -115,8 +115,6 @@ private:
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
 
-        ImGui::BeginDisabled(m_app_state.modals().has_focus());
-
         ImGuiViewport* viewport = ImGui::GetMainViewport();
         ImGui::SetNextWindowPos(viewport->Pos);
         ImGui::SetNextWindowSize(viewport->Size);
@@ -125,10 +123,6 @@ private:
         m_editor.draw();
 
         ImGui::End();
-
-        ImGui::EndDisabled();
-
-        m_app_state.modals().render();
 
         ImGui::Render();
     }

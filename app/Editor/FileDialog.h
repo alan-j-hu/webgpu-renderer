@@ -1,25 +1,36 @@
 #ifndef FILEDIALOG_H
 #define FILEDIALOG_H
 
-#include "Modal.h"
 #include <filesystem>
+#include <optional>
 #include <vector>
 
 /// File selector modal.
-class FileDialog : public Modal
+class FileDialog
 {
 public:
-    FileDialog(std::filesystem::path path,
-               std::vector<std::filesystem::path>& sink);
+    FileDialog(std::string name, std::filesystem::path path);
 
-    virtual ModalResponse render() override;
+    const std::string& name() const;
+
+    void open();
+
+    std::optional<std::filesystem::path> update();
 
 private:
+    std::string m_name;
     std::filesystem::path m_current_dir;
     std::filesystem::path m_backtrack_path;
     std::vector<std::filesystem::directory_entry> m_subdirs;
     std::vector<std::filesystem::directory_entry> m_files;
-    std::vector<std::filesystem::path>& m_sink;
+
+    // This extra state is necessary because ImGui::OpenPopup does not work
+    // if Imgui::BeginPopup is in a different ID stack scope. This problem
+    // often occurs when attempting to open a popup from MenuItem from within
+    // BeginMenu, from within BeginMenuBar.
+    //
+    // See https://github.com/ocornut/imgui/issues/5468#issuecomment-1184017711
+    enum class State { Open, Closed } m_state;
 
     void iterate_dir();
     bool backtrack_path_needs_update();

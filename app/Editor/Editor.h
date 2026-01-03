@@ -1,6 +1,7 @@
 #ifndef EDITOR_H
 #define EDITOR_H
 
+#include "FileDialog.h"
 #include "Tilemap/HeightMode.h"
 #include "Tilemap/LayerNode.h"
 #include "Tilemap/LevelNode.h"
@@ -73,6 +74,7 @@ private:
     int m_camera_selection;
 
     AppState* m_app_state;
+    FileDialog m_main_file_dialog;
 
     TileList m_tile_list;
 

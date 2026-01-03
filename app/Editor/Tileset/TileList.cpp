@@ -1,5 +1,4 @@
 #include "TileList.h"
-#include "AddTile.h"
 #include "../../Commands/UpdateTileCommand.h"
 #include <utility>
 #include "imgui.h"
@@ -8,6 +7,7 @@ TileList::TileList(AppState& state, Editor& editor)
     : m_app_state(&state),
       m_tile_picker(state, editor),
       m_editor(&editor),
+      m_new_tile(state),
       m_tile_editor(state),
       m_selected{-1}
 {
@@ -19,8 +19,9 @@ void TileList::draw()
         m_app_state->project().tileset_at(0);
 
     if (ImGui::Button("Add New Tile")) {
-        m_app_state->modals().push(std::make_unique<AddTile>(*m_app_state));
+        m_new_tile.open();
     }
+    m_new_tile.update();
 
     auto& project = m_app_state->project();
     m_tile_picker.render(m_selected);

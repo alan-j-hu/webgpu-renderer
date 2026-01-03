@@ -5,72 +5,99 @@
 
 namespace fs = std::filesystem;
 
-FileDialog::FileDialog(fs::path path, std::vector<fs::path>& sink)
-    : Modal("Choose a file"),
-      m_current_dir(std::move(path)),
-      m_sink(sink)
+FileDialog::FileDialog(std::string name, fs::path path)
+    : m_name(std::move(name)), m_current_dir(std::move(path)),
+      m_state(FileDialog::State::Closed)
 {
     m_backtrack_path = m_current_dir;
     iterate_dir();
 }
 
-ModalResponse FileDialog::render()
+const std::string& FileDialog::name() const
 {
-    ModalResponse response = ModalResponse::KeepOpen;
-    fs::path next_dir = m_current_dir;
-    fs::path header;
-    int n = 0;
-    for (fs::path comp : m_backtrack_path) {
-        ImGui::PushID(n++);
-        const char* name = comp.c_str();
-        header /= comp;
-        if (ImGui::Button(name)) {
-            next_dir = header;
-        }
-        ImGui::SameLine();
-        ImGui::PopID();
+    return m_name;
+}
+
+void FileDialog::open()
+{
+    m_state = FileDialog::State::Open;
+}
+
+std::optional<std::filesystem::path> FileDialog::update()
+{
+    std::optional<std::filesystem::path> output;
+
+    if (m_state == FileDialog::State::Open) {
+        ImGui::OpenPopup(m_name.c_str());
     }
-    ImGui::NewLine();
 
-    if (ImGui::BeginListBox("##Directories and files", ImVec2(-FLT_MIN, 0))) {
-        for (auto& entry : m_subdirs) {
-            if (ImGui::Selectable(entry.path().filename().c_str(),
-                                  false,
-                                  ImGuiSelectableFlags_AllowDoubleClick)) {
+    if (ImGui::BeginPopupModal(m_name.c_str())) {
+        fs::path next_dir = m_current_dir;
+        fs::path header;
+        int n = 0;
+        for (fs::path comp : m_backtrack_path) {
+            ImGui::PushID(n++);
+            const char* name = comp.c_str();
+            header /= comp;
+            if (ImGui::Button(name)) {
+                next_dir = header;
+            }
+            ImGui::SameLine();
+            ImGui::PopID();
+        }
+        ImGui::NewLine();
 
-                if (ImGui::IsMouseDoubleClicked(0)) {
-                    next_dir = entry.path();
+        if (ImGui::BeginListBox(
+                "##Directories and files",
+                ImVec2(-FLT_MIN, 0))) {
+
+            for (auto& entry : m_subdirs) {
+                if (ImGui::Selectable(
+                        entry.path().filename().c_str(),
+                        false,
+                        ImGuiSelectableFlags_AllowDoubleClick)) {
+
+                    if (ImGui::IsMouseDoubleClicked(0)) {
+                        next_dir = entry.path();
+                    }
                 }
             }
-        }
-        m_sink.clear();
-        for (auto& entry : m_files) {
-            if (ImGui::Selectable(entry.path().filename().c_str(),
-                                  false,
-                                  ImGuiSelectableFlags_AllowDoubleClick)) {
 
-                if (ImGui::IsMouseDoubleClicked(0)) {
-                    m_sink.push_back(entry.path());
-                    response = ModalResponse::Close;
+            for (auto& entry : m_files) {
+                if (ImGui::Selectable(
+                        entry.path().filename().c_str(),
+                        false,
+                        ImGuiSelectableFlags_AllowDoubleClick)) {
+
+                    if (ImGui::IsMouseDoubleClicked(0)) {
+                        output = entry.path();
+                        m_state = FileDialog::State::Closed;
+                    }
                 }
             }
+            ImGui::EndListBox();
         }
-        ImGui::EndListBox();
-    }
 
-    if (ImGui::Button("Cancel", ImVec2(0, 0))) {
-        response = ModalResponse::Close;
-    }
-
-    if (next_dir != m_current_dir) {
-        m_current_dir = next_dir;
-        iterate_dir();
-        if (backtrack_path_needs_update()) {
-            m_backtrack_path = m_current_dir;
+        if (ImGui::Button("Cancel", ImVec2(0, 0))) {
+            m_state = FileDialog::State::Closed;
         }
+
+        if (next_dir != m_current_dir) {
+            m_current_dir = next_dir;
+            iterate_dir();
+            if (backtrack_path_needs_update()) {
+                m_backtrack_path = m_current_dir;
+            }
+        }
+
+        if (m_state == FileDialog::State::Closed) {
+            ImGui::CloseCurrentPopup();
+        }
+
+        ImGui::EndPopup();
     }
 
-    return response;
+    return output;
 }
 
 void FileDialog::iterate_dir()

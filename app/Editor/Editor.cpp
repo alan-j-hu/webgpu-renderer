@@ -25,6 +25,7 @@ Editor::Editor(AppState& app_state)
     : m_listener(*this),
       m_camera_selection(0),
       m_app_state(&app_state),
+      m_main_file_dialog("Choose File", std::filesystem::current_path()),
       m_tile_list(app_state, *this),
       m_subwindow_2d(app_state.renderer().device(), 500, 500),
       m_subwindow_3d(app_state.renderer().device(), 500, 500),
@@ -151,10 +152,23 @@ void Editor::draw()
 
 void Editor::draw_menubar()
 {
-    if (!ImGui::BeginMenuBar()) return;
-    ImGui::MenuItem("File");
-    ImGui::MenuItem("Edit");
-    ImGui::EndMenuBar();
+    if (ImGui::BeginMenuBar()) {
+        if (ImGui::BeginMenu("File")) {
+            if (ImGui::MenuItem("Open")) {
+                m_main_file_dialog.open();
+            }
+
+            ImGui::EndMenu();
+        }
+        if (ImGui::BeginMenu("Edit")) {
+            ImGui::EndMenu();
+        }
+
+        if (auto path = m_main_file_dialog.update()) {
+        }
+
+        ImGui::EndMenuBar();
+    }
 }
 
 void Editor::draw_main_pane()

@@ -23,7 +23,6 @@ add_executable(demo
   Commands/UpdateTileCommand.cpp
   Editor/Editor.cpp
   Editor/FileDialog.cpp
-  Editor/Modal.cpp
   Editor/Tilemap/HeightMode.cpp
   Editor/Tilemap/LayerNode.cpp
   Editor/Tilemap/LevelNode.cpp
@@ -31,7 +30,7 @@ add_executable(demo
   Editor/Tilemap/View2DMode.cpp
   Editor/Tilemap/View3DMode.cpp
   Editor/Tilemap/ZPalette.cpp
-  Editor/Tileset/AddTile.cpp
+  Editor/Tileset/NewTile.cpp
   Editor/Tileset/TileDefinitionEditor.cpp
   Editor/Tileset/TileList.cpp
   Editor/Tileset/TileThumbnail.cpp

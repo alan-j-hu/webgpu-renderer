@@ -1,6 +1,7 @@
 #ifndef TILEDEFINITIONEDITOR_H
 #define TILEDEFINITIONEDITOR_H
 
+#include "../FileDialog.h"
 #include "../../AppState.h"
 #include "noworry/rendertarget.h"
 #include "noworry/transform.h"
@@ -22,7 +23,7 @@ public:
 
 private:
     AppState* m_app_state;
-    std::vector<std::filesystem::path> m_sink;
+    FileDialog m_file_dialog;
     std::optional<std::shared_ptr<Model>> m_model;
 
     RenderTarget m_preview;

@@ -4,7 +4,6 @@
 #include "Project.h"
 #include "ThumbnailUtil.h"
 #include "Commands/Command.h"
-#include "Editor/Modal.h"
 
 #include "noworry/renderer.h"
 #include "noworry/Draw2D/SpriteRenderer.h"
@@ -26,7 +25,6 @@ public:
 
     Renderer& renderer() { return m_renderer; }
     SpriteRenderer& sprite_renderer() { return m_sprite_renderer; }
-    ModalStack& modals() { return m_modals; }
     ResourceTable& resources() { return m_resources; }
 
     Material& default_material() { return *m_default_material; }
@@ -50,7 +48,6 @@ private:
     WGPUColor m_background_color;
     Renderer m_renderer;
     SpriteRenderer m_sprite_renderer;
-    ModalStack m_modals;
     ResourceTable m_resources;
 
     Material* m_default_material;

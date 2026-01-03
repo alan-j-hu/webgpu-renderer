@@ -9,6 +9,7 @@ namespace fs = std::filesystem;
 
 TileDefinitionEditor::TileDefinitionEditor(AppState& app_state)
     : m_app_state(&app_state),
+      m_file_dialog("Choose Model", fs::current_path()),
       m_preview(app_state.renderer().device(), 200, 200),
       m_scene(app_state.renderer())
 {
@@ -36,15 +37,14 @@ TileDefinitionEditor::render(const TileDef& definition)
     bool changed = false;
 
     if (ImGui::Button("Choose File")) {
-        m_app_state->modals().push(
-            std::make_unique<FileDialog>(fs::current_path(), m_sink));
+        m_file_dialog.open();
     }
 
     auto model_opt = definition.model();
     auto model_data_opt = definition.model_data();
 
-    if (m_sink.size() > 0) {
-        std::filesystem::path& path = m_sink[0];
+    if (auto selection = m_file_dialog.update()) {
+        std::filesystem::path& path = *selection;
         model_opt = m_app_state->resources().load<Model>(path);
         model_data_opt = m_app_state->resources().load<ModelData>(path);
 
@@ -52,8 +52,6 @@ TileDefinitionEditor::render(const TileDef& definition)
         new_definition->set_model(model_opt);
         new_definition->set_model_data(model_data_opt);
         changed = true;
-
-        m_sink.clear();
     }
 
     if (model_opt && model_data_opt) {

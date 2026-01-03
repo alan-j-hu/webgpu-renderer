@@ -1,17 +1,19 @@
-#ifndef ADDTILE_H
-#define ADDTILE_H
+#ifndef NEW_TILE_H
+#define NEW_TILE_H
 
 #include "TileDefinitionEditor.h"
+#include "../FileDialog.h"
 #include "../../AppState.h"
-#include "../Modal.h"
 
 /// Modal for adding a new tile.
-class AddTile : public Modal
+class NewTile
 {
 public:
-    AddTile(AppState&);
+    NewTile(AppState&);
 
-    virtual ModalResponse render() override;
+    void open();
+
+    void update();
 
 private:
     AppState* m_app_state;

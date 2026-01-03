@@ -1,6 +1,7 @@
-#ifndef TILELIST_H
-#define TILELIST_H
+#ifndef TILE_LIST_H
+#define TILE_LIST_H
 
+#include "NewTile.h"
 #include "TileDefinitionEditor.h"
 #include "../../AppState.h"
 #include "../../TilePicker.h"
@@ -19,6 +20,7 @@ private:
     AppState* m_app_state;
     Editor* m_editor;
     TilePicker m_tile_picker;
+    NewTile m_new_tile;
     TileDefinitionEditor m_tile_editor;
     int m_selected;
 };
