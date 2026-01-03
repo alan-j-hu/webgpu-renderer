@@ -51,26 +51,12 @@ public:
 
     const LayerLocation& selected_layer() const { return m_selected_layer; }
 
-    Project::Listener& listener() { return m_listener; }
-
     TilesetThumbnails& tileset_thumbnails(int idx)
     {
         return *m_tileset_thumbnails.at(idx);
     }
 
 private:
-    class Listener : public Project::Listener
-    {
-    public:
-        Listener(Editor& editor);
-
-        void world_added(World&, int idx) override;
-        void world_removed(World&, int idx) override;
-
-    private:
-        Editor* m_editor;
-    } m_listener;
-
     int m_camera_selection;
 
     AppState* m_app_state;

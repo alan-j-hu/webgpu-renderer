@@ -6,16 +6,6 @@
 #include <numbers>
 #include <utility>
 
-LayerNode::Listener::Listener(LayerNode& layer_node)
-    : m_layer_node(&layer_node)
-{
-}
-
-void LayerNode::Listener::layer_changed()
-{
-    m_layer_node->update();
-}
-
 glm::mat4 transform(
     float x, float y, float z,
     float width, float depth, Rotation rotation)
@@ -67,14 +57,13 @@ LayerNode::LayerNode(AppState& app_state, const Layer& layer)
                       glm::vec3(16, 0, 0),
                       glm::vec3(0, 16, 0))),
       m_layer(&layer),
-      m_thumbnail(app_state.renderer().device(), 100, 100),
-      m_listener(std::make_unique<LayerNode::Listener>(*this))
+      m_thumbnail(app_state.renderer().device(), 100, 100)
 {
     m_model = std::make_unique<DynamicModel>();
     m_instance = DynamicModelInstance(*m_model);
     m_thumbnail.set_clear_color(app_state.background_color());
 
-    layer.listenable().add_listener(*m_listener);
+    layer.listenable().add_listener(*this);
 
     update();
 }
@@ -91,13 +80,19 @@ LayerNode& LayerNode::operator=(LayerNode&& other)
     std::swap(m_model, other.m_model);
     std::swap(m_grid_mesh, other.m_grid_mesh);
     std::swap(m_instance, other.m_instance);
+    m_layer = other.m_layer;
 
     return *this;
 }
 
 LayerNode::~LayerNode()
 {
-    m_layer->listenable().remove_listener(*m_listener);
+    m_layer->listenable().remove_listener(*this);
+}
+
+void LayerNode::layer_changed()
+{
+    update();
 }
 
 void LayerNode::render(Frame& frame)

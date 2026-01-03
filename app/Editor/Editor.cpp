@@ -6,24 +6,10 @@
 #include "../Commands/PlaceTileCommand.h"
 #include "noworry/grid.h"
 
-#include "imgui.h"
-
-Editor::Listener::Listener(Editor& editor)
-    : m_editor(&editor)
-{
-}
-
-void Editor::Listener::world_added(World&, int idx)
-{
-}
-
-void Editor::Listener::world_removed(World&, int idx)
-{
-}
+#include <imgui.h>
 
 Editor::Editor(AppState& app_state)
-    : m_listener(*this),
-      m_camera_selection(0),
+    : m_camera_selection(0),
       m_app_state(&app_state),
       m_main_file_dialog("Choose File", std::filesystem::current_path()),
       m_tile_list(app_state, *this),
@@ -62,8 +48,6 @@ Editor::Editor(AppState& app_state)
             std::make_unique<LevelNode>(app_state, *it->second));
     }
 
-    project.listenable().add_listener(m_listener);
-
     //m_subwindow_2d.set_clear_color(app_state.background_color());
     m_subwindow_3d.set_clear_color(app_state.background_color());
 
@@ -91,7 +75,6 @@ Editor::Editor(AppState& app_state)
 Editor::~Editor()
 {
     auto& project = m_app_state->project();
-    project.listenable().remove_listener(m_listener);
 }
 
 const ZPalette& Editor::z_palette() const
