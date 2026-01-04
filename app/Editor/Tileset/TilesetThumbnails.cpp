@@ -7,9 +7,11 @@ TilesetThumbnails::Listener::Listener(TilesetThumbnails& thumbnails)
 
 void TilesetThumbnails::Listener::tile_added(int idx)
 {
-    m_thumbnails->m_thumbnails.push_back(std::make_unique<TileThumbnail>(
-        *m_thumbnails->m_app_state,
-        *m_thumbnails->m_tileset->at(idx)));
+    m_thumbnails->m_thumbnails.insert(
+        m_thumbnails->m_thumbnails.begin() + idx,
+        std::make_unique<TileThumbnail>(
+            *m_thumbnails->m_app_state,
+            *m_thumbnails->m_tileset->at(idx)));
 }
 
 void TilesetThumbnails::Listener::tile_removed(TileDef&, int idx)
@@ -30,6 +32,12 @@ TilesetThumbnails::TilesetThumbnails(
     const Tileset& tileset)
     : m_app_state(&app_state), m_tileset(&tileset), m_listener(*this)
 {
+    for (int i = 0; i < tileset.count(); ++i) {
+        m_thumbnails.emplace_back(
+            std::make_unique<TileThumbnail>(
+                *m_app_state,
+                *m_tileset->at(i)));
+    }
     m_tileset->listenable().add_listener(m_listener);
 }
 

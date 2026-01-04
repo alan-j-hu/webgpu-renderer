@@ -1,0 +1,42 @@
+{
+    "tilesets": [
+        {
+            "tiles": [
+                {
+                    "width": 1,
+                    "depth": 1,
+                    "model": "test.obj"
+                }
+            ]
+        }
+    ],
+    "worlds": [
+        {
+            "tileset": 0,
+            "levels": [
+                {
+                    "x": 0,
+                    "y": 0,
+                    "layers": [
+                        {
+                            "format": "sparse",
+                            "tiles": [
+                                {
+                                    "x": 2,
+                                    "y": 2,
+                                    "z": 0,
+                                    "rotation": "90",
+                                    "tile": 0
+                                }
+                            ]
+                        },
+                        {
+                            "format": "sparse",
+                            "tiles": []
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}

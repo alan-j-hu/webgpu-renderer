@@ -282,8 +282,8 @@ public:
         }
     }
 
-    Project(Project&&) = delete;
-    Project& operator=(Project&&) = delete;
+    Project(Project&&) = default;
+    Project& operator=(Project&&) = default;
 
     std::size_t tileset_count() const;
     std::shared_ptr<Tileset> tileset_at(int idx);

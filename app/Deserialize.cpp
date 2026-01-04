@@ -1,30 +1,38 @@
-#include "Json.h"
+#include "Deserialize.h"
 #include "noworry/Resource/ResourceLoader.h"
 
-ImportError::ImportError(std::string message)
+DeserializeError::DeserializeError(std::string message)
     : m_message(std::move(message))
 {
 }
 
-JsonImporter::JsonImporter(ResourceTable& resources)
+const char* DeserializeError::what() const noexcept
+{
+    return m_message.c_str();
+}
+
+JsonDeserializer::JsonDeserializer(ResourceTable& resources)
     : m_resources(&resources)
 {
 }
 
-Project JsonImporter::load_project(const nlohmann::json& json)
+Project JsonDeserializer::load_project(
+    const std::filesystem::path& working_dir,
+    const nlohmann::json& json)
 {
     if (!json.is_object()) {
-        throw ImportError("Expected object");
+        throw DeserializeError("Expected object at top level");
     }
 
     const nlohmann::json& tilesets_json = json.at("tilesets");
     if (!tilesets_json.is_array()) {
-        throw ImportError("Expected array of tilesets");
+        throw DeserializeError("Expected array of tilesets");
     }
 
     m_tileset_buf.clear();
     for (auto& tileset_json : tilesets_json) {
-        std::unique_ptr<Tileset> tileset = load_tileset(json);
+        std::unique_ptr<Tileset> tileset =
+            load_tileset(working_dir, tileset_json);
         m_tileset_buf.push_back(
             std::make_shared<Tileset>(std::move(*tileset))
         );
@@ -32,7 +40,7 @@ Project JsonImporter::load_project(const nlohmann::json& json)
 
     const nlohmann::json& worlds_json = json.at("worlds");
     if (!worlds_json.is_array()) {
-        throw ImportError("Expected array of worlds");
+        throw DeserializeError("Expected array of worlds");
     }
 
     m_world_buf.clear();
@@ -49,24 +57,30 @@ Project JsonImporter::load_project(const nlohmann::json& json)
     );
 }
 
-std::unique_ptr<Tileset> JsonImporter::load_tileset(const nlohmann::json& json)
+std::unique_ptr<Tileset>
+JsonDeserializer::load_tileset(
+    const std::filesystem::path& working_dir,
+    const nlohmann::json& json)
 {
-    std::unique_ptr<Tileset> tileset;
+    std::unique_ptr<Tileset> tileset = std::make_unique<Tileset>();
 
     const nlohmann::json& tiles = json.at("tiles");
     if (!tiles.is_array()) {
-        throw ImportError("Expected array of tile definitions");
+        throw DeserializeError("Expected array of tile definitions");
     }
 
     for (auto& elt : tiles) {
-        auto tile_def = load_tiledef(elt);
+        auto tile_def = load_tiledef(working_dir, elt);
         tileset->add(*tile_def);
     }
 
     return tileset;
 }
 
-std::unique_ptr<TileDef> JsonImporter::load_tiledef(const nlohmann::json& json)
+std::unique_ptr<TileDef>
+JsonDeserializer::load_tiledef(
+    const std::filesystem::path& working_dir,
+    const nlohmann::json& json)
 {
     short width = 0;
     short depth = 0;
@@ -74,15 +88,16 @@ std::unique_ptr<TileDef> JsonImporter::load_tiledef(const nlohmann::json& json)
     json.at("depth").get_to(depth);
 
     std::filesystem::path model_path;
-    json.at("path").get_to(model_path);
+    json.at("model").get_to(model_path);
 
-    auto model_opt = m_resources->load<Model>(model_path);
-    auto model_data_opt = m_resources->load<ModelData>(model_path);
+    const std::filesystem::path full_path = working_dir / model_path;
+    auto model_opt = m_resources->load<Model>(full_path);
+    auto model_data_opt = m_resources->load<ModelData>(full_path);
     if (!model_opt || !model_data_opt) {
-        throw ImportError("Could not load model: " + model_path.string());
+        throw DeserializeError("Could not load model: " + full_path.string());
     }
 
-    std::unique_ptr<TileDef> tiledef;
+    std::unique_ptr<TileDef> tiledef = std::make_unique<TileDef>();
     tiledef->set_width(width);
     tiledef->set_depth(depth);
     tiledef->set_model_path(std::move(model_path));
@@ -92,23 +107,23 @@ std::unique_ptr<TileDef> JsonImporter::load_tiledef(const nlohmann::json& json)
     return tiledef;
 }
 
-World JsonImporter::load_world(
+World JsonDeserializer::load_world(
     std::span<const std::shared_ptr<Tileset>> tilesets,
     const nlohmann::json& json)
 {
     if (!json.is_object()) {
-        throw ImportError("Expected JSON object");
+        throw DeserializeError("Expected object for world");
     }
 
     int tileset_idx;
     json.at("tileset").get_to(tileset_idx);
     if (tileset_idx < 0 || tileset_idx >= tilesets.size()) {
-        throw ImportError("Tileset index out of range");
+        throw DeserializeError("Tileset index out of range");
     }
 
     const nlohmann::json& levels_json = json.at("levels");
     if (!levels_json.is_array()) {
-        throw ImportError("Expected levels to be array");
+        throw DeserializeError("Expected levels to be array");
     }
 
     m_level_buf.clear();
@@ -131,19 +146,19 @@ World JsonImporter::load_world(
     );
 }
 
-Level JsonImporter::load_level(
+Level JsonDeserializer::load_level(
     const Tileset& tileset,
     int level_width,
     int level_depth,
     const nlohmann::json& json)
 {
     if (!json.is_object()) {
-        throw ImportError("Expected JSON object");
+        throw DeserializeError("Expected object for level");
     }
 
     const nlohmann::json& layers_json = json.at("layers");
     if (!layers_json.is_array()) {
-        throw ImportError("Expected layers to be array");
+        throw DeserializeError("Expected layers to be array");
     }
 
     std::vector<Layer> layers;
@@ -161,7 +176,7 @@ Level JsonImporter::load_level(
     return Level(layers.begin(), layers.end());
 }
 
-Layer JsonImporter::load_layer(
+Layer JsonDeserializer::load_layer(
     const Tileset& tileset,
     int layer_width,
     int layer_depth,
@@ -174,11 +189,11 @@ Layer JsonImporter::load_layer(
     } else if (format == "sparse") {
         return load_layer_sparse(tileset, layer_width, layer_depth, json);
     } else {
-        throw ImportError("Unknown format: " + format);
+        throw DeserializeError("Unknown format: " + format);
     }
 }
 
-Layer JsonImporter::load_layer_dense(
+Layer JsonDeserializer::load_layer_dense(
     const Tileset& tileset,
     int layer_width,
     int layer_depth,
@@ -188,19 +203,19 @@ Layer JsonImporter::load_layer_dense(
 
     const nlohmann::json& rows = json.at("tiles");
     if (!rows.is_array()) {
-        throw ImportError("Expected JSON array");
+        throw DeserializeError("Expected array");
     }
     if (rows.size() != layer_depth) {
-        throw ImportError("Layer is wrong depth");
+        throw DeserializeError("Layer is wrong depth");
     }
 
     int y = 0;
     for (auto& row : rows) {
         if (!row.is_array()) {
-            throw ImportError("Expected JSON array");
+            throw DeserializeError("Expected array");
         }
         if (row.size() != layer_width) {
-            throw ImportError("Layer is wrong width");
+            throw DeserializeError("Layer is wrong width");
         }
 
         int x = 0;
@@ -210,7 +225,7 @@ Layer JsonImporter::load_layer_dense(
                 continue;
             }
             if (!elt.is_object()) {
-                throw ImportError("Expected JSON tile instance object");
+                throw DeserializeError("Expected object for tile instance");
             }
 
             short z;
@@ -231,7 +246,7 @@ Layer JsonImporter::load_layer_dense(
     return layer;
 }
 
-Layer JsonImporter::load_layer_sparse(
+Layer JsonDeserializer::load_layer_sparse(
     const Tileset& tileset,
     int layer_width,
     int layer_depth,
@@ -241,29 +256,29 @@ Layer JsonImporter::load_layer_sparse(
 
     const nlohmann::json& tiles = json.at("tiles");
     if (!tiles.is_array()) {
-        throw ImportError("Expected JSON array");
+        throw DeserializeError("Expected JSON array");
     }
 
     for (auto& elt : tiles) {
         if (!elt.is_object()) {
-            throw ImportError("Expected JSON tile instance object");
+            throw DeserializeError("Expected object for tile instance");
         }
 
-        int x;
-        int y;
+        int x = -1;
+        int y = -1;
         elt.at("x").get_to(x);
         elt.at("y").get_to(y);
         if (x < 0 || x >= layer_width || y < 0 || y >= layer_depth) {
-            throw ImportError("Coordinates out of range ");
+            throw DeserializeError("Coordinates out of range");
         }
 
-        short z;
+        short z = -1;
         elt.at("z").get_to(z);
 
         int tile_idx;
         elt.at("tile").get_to(tile_idx);
         if (tile_idx < 0 || tile_idx >= tileset.count()) {
-            throw ImportError("Tile index out of range");
+            throw DeserializeError("Tile index out of range");
         }
 
         auto rotation = load_rotation(elt.at("rotation"));
@@ -273,10 +288,10 @@ Layer JsonImporter::load_layer_sparse(
     return layer;
 }
 
-Rotation JsonImporter::load_rotation(const nlohmann::json& json)
+Rotation JsonDeserializer::load_rotation(const nlohmann::json& json)
 {
     if (!json.is_string()) {
-        throw ImportError("Expected string for rotation");
+        throw DeserializeError("Expected string for rotation");
     }
     std::string str;
     json.get_to(str);
@@ -291,5 +306,5 @@ Rotation JsonImporter::load_rotation(const nlohmann::json& json)
         return Rotation::Rotate270;
     }
 
-    throw ImportError("Got unknown rotation " + str);
+    throw DeserializeError("Got unknown rotation " + str);
 }
