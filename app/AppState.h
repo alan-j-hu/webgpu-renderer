@@ -1,6 +1,7 @@
 #ifndef APPSTATE_H
 #define APPSTATE_H
 
+#include "Deserialize.h"
 #include "Project.h"
 #include "ThumbnailUtil.h"
 #include "Commands/Command.h"
@@ -31,7 +32,11 @@ public:
     Material& wireframe_material() { return *m_wireframe_material; }
     BasicMesh& small_grid_mesh() { return m_small_grid_mesh; }
 
+    JsonDeserializer& deserializer() { return m_deserializer; }
+
     const Project& project() const { return m_project; }
+
+    void set_project(Project);
 
     void push_command(std::unique_ptr<Command>);
 
@@ -49,6 +54,7 @@ private:
     Renderer m_renderer;
     SpriteRenderer m_sprite_renderer;
     ResourceTable m_resources;
+    JsonDeserializer m_deserializer;
 
     Material* m_default_material;
     Material* m_wireframe_material;

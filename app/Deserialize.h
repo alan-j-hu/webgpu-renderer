@@ -1,25 +1,31 @@
-#ifndef JSON_IMPORT_EXPORT_H
-#define JSON_IMPORT_EXPORT_H
+#ifndef SERIALIZE_H
+#define SERIALIZE_H
 
 #include "Project.h"
 #include "noworry/resourcetable.h"
+
+#include <exception>
 #include <nlohmann/json.hpp>
 
-class ImportError
+class DeserializeError : public std::exception
 {
 public:
-    ImportError(std::string);
+    DeserializeError(std::string);
+
+    virtual const char* what() const noexcept override;
 
 private:
     std::string m_message;
 };
 
-class JsonImporter
+class JsonDeserializer
 {
 public:
-    JsonImporter(ResourceTable&);
+    JsonDeserializer(ResourceTable&);
 
-    Project load_project(const nlohmann::json&);
+    Project load_project(
+        const std::filesystem::path& working_dir,
+        const nlohmann::json&);
 
 private:
     ResourceTable* m_resources;
@@ -27,9 +33,13 @@ private:
     std::vector<std::unique_ptr<World>> m_world_buf;
     std::vector<std::pair<glm::ivec2, Level>> m_level_buf;
 
-    std::unique_ptr<TileDef> load_tiledef(const nlohmann::json&);
+    std::unique_ptr<TileDef> load_tiledef(
+        const std::filesystem::path& working_dir,
+        const nlohmann::json&);
 
-    std::unique_ptr<Tileset> load_tileset(const nlohmann::json&);
+    std::unique_ptr<Tileset> load_tileset(
+        const std::filesystem::path& working_dir,
+        const nlohmann::json&);
 
     World load_world(
         std::span<const std::shared_ptr<Tileset>>,

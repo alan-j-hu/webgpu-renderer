@@ -10,8 +10,8 @@ set(IMGUI_SRC
 
 add_executable(demo
   AppState.cpp
+  Deserialize.cpp
   main.cpp
-  Json.cpp
   Project.cpp
   TilePicker.cpp
   ThumbnailUtil.cpp
@@ -22,6 +22,7 @@ add_executable(demo
   Commands/PlaceTileCommand.cpp
   Commands/UpdateTileCommand.cpp
   Editor/Editor.cpp
+  Editor/ErrorModal.cpp
   Editor/FileDialog.cpp
   Editor/Tilemap/HeightMode.cpp
   Editor/Tilemap/LayerNode.cpp

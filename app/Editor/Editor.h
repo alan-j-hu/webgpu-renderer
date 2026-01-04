@@ -2,6 +2,7 @@
 #define EDITOR_H
 
 #include "FileDialog.h"
+#include "ErrorModal.h"
 #include "Tilemap/HeightMode.h"
 #include "Tilemap/LayerNode.h"
 #include "Tilemap/LevelNode.h"
@@ -61,6 +62,7 @@ private:
 
     AppState* m_app_state;
     FileDialog m_main_file_dialog;
+    ErrorModal m_error_modal;
 
     TileList m_tile_list;
 
@@ -107,6 +109,14 @@ private:
     void draw_layer_list();
 
     void draw_layer_item(int i);
+
+    void draw_error_modal();
+
+    void load_project(const std::filesystem::path&);
+
+    void destroy_scene();
+
+    void setup_scene();
 };
 
 #endif

@@ -1,11 +1,11 @@
 #include "Editor.h"
 #include "Tilemap/LayerNode.h"
-#include "../Json.h"
 #include "../Commands/CreateLayerCommand.h"
 #include "../Commands/DeleteLayerCommand.h"
 #include "../Commands/PlaceTileCommand.h"
 #include "noworry/grid.h"
 
+#include <fstream>
 #include <imgui.h>
 
 Editor::Editor(AppState& app_state)
@@ -33,48 +33,11 @@ Editor::Editor(AppState& app_state)
                       glm::vec3(0, 16, 0))),
       m_z_palette(app_state)
 {
-    auto& project = app_state.project();
-
-    for (int i = 0; i < project.tileset_count(); ++i) {
-        m_tileset_thumbnails.push_back(std::make_unique<TilesetThumbnails>(
-            app_state,
-            *project.tileset_at(i)));
-    }
-
-    auto& world = project.world_at(0);
-    for (auto it = world.begin(); it != world.end(); ++it) {
-        m_level_nodes.emplace(
-            it->second.get(),
-            std::make_unique<LevelNode>(app_state, *it->second));
-    }
-
-    //m_subwindow_2d.set_clear_color(app_state.background_color());
-    m_subwindow_3d.set_clear_color(app_state.background_color());
-
-    m_persp_camera.set_position(glm::vec3(8.0f, -1.0f, 10.0f));
-    m_persp_camera.set_target(glm::vec3(8.0f, 8.0f, 0.0f));
-
-    m_ortho_camera.set_position(glm::vec3(0.0f, 0.0f, 10.0f));
-    m_ortho_camera.set_target(glm::vec3(0.0f, 0.0f, 0.0f));
-
-    m_current_camera = &m_persp_camera;
-
-    Transform transform;
-
-    m_scene.children().push_back(std::make_unique<RenderObject>(
-        app_state.renderer(),
-        transform,
-        m_grid_mesh,
-        app_state.wireframe_material()
-    ));
-    m_scene.children().push_back(std::make_unique<RenderableRef>(
-        *m_level_nodes.at(&world.level_at(0, 0))
-    ));
+    setup_scene();
 }
 
 Editor::~Editor()
 {
-    auto& project = m_app_state->project();
 }
 
 const ZPalette& Editor::z_palette() const
@@ -131,6 +94,7 @@ void Editor::draw()
 {
     draw_menubar();
     draw_main_pane();
+    m_error_modal.update("Error");
 }
 
 void Editor::draw_menubar()
@@ -148,6 +112,7 @@ void Editor::draw_menubar()
         }
 
         if (auto path = m_main_file_dialog.update()) {
+            load_project(*path);
         }
 
         ImGui::EndMenuBar();
@@ -298,4 +263,71 @@ void Editor::draw_layer_item(int i)
 
         m_selected_layer.layer = i;
     }
+}
+
+void Editor::load_project(const std::filesystem::path& path)
+{
+    try {
+        std::ifstream f(path);
+        nlohmann::json json = nlohmann::json::parse(f);
+        Project project = m_app_state->deserializer().load_project(
+            path.parent_path(),
+            json);
+
+        destroy_scene();
+
+        m_app_state->set_project(std::move(project));
+
+        setup_scene();
+    } catch(std::exception& ex) {
+        m_error_modal.open(ex.what());
+    }
+}
+
+void Editor::destroy_scene()
+{
+    m_scene.children().clear();
+    m_tileset_thumbnails.clear();
+    m_level_nodes.clear();
+}
+
+void Editor::setup_scene()
+{
+    auto& project = m_app_state->project();
+
+    for (int i = 0; i < project.tileset_count(); ++i) {
+        m_tileset_thumbnails.push_back(std::make_unique<TilesetThumbnails>(
+            *m_app_state,
+            *project.tileset_at(i)));
+    }
+
+    auto& world = project.world_at(0);
+    for (auto it = world.begin(); it != world.end(); ++it) {
+        m_level_nodes.emplace(
+            it->second.get(),
+            std::make_unique<LevelNode>(*m_app_state, *it->second));
+    }
+
+    m_subwindow_3d.set_clear_color(m_app_state->background_color());
+
+    m_persp_camera.set_position(glm::vec3(8.0f, -1.0f, 10.0f));
+    m_persp_camera.set_target(glm::vec3(8.0f, 8.0f, 0.0f));
+
+    m_ortho_camera.set_position(glm::vec3(0.0f, 0.0f, 10.0f));
+    m_ortho_camera.set_target(glm::vec3(0.0f, 0.0f, 0.0f));
+
+    m_current_camera = &m_persp_camera;
+
+    Transform transform;
+
+    m_scene.children().clear();
+    m_scene.children().push_back(std::make_unique<RenderObject>(
+        m_app_state->renderer(),
+        transform,
+        m_grid_mesh,
+        m_app_state->wireframe_material()
+    ));
+    m_scene.children().push_back(std::make_unique<RenderableRef>(
+        *m_level_nodes.at(&world.level_at(0, 0))
+    ));
 }
