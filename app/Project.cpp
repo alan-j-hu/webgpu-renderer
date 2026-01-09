@@ -190,7 +190,13 @@ std::unique_ptr<Layer> Level::remove_layer(int idx)
 World::World(std::shared_ptr<const Tileset> tileset)
     : m_tileset(std::move(tileset))
 {
-    m_levels.insert(std::pair(glm::ivec2(0, 0), std::make_unique<Level>()));
+    InsertionInfo info = {
+        0,
+        0,
+        "default",
+        std::make_unique<Level>()
+    };
+    insert_level(std::move(info));
 }
 
 std::shared_ptr<const Tileset> World::tileset() const
@@ -198,34 +204,50 @@ std::shared_ptr<const Tileset> World::tileset() const
     return m_tileset;
 }
 
-World::LevelTable::iterator World::begin()
+World::iterator World::begin() const
 {
-    return m_levels.begin();
+    return m_levels_by_name.begin();
 }
 
-World::LevelTable::const_iterator World::begin() const
+World::iterator World::end() const
 {
-    return m_levels.begin();
+    return m_levels_by_name.end();
 }
 
-World::LevelTable::iterator World::end()
+Level* World::level_at(const std::string& name)
 {
-    return m_levels.end();
+    auto ptr = m_levels_by_name.find(name);
+    if (ptr == nullptr) {
+        return nullptr;
+    }
+
+    return ptr->get();
 }
 
-World::LevelTable::const_iterator World::end() const
+const Level* World::level_at(const std::string& name) const
 {
-    return m_levels.end();
+    auto ptr = m_levels_by_name.find(name);
+    if (ptr == nullptr) {
+        return nullptr;
+    }
+
+    return ptr->get();
 }
 
 Level& World::level_at(int x, int y)
 {
-    return *m_levels.at(glm::ivec2(x, y));
+    return *m_levels_by_coord.at(glm::ivec2(x, y));
 }
 
 const Level& World::level_at(int x, int y) const
 {
-    return *m_levels.at(glm::ivec2(x, y));
+    return *m_levels_by_coord.at(glm::ivec2(x, y));
+}
+
+void World::insert_level(World::InsertionInfo info)
+{
+    auto [k, v] = m_levels_by_name.insert(info.name, std::move(info.level));
+    m_levels_by_coord.emplace(glm::ivec2(info.x, info.y), v.get());
 }
 
 Project::Project()

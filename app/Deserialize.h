@@ -31,7 +31,7 @@ private:
     ResourceTable* m_resources;
     std::vector<std::shared_ptr<Tileset>> m_tileset_buf;
     std::vector<std::unique_ptr<World>> m_world_buf;
-    std::vector<std::pair<glm::ivec2, Level>> m_level_buf;
+    std::vector<World::InsertionInfo> m_level_buf;
 
     std::unique_ptr<TileDef> load_tiledef(
         const std::filesystem::path& working_dir,
