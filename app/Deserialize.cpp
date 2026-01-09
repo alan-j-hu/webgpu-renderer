@@ -133,10 +133,16 @@ World JsonDeserializer::load_world(
         elt.at("x").get_to(x);
         elt.at("y").get_to(y);
 
+        std::string name;
+        elt.at("name").get_to(name);
+
         Level level = load_level(*tilesets[tileset_idx], 16, 16, elt);
-        m_level_buf.push_back(
-            std::make_pair(glm::ivec2(x, y), std::move(level))
-        );
+        m_level_buf.push_back({
+            x,
+            y,
+            name,
+            std::make_unique<Level>(std::move(level))
+        });
     }
 
     return World(

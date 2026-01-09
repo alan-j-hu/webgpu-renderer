@@ -2,6 +2,7 @@
 #define REDUCER_H
 
 #include "Listener.h"
+#include "NameMap.h"
 
 #include "noworry/Gfx3D/Model.h"
 #include "noworry/Material/TextureMaterial.h"
@@ -11,6 +12,7 @@
 #include "glm/gtx/hash.hpp"
 
 #include <filesystem>
+#include <map>
 #include <memory>
 #include <optional>
 #include <string>
@@ -200,13 +202,22 @@ private:
 
 class World
 {
-    using LevelTable = std::unordered_map<glm::ivec2, std::unique_ptr<Level>>;
 public:
+    using iterator = NameMap<std::unique_ptr<Level>>::iterator;
+
     class Listener
     {
     public:
         virtual void level_added(Level&, int x, int y) = 0;
         virtual void level_removed(Level&, int x, int y) = 0;
+    };
+
+    struct InsertionInfo
+    {
+        int x;
+        int y;
+        std::string name;
+        std::unique_ptr<Level> level;
     };
 
     World(std::shared_ptr<const Tileset>);
@@ -216,13 +227,17 @@ public:
         : m_tileset(std::move(tileset))
     {
         for (; it != end; ++it) {
-            m_levels.emplace(
-                it->first,
-                std::make_unique<Level>(std::move(it->second)));
+            insert_level(std::move(*it));
         }
 
-        if (m_levels.size() == 0) {
-            m_levels.emplace(glm::ivec2(0, 0), std::make_unique<Level>());
+        if (m_levels_by_name.size() == 0) {
+            InsertionInfo info = {
+                0,
+                0,
+                "default",
+                std::make_unique<Level>()
+            };
+            insert_level(std::move(info));
         }
     }
 
@@ -232,14 +247,16 @@ public:
 
     std::shared_ptr<const Tileset> tileset() const;
 
-    LevelTable::iterator begin();
-    LevelTable::const_iterator begin() const;
+    iterator begin() const;
+    iterator end() const;
 
-    LevelTable::iterator end();
-    LevelTable::const_iterator end() const;
+    Level* level_at(const std::string&);
+    const Level* level_at(const std::string&) const;
 
     Level& level_at(int x, int y);
     const Level& level_at(int x, int y) const;
+
+    void insert_level(InsertionInfo);
 
     Listenable<Listener>& listenable() const
     {
@@ -247,8 +264,9 @@ public:
     }
 
 private:
+    NameMap<std::unique_ptr<Level>> m_levels_by_name;
+    std::unordered_map<glm::ivec2, Level*> m_levels_by_coord;
     std::shared_ptr<const Tileset> m_tileset;
-    LevelTable m_levels;
     mutable Listenable<Listener> m_listenable;
 };
 
