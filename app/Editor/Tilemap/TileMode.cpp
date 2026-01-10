@@ -20,10 +20,11 @@ void TileMode::handle_click(int x, int y)
     auto& world = project.world_at(selected.world);
 
     if (selected.layer != -1 && m_selected_tile != -1) {
+        auto& layer = project.layer_at(selected);
         short z = editor().z_palette().selected_z();
 
         app_state().push_command(std::make_unique<PlaceTileCommand>(
-            selected, x, y, z, m_rotation,
+            layer, x, y, z, m_rotation,
             world.tileset()->at(m_selected_tile)));
     }
 }
@@ -39,7 +40,9 @@ void TileMode::draw_overlay(
     TileThumbnail* thumb = nullptr;
     const TileDef* tiledef = nullptr;
 
-    if (m_selected_tile != -1) {
+    if (m_selected_tile >= 0
+        && m_selected_tile < project.tileset_at(0)->count()) {
+
         thumb = &editor().tileset_thumbnails(0).at(m_selected_tile);
         tiledef = world.tileset()->at(m_selected_tile).get();
     }

@@ -1,21 +1,24 @@
 #include "CreateLayerCommand.h"
 
-CreateLayerCommand::CreateLayerCommand(LayerLocation loc)
-    : m_loc(loc)
+CreateLayerCommand::CreateLayerCommand(Level& level)
+    : CreateLayerCommand(level, level.layer_count())
+{
+}
+
+CreateLayerCommand::CreateLayerCommand(Level& level, int idx)
+    : m_level(level), m_idx(idx), m_layer(std::make_unique<Layer>())
 {
 }
 
 Command::Outcome CreateLayerCommand::up(Project& project)
 {
-    project.level_at(m_loc).add_layer();
+    m_level.add_layer(std::move(m_layer), m_idx);
     return Outcome::COMPLETED;
 }
 
 void CreateLayerCommand::down(Project& project)
 {
-    project
-        .level_at(m_loc)
-        .remove_layer(project.level_at(m_loc).layer_count() - 1);
+    m_layer = m_level.remove_layer(m_idx);
 }
 
 const char* CreateLayerCommand::name()

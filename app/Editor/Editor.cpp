@@ -222,14 +222,19 @@ void Editor::draw_layer_list()
     auto& level = project.level_at(m_selected_layer);
 
     if (ImGui::Button("-")) {
-        m_app_state->push_command(
-            std::make_unique<DeleteLayerCommand>(m_selected_layer));
-        m_selected_layer.layer = std::max(-1, m_selected_layer.layer - 1);
+        if (m_selected_layer.layer != -1) {
+            auto& layer = project.layer_at(m_selected_layer);
+            m_app_state->push_command(
+                std::make_unique<DeleteLayerCommand>(
+                   level,
+                   m_selected_layer.layer));
+            m_selected_layer.layer = std::max(-1, m_selected_layer.layer - 1);
+        }
     }
     ImGui::SameLine();
     if (ImGui::Button("+")) {
         m_app_state->push_command(
-            std::make_unique<CreateLayerCommand>(m_selected_layer));
+            std::make_unique<CreateLayerCommand>(level));
     }
 
     for (int i = 0; i < level.layer_count(); ++i) {

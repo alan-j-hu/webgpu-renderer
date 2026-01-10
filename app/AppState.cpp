@@ -18,8 +18,7 @@ AppState::AppState(WGPUDevice device)
                       5,
                       glm::vec3(5, 0, 0),
                       glm::vec3(0, 5, 0))),
-      m_thumbnail_util(*this),
-      m_history_cursor(0)
+      m_thumbnail_util(*this)
 {
     m_background_color = {0.0f, 0.5f, 0.5f, 1.0f};
     m_default_material = &m_resources.add_flat_material(0.5, 0.5, 0.5);
@@ -34,28 +33,29 @@ void AppState::set_project(Project project)
 void AppState::push_command(std::unique_ptr<Command> command)
 {
     if (command->redo(m_project) == Command::Outcome::COMPLETED) {
-        while (m_history.size() > m_history_cursor) {
-            m_history.pop_back();
-        }
-        m_history.push_back(std::move(command));
-        m_history_cursor = m_history.size();
+        m_undo_stack.push_back(std::move(command));
+        m_redo_stack.clear();
     }
 }
 
 void AppState::undo()
 {
-    if (m_history_cursor <= 0 || m_history_cursor > m_history.size()) {
+    if (m_undo_stack.size() == 0) {
         return;
     }
-    --m_history_cursor;
-    m_history[m_history_cursor]->undo(m_project);
+    auto command = std::move(m_undo_stack.back());
+    m_undo_stack.pop_back();
+    command->undo(m_project);
+    m_redo_stack.push_back(std::move(command));
 }
 
 void AppState::redo()
 {
-    if (m_history_cursor < 0 || m_history_cursor >= m_history.size()) {
+    if (m_redo_stack.size() == 0) {
         return;
     }
-    m_history[m_history_cursor]->redo(m_project);
-    ++m_history_cursor;
+    auto command = std::move(m_redo_stack.back());
+    m_redo_stack.pop_back();
+    command->redo(m_project);
+    m_undo_stack.push_back(std::move(command));
 }

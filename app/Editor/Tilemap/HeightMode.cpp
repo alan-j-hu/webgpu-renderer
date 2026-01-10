@@ -55,16 +55,15 @@ void HeightMode::handle_click(int tile_x, int tile_y)
 {
     auto& project = app_state().project();
     auto& selected = editor().selected_layer();
+    auto& layer = project.layer_at(selected);
 
-    std::optional<TileInst> inst_opt = project
-        .layer_at(selected)
-        .at(tile_x, tile_y);
+    std::optional<TileInst> inst_opt = layer.at(tile_x, tile_y);
 
     if (inst_opt) {
         short z = editor().z_palette().selected_z();
 
         app_state().push_command(std::make_unique<PlaceTileCommand>(
-            selected, tile_x, tile_y, z,
+            layer, tile_x, tile_y, z,
             inst_opt->rotation(), inst_opt->def()));
     }
 }
