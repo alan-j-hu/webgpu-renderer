@@ -10,7 +10,7 @@ class PlaceTileCommand : public Command
 {
 public:
     PlaceTileCommand(
-        LayerLocation,
+        Layer&,
         int x,
         int y,
         int z,
@@ -24,7 +24,10 @@ protected:
     void down(Project&) override;
 
 private:
-    LayerLocation m_loc;
+    // SAFETY: m_layer is a live reference because the underlying object
+    // will either be owned by the project state or another command in the
+    // undo/redo stack.
+    Layer& m_layer;
     int m_x;
     int m_y;
     std::optional<TileInst> m_inst;

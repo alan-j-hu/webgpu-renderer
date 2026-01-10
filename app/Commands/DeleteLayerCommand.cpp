@@ -1,7 +1,7 @@
 #include "DeleteLayerCommand.h"
 
-DeleteLayerCommand::DeleteLayerCommand(LayerLocation loc)
-    : m_loc(loc)
+DeleteLayerCommand::DeleteLayerCommand(Level& level, int idx)
+    : m_level(level), m_idx(idx)
 {
 }
 
@@ -12,7 +12,7 @@ const char* DeleteLayerCommand::name()
 
 Command::Outcome DeleteLayerCommand::up(Project& project)
 {
-    m_layer = project.level_at(m_loc).remove_layer(m_loc.layer);
+    m_layer = m_level.remove_layer(m_idx);
     if (m_layer == nullptr) {
         return Outcome::CANCELED;
     }
@@ -21,6 +21,5 @@ Command::Outcome DeleteLayerCommand::up(Project& project)
 
 void DeleteLayerCommand::down(Project& project)
 {
-    project.level_at(m_loc).add_layer(std::move(*m_layer), m_loc.layer);
-    m_layer = std::nullopt;
+    m_level.add_layer(std::move(m_layer), m_idx);
 }

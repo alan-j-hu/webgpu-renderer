@@ -1,25 +1,24 @@
 #include "PlaceTileCommand.h"
 
 PlaceTileCommand::PlaceTileCommand(
-    LayerLocation loc,
+    Layer& layer,
     int x,
     int y,
     int z,
     Rotation rotation,
     std::shared_ptr<const TileDef> tiledef)
-    : m_loc(loc), m_x(x), m_y(y),
+    : m_layer(layer), m_x(x), m_y(y),
       m_inst(std::make_optional<TileInst>(tiledef, z, rotation))
 {
 }
 
 Command::Outcome PlaceTileCommand::up(Project& project)
 {
-    Layer& layer = project.layer_at(m_loc);
-    std::optional<TileInst> old = layer.at(m_x, m_y);
+    std::optional<TileInst> old = m_layer.at(m_x, m_y);
     if (m_inst == old) {
         return Outcome::CANCELED;
     }
-    layer.set(m_x, m_y, m_inst);
+    m_layer.set(m_x, m_y, m_inst);
     m_inst = old;
     return Outcome::COMPLETED;
 }

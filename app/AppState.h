@@ -34,6 +34,8 @@ public:
 
     JsonDeserializer& deserializer() { return m_deserializer; }
 
+    Project& project() { return m_project; }
+
     const Project& project() const { return m_project; }
 
     void set_project(Project);
@@ -47,7 +49,8 @@ public:
     ThumbnailUtil& thumbnail_util() { return m_thumbnail_util; }
 
 private:
-    std::vector<std::unique_ptr<Command>> m_history;
+    std::vector<std::unique_ptr<Command>> m_undo_stack;
+    std::vector<std::unique_ptr<Command>> m_redo_stack;
     int m_history_cursor;
 
     WGPUColor m_background_color;
