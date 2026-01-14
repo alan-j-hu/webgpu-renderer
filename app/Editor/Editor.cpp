@@ -102,7 +102,12 @@ void Editor::draw_menubar()
     if (ImGui::BeginMenuBar()) {
         if (ImGui::BeginMenu("File")) {
             if (ImGui::MenuItem("Open")) {
-                m_main_file_dialog.open();
+                m_io_state = Editor::IOState::OPENING;
+                m_main_file_dialog.open(FileDialog::READ);
+            }
+            if (ImGui::MenuItem("Save As")) {
+                m_io_state = Editor::IOState::SAVING;
+                m_main_file_dialog.open(FileDialog::CREATE);
             }
 
             ImGui::EndMenu();
@@ -112,7 +117,12 @@ void Editor::draw_menubar()
         }
 
         if (auto path = m_main_file_dialog.update()) {
-            load_project(*path);
+            if (m_io_state == IOState::OPENING) {
+                load_project(*path);
+            } else if (m_io_state == IOState::SAVING) {
+                save_project(*path);
+            }
+            m_io_state = IOState::NONE;
         }
 
         ImGui::EndMenuBar();
@@ -284,9 +294,22 @@ void Editor::load_project(const std::filesystem::path& path)
         m_app_state->set_project(std::move(project));
 
         setup_scene();
-    } catch(std::exception& ex) {
+    } catch (std::exception& ex) {
         m_error_modal.open(ex.what());
     }
+}
+
+void Editor::save_project(const std::filesystem::path& path)
+{
+    /*try {*/
+        std::ofstream f(path);
+        nlohmann::json json = m_app_state->serializer().save_project(
+            m_app_state->project()
+        );
+        f << json << std::flush;
+    /*} catch (std::exception& ex) {
+        m_error_modal.open(ex.what());
+    }*/
 }
 
 void Editor::destroy_scene()

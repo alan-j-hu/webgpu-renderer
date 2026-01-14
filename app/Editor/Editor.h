@@ -58,6 +58,13 @@ public:
     }
 
 private:
+    enum class IOState
+    {
+        NONE,
+        OPENING,
+        SAVING
+    } m_io_state;
+
     int m_camera_selection;
 
     AppState* m_app_state;
@@ -113,6 +120,8 @@ private:
     void draw_error_modal();
 
     void load_project(const std::filesystem::path&);
+
+    void save_project(const std::filesystem::path&);
 
     void destroy_scene();
 

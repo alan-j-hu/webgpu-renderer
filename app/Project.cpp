@@ -248,6 +248,7 @@ void World::insert_level(World::InsertionInfo info)
 {
     auto [k, v] = m_levels_by_name.insert(info.name, std::move(info.level));
     m_levels_by_coord.emplace(glm::ivec2(info.x, info.y), v.get());
+    v->set_loc(info.x, info.y);
 }
 
 Project::Project()

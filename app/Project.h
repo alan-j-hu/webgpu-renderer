@@ -182,6 +182,15 @@ public:
 
     Level& operator=(Level&&) = default;
 
+    int x() const { return m_x; }
+    int y() const { return m_y; }
+
+    void set_loc(int x, int y)
+    {
+        m_x = x;
+        m_y = y;
+    }
+
     std::size_t layer_count() const;
     const Layer& layer_at(int idx) const;
     Layer& layer_at(int idx);
@@ -197,6 +206,8 @@ public:
 
 private:
     std::vector<std::unique_ptr<Layer>> m_layers;
+    int m_x = 0;
+    int m_y = 0;
     mutable Listenable<Listener> m_listenable;
 };
 
