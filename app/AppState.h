@@ -3,6 +3,7 @@
 
 #include "Deserialize.h"
 #include "Project.h"
+#include "Serialize.h"
 #include "ThumbnailUtil.h"
 #include "Commands/Command.h"
 
@@ -34,6 +35,8 @@ public:
 
     JsonDeserializer& deserializer() { return m_deserializer; }
 
+    JsonSerializer& serializer() { return m_serializer; }
+
     Project& project() { return m_project; }
 
     const Project& project() const { return m_project; }
@@ -58,6 +61,7 @@ private:
     SpriteRenderer m_sprite_renderer;
     ResourceTable m_resources;
     JsonDeserializer m_deserializer;
+    JsonSerializer m_serializer;
 
     Material* m_default_material;
     Material* m_wireframe_material;

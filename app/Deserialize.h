@@ -1,5 +1,5 @@
-#ifndef SERIALIZE_H
-#define SERIALIZE_H
+#ifndef DESERIALIZE_H
+#define DESERIALIZE_H
 
 #include "Project.h"
 #include "noworry/resourcetable.h"

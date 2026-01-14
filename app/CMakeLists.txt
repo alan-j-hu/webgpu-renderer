@@ -1,18 +1,20 @@
 set(IMGUI_DIR ../third_party/imgui)
 set(IMGUI_SRC
-  ${IMGUI_DIR}/backends/imgui_impl_glfw.cpp
-  ${IMGUI_DIR}/backends/imgui_impl_wgpu.cpp
   ${IMGUI_DIR}/imgui.cpp
   ${IMGUI_DIR}/imgui_draw.cpp
   ${IMGUI_DIR}/imgui_demo.cpp
   ${IMGUI_DIR}/imgui_tables.cpp
-  ${IMGUI_DIR}/imgui_widgets.cpp)
+  ${IMGUI_DIR}/imgui_widgets.cpp
+  ${IMGUI_DIR}/backends/imgui_impl_glfw.cpp
+  ${IMGUI_DIR}/backends/imgui_impl_wgpu.cpp
+  ${IMGUI_DIR}/misc/cpp/imgui_stdlib.cpp)
 
 add_executable(demo
   AppState.cpp
   Deserialize.cpp
   main.cpp
   Project.cpp
+  Serialize.cpp
   TilePicker.cpp
   ThumbnailUtil.cpp
   Commands/Command.cpp
