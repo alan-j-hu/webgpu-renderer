@@ -68,6 +68,8 @@ nlohmann::json JsonSerializer::save_world(
     }
 
     return {
+        {"grid_depth", world.grid_depth()},
+        {"grid_width", world.grid_width()},
         {"levels", levels},
         {"tileset", tileset_mapping.at(world.tileset().get())}
     };
@@ -106,7 +108,7 @@ nlohmann::json JsonSerializer::save_layer(
         }
     }
 
-    if (true) {
+    if (tiles.size () < 128) {
         std::vector<nlohmann::json> tile_json;
         for (auto [x, y, inst] : tiles) {
             tile_json.push_back({
