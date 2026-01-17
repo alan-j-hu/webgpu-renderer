@@ -234,8 +234,12 @@ public:
     World(std::shared_ptr<const Tileset>);
 
     template<class It>
-    World(std::shared_ptr<const Tileset> tileset, It it, It end)
-        : m_tileset(std::move(tileset))
+    World(std::shared_ptr<const Tileset> tileset,
+          int width, int depth,
+          It it, It end)
+        : m_tileset(std::move(tileset)),
+          m_grid_width(width),
+          m_grid_depth(depth)
     {
         for (; it != end; ++it) {
             insert_level(std::move(*it));
@@ -261,13 +265,16 @@ public:
     iterator begin() const;
     iterator end() const;
 
+    int grid_width() const;
+    int grid_depth() const;
+
     Level* level_at(const std::string&);
     const Level* level_at(const std::string&) const;
 
     Level& level_at(int x, int y);
     const Level& level_at(int x, int y) const;
 
-    void insert_level(InsertionInfo);
+    bool insert_level(InsertionInfo);
 
     Listenable<Listener>& listenable() const
     {
@@ -278,6 +285,8 @@ private:
     NameMap<std::unique_ptr<Level>> m_levels_by_name;
     std::unordered_map<glm::ivec2, Level*> m_levels_by_coord;
     std::shared_ptr<const Tileset> m_tileset;
+    int m_grid_width;
+    int m_grid_depth;
     mutable Listenable<Listener> m_listenable;
 };
 

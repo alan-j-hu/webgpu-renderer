@@ -188,7 +188,7 @@ std::unique_ptr<Layer> Level::remove_layer(int idx)
 }
 
 World::World(std::shared_ptr<const Tileset> tileset)
-    : m_tileset(std::move(tileset))
+    : m_tileset(std::move(tileset)), m_grid_width(1), m_grid_depth(1)
 {
     InsertionInfo info = {
         0,
@@ -212,6 +212,16 @@ World::iterator World::begin() const
 World::iterator World::end() const
 {
     return m_levels_by_name.end();
+}
+
+int World::grid_width() const
+{
+    return m_grid_width;
+}
+
+int World::grid_depth() const
+{
+    return m_grid_depth;
 }
 
 Level* World::level_at(const std::string& name)
@@ -244,11 +254,16 @@ const Level& World::level_at(int x, int y) const
     return *m_levels_by_coord.at(glm::ivec2(x, y));
 }
 
-void World::insert_level(World::InsertionInfo info)
+bool World::insert_level(World::InsertionInfo info)
 {
+    auto ivec2 = glm::ivec2(info.x, info.y);
+    if (m_levels_by_coord.find(ivec2) != m_levels_by_coord.end()) {
+        return false;
+    }
     auto [k, v] = m_levels_by_name.insert(info.name, std::move(info.level));
-    m_levels_by_coord.emplace(glm::ivec2(info.x, info.y), v.get());
+    m_levels_by_coord.emplace(ivec2, v.get());
     v->set_loc(info.x, info.y);
+    return true;
 }
 
 Project::Project()

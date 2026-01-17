@@ -121,6 +121,11 @@ World JsonDeserializer::load_world(
         throw DeserializeError("Tileset index out of range");
     }
 
+    int grid_width;
+    int grid_depth;
+    json.at("grid_width").get_to(grid_width);
+    json.at("grid_depth").get_to(grid_depth);
+
     const nlohmann::json& levels_json = json.at("levels");
     if (!levels_json.is_array()) {
         throw DeserializeError("Expected levels to be array");
@@ -147,6 +152,8 @@ World JsonDeserializer::load_world(
 
     return World(
         tilesets[tileset_idx],
+        grid_width,
+        grid_depth,
         m_level_buf.begin(),
         m_level_buf.end()
     );
