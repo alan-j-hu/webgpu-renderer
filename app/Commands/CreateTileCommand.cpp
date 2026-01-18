@@ -9,7 +9,7 @@ CreateTileCommand::CreateTileCommand(TileDef tile_def)
 Command::Outcome CreateTileCommand::up(Project& project)
 {
     project.tileset_at(0)->add(m_tile_def);
-    return Outcome::COMPLETED;
+    return Outcome::DONE;
 }
 
 void CreateTileCommand::down(Project& project)

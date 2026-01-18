@@ -1,6 +1,11 @@
 #include "ErrorModal.h"
 #include <imgui.h>
 
+ErrorModal::ErrorModal()
+    : m_state(ErrorModal::State::CLOSED)
+{
+}
+
 void ErrorModal::open(const char* message)
 {
     m_state = ErrorModal::State::OPEN;

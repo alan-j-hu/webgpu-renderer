@@ -13,7 +13,7 @@ CreateLayerCommand::CreateLayerCommand(Level& level, int idx)
 Command::Outcome CreateLayerCommand::up(Project& project)
 {
     m_level.add_layer(std::move(m_layer), m_idx);
-    return Outcome::COMPLETED;
+    return Outcome::DONE;
 }
 
 void CreateLayerCommand::down(Project& project)

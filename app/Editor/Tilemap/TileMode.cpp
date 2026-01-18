@@ -1,9 +1,8 @@
 #include "TileMode.h"
 #include "../Editor.h"
-#include "../../Commands/PlaceTileCommand.h"
 
-#include <imgui.h>
 #include <numbers>
+#include <imgui.h>
 
 TileMode::TileMode(AppState& app_state, Editor& editor)
     : View2DMode(app_state, editor),
@@ -11,22 +10,6 @@ TileMode::TileMode(AppState& app_state, Editor& editor)
       m_tile_picker(app_state, editor),
       m_rotation(Rotation::Rotate0)
 {
-}
-
-void TileMode::handle_click(int x, int y)
-{
-    auto& project = app_state().project();
-    auto selected = editor().selected_layer();
-    auto& world = project.world_at(selected.world);
-
-    if (selected.layer != -1 && m_selected_tile != -1) {
-        auto& layer = project.layer_at(selected);
-        short z = editor().z_palette().selected_z();
-
-        app_state().push_command(std::make_unique<PlaceTileCommand>(
-            layer, x, y, z, m_rotation,
-            world.tileset()->at(m_selected_tile)));
-    }
 }
 
 void TileMode::draw_overlay(
@@ -112,4 +95,33 @@ void TileMode::draw_controls()
     }
 
     m_tile_picker.render(m_selected_tile);
+}
+
+void TileMode::handle_left_mouse_down(int x, int y)
+{
+    auto& project = app_state().project();
+    auto selected = editor().selected_layer();
+    auto& world = project.world_at(selected.world);
+
+    if (selected.layer != -1 && m_selected_tile != -1) {
+        auto& layer = project.layer_at(selected);
+        short z = editor().z_palette().selected_z();
+
+        if (m_command.get() == nullptr) {
+            auto command = std::make_unique<PlaceTileCommand>(
+                layer, z, m_rotation,
+                world.tileset()->at(m_selected_tile));
+            app_state().push_command(std::move(command), &m_command);
+        }
+
+        m_command.get()->add_placement(x, y);
+        app_state().update_current_command();
+    }
+}
+
+void TileMode::handle_left_mouse_up(int x, int y)
+{
+    if (m_command.get() != nullptr) {
+        app_state().finish_current_command();
+    }
 }

@@ -2,33 +2,52 @@
 
 PlaceTileCommand::PlaceTileCommand(
     Layer& layer,
-    int x,
-    int y,
-    int z,
+    short z,
     Rotation rotation,
     std::shared_ptr<const TileDef> tiledef)
-    : m_layer(layer), m_x(x), m_y(y),
+    : m_layer(layer),
       m_inst(std::make_optional<TileInst>(tiledef, z, rotation))
 {
 }
 
 Command::Outcome PlaceTileCommand::up(Project& project)
 {
-    std::optional<TileInst> old = m_layer.at(m_x, m_y);
-    if (m_inst == old) {
-        return Outcome::CANCELED;
+    bool changed = false;
+    for (auto& placement : m_placements) {
+        auto old = m_old_tiles[placement];
+        if (m_inst != old) {
+            m_layer.set(placement.x, placement.y, m_inst);
+            changed = true;
+        }
     }
-    m_layer.set(m_x, m_y, m_inst);
-    m_inst = old;
-    return Outcome::COMPLETED;
+
+    if (!changed) {
+        return Outcome::UNCHANGED;
+    }
+    return Outcome::IN_PROGRESS;
 }
 
 void PlaceTileCommand::down(Project& project)
 {
-    up(project);
+    for (auto& placement : m_placements) {
+        auto old = m_old_tiles[placement];
+        m_layer.set(placement.x, placement.y, old);
+    }
 }
 
 const char* PlaceTileCommand::name()
 {
     return "Place Tile";
+}
+
+void PlaceTileCommand::add_placement(int x, int y)
+{
+    auto ivec2 = glm::ivec2(x, y);
+    auto it = m_old_tiles.find(ivec2);
+    if (it == m_old_tiles.end()) {
+        std::optional<TileInst> old = m_layer.at(x, y);
+        m_old_tiles.insert(std::pair(ivec2, old));
+    }
+
+    m_placements.emplace_back(x, y);
 }

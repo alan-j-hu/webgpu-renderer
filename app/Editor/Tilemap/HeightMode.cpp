@@ -1,6 +1,5 @@
 #include "HeightMode.h"
 #include "../Editor.h"
-#include "../../Commands/PlaceTileCommand.h"
 
 HeightMode::HeightMode(AppState& app_state, Editor& editor)
     : View2DMode(app_state, editor)
@@ -51,7 +50,7 @@ void HeightMode::draw_controls()
 {
 }
 
-void HeightMode::handle_click(int tile_x, int tile_y)
+void HeightMode::handle_left_mouse_down(int tile_x, int tile_y)
 {
     auto& project = app_state().project();
     auto& selected = editor().selected_layer();
@@ -62,8 +61,20 @@ void HeightMode::handle_click(int tile_x, int tile_y)
     if (inst_opt) {
         short z = editor().z_palette().selected_z();
 
-        app_state().push_command(std::make_unique<PlaceTileCommand>(
-            layer, tile_x, tile_y, z,
-            inst_opt->rotation(), inst_opt->def()));
+        if (m_command.get() == nullptr) {
+            auto command = std::make_unique<PlaceTileCommand>(
+                layer, z, inst_opt->rotation(), inst_opt->def());
+            app_state().push_command(std::move(command), &m_command);
+        }
+
+        m_command.get()->add_placement(tile_x, tile_y);
+        app_state().update_current_command();
+    }
+}
+
+void HeightMode::handle_left_mouse_up(int x, int y)
+{
+    if (m_command.get() != nullptr) {
+        app_state().finish_current_command();
     }
 }

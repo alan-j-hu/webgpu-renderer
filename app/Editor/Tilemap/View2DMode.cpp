@@ -14,13 +14,17 @@ void View2DMode::handle_input()
 {
     auto& project = app_state().project();
 
-    if (ImGui::IsMouseDown(0)) {
-        auto cell_opt = editor().mouseover_cell();
-        if (cell_opt) {
-            int x = cell_opt->first;
-            int y = cell_opt->second;
+    auto cell_opt = editor().mouseover_cell();
+    if (cell_opt) {
+        int x = cell_opt->first;
+        int y = cell_opt->second;
 
-            handle_click(x, y);
+        if (ImGui::IsMouseDown(ImGuiMouseButton_Left)) {
+            handle_left_mouse_down(x, y);
+        } else if (ImGui::IsMouseReleased(ImGuiMouseButton_Left)) {
+            handle_left_mouse_up(x, y);
+        } else if (ImGui::IsMouseDown(ImGuiMouseButton_Right)) {
+            handle_right_mouse_down(x, y);
         }
     }
 }
@@ -55,6 +59,14 @@ Region View2DMode::region(int tile_x, int tile_y, float w, float h)
     return r;
 }
 
-void View2DMode::handle_click(int tile_x, int tile_y)
+void View2DMode::handle_left_mouse_down(int tile_x, int tile_y)
+{
+}
+
+void View2DMode::handle_left_mouse_up(int tile_x, int tile_y)
+{
+}
+
+void View2DMode::handle_right_mouse_down(int tile_x, int tile_y)
 {
 }

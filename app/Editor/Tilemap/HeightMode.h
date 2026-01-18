@@ -3,6 +3,7 @@
 
 #include "View2DMode.h"
 #include "../../AppState.h"
+#include "../../Commands/PlaceTileCommand.h"
 
 class Editor;
 
@@ -16,9 +17,12 @@ public:
     virtual void draw_controls() override;
 
 protected:
-    virtual void handle_click(int tile_x, int tile_y) override;
+    virtual void handle_left_mouse_down(int tile_x, int tile_y) override;
+
+    virtual void handle_left_mouse_up(int tile_x, int tile_y) override;
 
 private:
+    AppState::CommandHolder<PlaceTileCommand> m_command;
 };
 
 #endif

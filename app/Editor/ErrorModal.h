@@ -6,6 +6,8 @@
 class ErrorModal
 {
 public:
+    ErrorModal();
+
     void open(const char*);
 
     void update(const char*);

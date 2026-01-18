@@ -5,19 +5,21 @@
 #include "../Project.h"
 #include <optional>
 #include <memory>
+#include <unordered_map>
+#include <vector>
 
 class PlaceTileCommand : public Command
 {
 public:
     PlaceTileCommand(
         Layer&,
-        int x,
-        int y,
-        int z,
+        short z,
         Rotation rotation,
         std::shared_ptr<const TileDef> tiledef);
 
     const char* name() override;
+
+    void add_placement(int x, int y);
 
 protected:
     Command::Outcome up(Project&) override;
@@ -28,9 +30,10 @@ private:
     // will either be owned by the project state or another command in the
     // undo/redo stack.
     Layer& m_layer;
-    int m_x;
-    int m_y;
     std::optional<TileInst> m_inst;
+
+    std::unordered_map<glm::ivec2, std::optional<TileInst>> m_old_tiles;
+    std::vector<glm::ivec2> m_placements;
 };
 
 #endif

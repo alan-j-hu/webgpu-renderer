@@ -14,9 +14,9 @@ Command::Outcome DeleteLayerCommand::up(Project& project)
 {
     m_layer = m_level.remove_layer(m_idx);
     if (m_layer == nullptr) {
-        return Outcome::CANCELED;
+        return Outcome::UNCHANGED;
     }
-    return Outcome::COMPLETED;
+    return Outcome::DONE;
 }
 
 void DeleteLayerCommand::down(Project& project)

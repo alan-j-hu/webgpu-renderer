@@ -12,7 +12,7 @@ Command::Outcome UpdateTileCommand::up(Project& project)
     std::shared_ptr<Tileset> tileset = project.tileset_at(0);
     std::shared_ptr<TileDef> old_tiledef = tileset->at(m_idx);
     std::swap(old_tiledef, m_tiledef);
-    return Outcome::COMPLETED;
+    return Outcome::DONE;
 }
 
 void UpdateTileCommand::down(Project& project)

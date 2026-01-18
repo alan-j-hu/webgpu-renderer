@@ -20,7 +20,11 @@ protected:
 
     Region region(int tile_x, int tile_y, float w, float h);
 
-    virtual void handle_click(int tile_x, int tile_y);
+    virtual void handle_left_mouse_down(int tile_x, int tile_y);
+
+    virtual void handle_left_mouse_up(int tile_x, int tile_y);
+
+    virtual void handle_right_mouse_down(int tile_x, int tile_y);
 
 private:
     AppState* m_app_state;
