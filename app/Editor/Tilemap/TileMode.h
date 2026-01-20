@@ -4,7 +4,7 @@
 #include "View2DMode.h"
 #include "../../AppState.h"
 #include "../../TilePicker.h"
-#include "../../Commands/PlaceTileCommand.h"
+#include "../../Commands/PlaceTilesCommand.h"
 #include "noworry/rendertarget.h"
 #include "noworry/Draw2D/SpriteRenderer.h"
 
@@ -22,13 +22,17 @@ public:
 protected:
     virtual void handle_left_mouse_down(int tile_x, int tile_y) override;
 
-    virtual void handle_left_mouse_up(int tile_x, int tile_y) override;
+    virtual void handle_left_mouse_released(int tile_x, int tile_y) override;
+
+    virtual void handle_right_mouse_down(int tile_x, int tile_y) override;
+
+    virtual void handle_right_mouse_released(int tile_x, int tile_y) override;
 
 private:
     TilePicker m_tile_picker;
     int m_selected_tile;
     Rotation m_rotation;
-    AppState::CommandHolder<PlaceTileCommand> m_command;
+    AppState::CommandHolder<PlaceTilesCommand> m_command;
 };
 
 #endif

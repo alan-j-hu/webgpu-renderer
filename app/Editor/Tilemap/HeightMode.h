@@ -3,7 +3,7 @@
 
 #include "View2DMode.h"
 #include "../../AppState.h"
-#include "../../Commands/PlaceTileCommand.h"
+#include "../../Commands/PlaceTilesCommand.h"
 
 class Editor;
 
@@ -19,10 +19,10 @@ public:
 protected:
     virtual void handle_left_mouse_down(int tile_x, int tile_y) override;
 
-    virtual void handle_left_mouse_up(int tile_x, int tile_y) override;
+    virtual void handle_left_mouse_released(int tile_x, int tile_y) override;
 
 private:
-    AppState::CommandHolder<PlaceTileCommand> m_command;
+    AppState::CommandHolder<PlaceTilesCommand> m_command;
 };
 
 #endif

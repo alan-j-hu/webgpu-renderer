@@ -1,5 +1,5 @@
-#ifndef PLACETILECOMMAND_H
-#define PLACETILECOMMAND_H
+#ifndef PLACE_TILES_COMMAND_H
+#define PLACE_TILES_COMMAND_H
 
 #include "Command.h"
 #include "../Project.h"
@@ -8,14 +8,15 @@
 #include <unordered_map>
 #include <vector>
 
-class PlaceTileCommand : public Command
+class PlaceTilesCommand : public Command
 {
 public:
-    PlaceTileCommand(
+    PlaceTilesCommand(
         Layer&,
         short z,
         Rotation rotation,
         std::shared_ptr<const TileDef> tiledef);
+    PlaceTilesCommand(Layer&);
 
     const char* name() override;
 

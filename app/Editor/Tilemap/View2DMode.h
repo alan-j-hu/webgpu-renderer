@@ -22,9 +22,11 @@ protected:
 
     virtual void handle_left_mouse_down(int tile_x, int tile_y);
 
-    virtual void handle_left_mouse_up(int tile_x, int tile_y);
+    virtual void handle_left_mouse_released(int tile_x, int tile_y);
 
     virtual void handle_right_mouse_down(int tile_x, int tile_y);
+
+    virtual void handle_right_mouse_released(int tile_x, int tile_y);
 
 private:
     AppState* m_app_state;

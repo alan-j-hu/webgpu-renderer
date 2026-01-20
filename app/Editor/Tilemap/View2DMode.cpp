@@ -22,9 +22,11 @@ void View2DMode::handle_input()
         if (ImGui::IsMouseDown(ImGuiMouseButton_Left)) {
             handle_left_mouse_down(x, y);
         } else if (ImGui::IsMouseReleased(ImGuiMouseButton_Left)) {
-            handle_left_mouse_up(x, y);
+            handle_left_mouse_released(x, y);
         } else if (ImGui::IsMouseDown(ImGuiMouseButton_Right)) {
             handle_right_mouse_down(x, y);
+        } else if (ImGui::IsMouseReleased(ImGuiMouseButton_Right)) {
+            handle_right_mouse_released(x, y);
         }
     }
 }
@@ -63,10 +65,14 @@ void View2DMode::handle_left_mouse_down(int tile_x, int tile_y)
 {
 }
 
-void View2DMode::handle_left_mouse_up(int tile_x, int tile_y)
+void View2DMode::handle_left_mouse_released(int tile_x, int tile_y)
 {
 }
 
 void View2DMode::handle_right_mouse_down(int tile_x, int tile_y)
+{
+}
+
+void View2DMode::handle_right_mouse_released(int tile_x, int tile_y)
 {
 }

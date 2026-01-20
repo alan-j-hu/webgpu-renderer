@@ -1,6 +1,6 @@
-#include "PlaceTileCommand.h"
+#include "PlaceTilesCommand.h"
 
-PlaceTileCommand::PlaceTileCommand(
+PlaceTilesCommand::PlaceTilesCommand(
     Layer& layer,
     short z,
     Rotation rotation,
@@ -10,7 +10,12 @@ PlaceTileCommand::PlaceTileCommand(
 {
 }
 
-Command::Outcome PlaceTileCommand::up(Project& project)
+PlaceTilesCommand::PlaceTilesCommand(Layer& layer)
+    : m_layer(layer)
+{
+}
+
+Command::Outcome PlaceTilesCommand::up(Project& project)
 {
     bool changed = false;
     for (auto& placement : m_placements) {
@@ -27,7 +32,7 @@ Command::Outcome PlaceTileCommand::up(Project& project)
     return Outcome::IN_PROGRESS;
 }
 
-void PlaceTileCommand::down(Project& project)
+void PlaceTilesCommand::down(Project& project)
 {
     for (auto& placement : m_placements) {
         auto old = m_old_tiles[placement];
@@ -35,12 +40,12 @@ void PlaceTileCommand::down(Project& project)
     }
 }
 
-const char* PlaceTileCommand::name()
+const char* PlaceTilesCommand::name()
 {
     return "Place Tile";
 }
 
-void PlaceTileCommand::add_placement(int x, int y)
+void PlaceTilesCommand::add_placement(int x, int y)
 {
     auto ivec2 = glm::ivec2(x, y);
     auto it = m_old_tiles.find(ivec2);

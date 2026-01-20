@@ -62,7 +62,7 @@ void HeightMode::handle_left_mouse_down(int tile_x, int tile_y)
         short z = editor().z_palette().selected_z();
 
         if (m_command.get() == nullptr) {
-            auto command = std::make_unique<PlaceTileCommand>(
+            auto command = std::make_unique<PlaceTilesCommand>(
                 layer, z, inst_opt->rotation(), inst_opt->def());
             app_state().push_command(std::move(command), &m_command);
         }
@@ -72,7 +72,7 @@ void HeightMode::handle_left_mouse_down(int tile_x, int tile_y)
     }
 }
 
-void HeightMode::handle_left_mouse_up(int x, int y)
+void HeightMode::handle_left_mouse_released(int x, int y)
 {
     if (m_command.get() != nullptr) {
         app_state().finish_current_command();
