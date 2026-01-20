@@ -34,7 +34,6 @@ private:
     std::optional<TileInst> m_inst;
 
     std::unordered_map<glm::ivec2, std::optional<TileInst>> m_old_tiles;
-    std::vector<glm::ivec2> m_placements;
 };
 
 #endif

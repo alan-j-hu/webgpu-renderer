@@ -18,10 +18,9 @@ PlaceTilesCommand::PlaceTilesCommand(Layer& layer)
 Command::Outcome PlaceTilesCommand::up(Project& project)
 {
     bool changed = false;
-    for (auto& placement : m_placements) {
-        auto old = m_old_tiles[placement];
-        if (m_inst != old) {
-            m_layer.set(placement.x, placement.y, m_inst);
+    for (auto& pair : m_old_tiles) {
+        if (m_inst != pair.second) {
+            m_layer.set(pair.first.x, pair.first.y, m_inst);
             changed = true;
         }
     }
@@ -34,9 +33,8 @@ Command::Outcome PlaceTilesCommand::up(Project& project)
 
 void PlaceTilesCommand::down(Project& project)
 {
-    for (auto& placement : m_placements) {
-        auto old = m_old_tiles[placement];
-        m_layer.set(placement.x, placement.y, old);
+    for (auto& pair : m_old_tiles) {
+        m_layer.set(pair.first.x, pair.first.y, pair.second);
     }
 }
 
@@ -53,6 +51,4 @@ void PlaceTilesCommand::add_placement(int x, int y)
         std::optional<TileInst> old = m_layer.at(x, y);
         m_old_tiles.insert(std::pair(ivec2, old));
     }
-
-    m_placements.emplace_back(x, y);
 }
