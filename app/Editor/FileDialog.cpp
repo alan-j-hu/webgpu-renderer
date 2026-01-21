@@ -69,32 +69,22 @@ std::optional<std::filesystem::path> FileDialog::update()
                 "##Directories and files",
                 ImVec2(-FLT_MIN, 0.8 * m_height))) {
 
+            const ImGuiSelectableFlags flags =
+                ImGuiSelectableFlags_AllowDoubleClick;
             for (auto& entry : m_subdirs) {
-                auto fname = entry.path().filename();
-                const char* c_str = fname.c_str();
-
-                if (ImGui::Selectable(
-                        c_str,
-                        false,
-                        ImGuiSelectableFlags_AllowDoubleClick)) {
-
+                if (ImGui::Selectable(entry.label.c_str(), false, flags)) {
                     if (ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left)) {
-                        next_dir = entry.path();
+                        next_dir = entry.inner.path();
                     }
                 }
             }
 
             for (auto& entry : m_files) {
-                auto fname = entry.path().filename();
-                const char* cstr = fname.c_str();
-
                 bool select = m_selected == &entry;
-                const ImGuiSelectableFlags flags =
-                    ImGuiSelectableFlags_AllowDoubleClick;
-                if (ImGui::Selectable(cstr, select, flags)) {
+                if (ImGui::Selectable(entry.label.c_str(), select, flags)) {
                     m_selected = &entry;
                     if (ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left)) {
-                        output = entry.path();
+                        output = entry.inner.path();
                     }
                 }
             }
@@ -170,16 +160,19 @@ void FileDialog::iterate_dir()
 
     fs::directory_iterator end;
     for (auto it = fs::directory_iterator(m_current_dir); it != end; ++it) {
-        auto& entry = *it;
-        if (entry.is_directory()) {
-            m_subdirs.push_back(entry);
+        FileDialog::Entry entry { *it, it->path().filename() };
+        if (entry.inner.is_directory()) {
+            m_subdirs.push_back(std::move(entry));
         } else {
-            m_files.push_back(entry);
+            m_files.push_back(std::move(entry));
         }
     }
 
-    std::sort(m_subdirs.begin(), m_subdirs.end());
-    std::sort(m_files.begin(), m_files.end());
+    auto cmp = [](const FileDialog::Entry& lhs, const FileDialog::Entry& rhs) {
+        return lhs.inner < rhs.inner;
+    };
+    std::sort(m_subdirs.begin(), m_subdirs.end(), cmp);
+    std::sort(m_files.begin(), m_files.end(), cmp);
 }
 
 bool FileDialog::backtrack_path_needs_update()

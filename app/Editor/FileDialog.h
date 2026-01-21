@@ -25,14 +25,19 @@ public:
 
 private:
     enum class State { OPEN, CLOSED };
+    struct Entry
+    {
+        std::filesystem::directory_entry inner;
+        std::string label;
+    };
 
     std::string m_name;
     std::string m_new_file;
     std::filesystem::path m_current_dir;
     std::filesystem::path m_backtrack_path;
-    std::vector<std::filesystem::directory_entry> m_subdirs;
-    std::vector<std::filesystem::directory_entry> m_files;
-    std::filesystem::directory_entry* m_selected;
+    std::vector<Entry> m_subdirs;
+    std::vector<Entry> m_files;
+    Entry* m_selected;
 
     short m_width;
     short m_height;
