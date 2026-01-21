@@ -135,6 +135,7 @@ std::optional<std::filesystem::path> FileDialog::draw_overwrite_confirm()
     std::optional<std::filesystem::path> output;
     ImGui::OpenPopup("Overwrite?");
 
+    ImGui::SetNextWindowSize(ImVec2(0, 0));
     if (ImGui::BeginPopupModal("Overwrite?")) {
         if (ImGui::Button("Yes", ImVec2(0, 0))) {
             output = m_path_to_confirm;
@@ -142,6 +143,7 @@ std::optional<std::filesystem::path> FileDialog::draw_overwrite_confirm()
             m_state = State::CLOSED;
             m_path_to_confirm.reset();
         }
+        ImGui::SameLine();
         if (ImGui::Button("No", ImVec2(0, 0))) {
           ImGui::CloseCurrentPopup();
           m_state = State::CLOSED;
