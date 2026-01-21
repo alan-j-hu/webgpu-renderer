@@ -1,14 +1,16 @@
 #include "FileDialog.h"
 
-#include <utility>
 #include <imgui.h>
 #include <misc/cpp/imgui_stdlib.h>
+
+#include <algorithm>
+#include <utility>
 
 namespace fs = std::filesystem;
 
 FileDialog::FileDialog(std::string name, fs::path path)
     : m_name(std::move(name)), m_current_dir(std::move(path)),
-      m_state(FileDialog::CLOSED)
+      m_state(State::CLOSED)
 {
     m_backtrack_path = m_current_dir;
     iterate_dir();
@@ -19,11 +21,15 @@ const std::string& FileDialog::name() const
     return m_name;
 }
 
-void FileDialog::open(FileDialog::Mode mode)
+void FileDialog::open(FileDialog::Flags flags, short width, short height)
 {
+    m_width = width;
+    m_height = height;
+
     m_backtrack_path = m_current_dir;
     m_new_file.clear();
-    m_state = mode;
+    m_state = State::OPEN;
+    m_flags = flags;
     m_path_to_confirm.reset();
     m_selected = nullptr;
     iterate_dir();
@@ -31,37 +37,19 @@ void FileDialog::open(FileDialog::Mode mode)
 
 std::optional<std::filesystem::path> FileDialog::update()
 {
-    const bool can_create = m_state & FileDialog::CREATE;
-    const bool can_read = m_state & FileDialog::READ;
-
     std::optional<std::filesystem::path> output;
 
     if (m_path_to_confirm.has_value()) {
-        ImGui::OpenPopup("Overwrite?");
-
-        if (ImGui::BeginPopupModal("Overwrite?")) {
-            if (ImGui::Button("Yes", ImVec2(0, 0))) {
-                output = m_path_to_confirm;
-                ImGui::CloseCurrentPopup();
-                m_state = FileDialog::CLOSED;
-                m_path_to_confirm.reset();
-            }
-            if (ImGui::Button("No", ImVec2(0, 0))) {
-                ImGui::CloseCurrentPopup();
-                m_state = FileDialog::CLOSED;
-                m_path_to_confirm.reset();
-            }
-            ImGui::EndPopup();
-        }
-
-        return output;
+        return draw_overwrite_confirm();
     }
 
-    if (m_state != 0) {
+    if (m_state == State::OPEN) {
         ImGui::OpenPopup(m_name.c_str());
     }
 
-    if (ImGui::BeginPopupModal(m_name.c_str())) {
+    const ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoResize;
+    ImGui::SetNextWindowSize(ImVec2(m_width, m_height));
+    if (ImGui::BeginPopupModal(m_name.c_str(), nullptr, window_flags)) {
         fs::path next_dir = m_current_dir;
         fs::path header;
         int n = 0;
@@ -79,7 +67,7 @@ std::optional<std::filesystem::path> FileDialog::update()
 
         if (ImGui::BeginListBox(
                 "##Directories and files",
-                ImVec2(-FLT_MIN, 0))) {
+                ImVec2(-FLT_MIN, 0.8 * m_height))) {
 
             for (auto& entry : m_subdirs) {
                 auto fname = entry.path().filename();
@@ -90,7 +78,7 @@ std::optional<std::filesystem::path> FileDialog::update()
                         false,
                         ImGuiSelectableFlags_AllowDoubleClick)) {
 
-                    if (ImGui::IsMouseDoubleClicked(0)) {
+                    if (ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left)) {
                         next_dir = entry.path();
                     }
                 }
@@ -100,41 +88,29 @@ std::optional<std::filesystem::path> FileDialog::update()
                 auto fname = entry.path().filename();
                 const char* cstr = fname.c_str();
 
-                ImGuiSelectableFlags flags = can_read
-                    ? ImGuiSelectableFlags_AllowDoubleClick
-                    : ImGuiSelectableFlags_Disabled;
-
                 bool select = m_selected == &entry;
-
+                const ImGuiSelectableFlags flags =
+                    ImGuiSelectableFlags_AllowDoubleClick;
                 if (ImGui::Selectable(cstr, select, flags)) {
                     m_selected = &entry;
-                    if (ImGui::IsMouseDoubleClicked(0)) {
-                        if (can_create) {
-                            m_path_to_confirm = entry.path();
-                        } else {
-                            output = entry.path();
-                        }
-                        m_state = FileDialog::CLOSED;
+                    if (ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left)) {
+                        output = entry.path();
                     }
                 }
             }
             ImGui::EndListBox();
         }
 
-        if (can_create) {
+        if (m_flags == FileDialog::WRITE) {
             ImGui::InputText("New File", &m_new_file);
         }
 
-        if (ImGui::Button("Ok", ImVec2(0, 0))) {
-            if (m_new_file == "") {
-                output = m_selected->path();
-            } else {
-                m_path_to_confirm = m_current_dir / m_new_file;
-            }
+        if (ImGui::Button("Ok", ImVec2(0, 0)) && !m_new_file.empty()) {
+            output = m_current_dir / m_new_file;
         }
         ImGui::SameLine();
         if (ImGui::Button("Cancel", ImVec2(0, 0))) {
-            m_state = FileDialog::CLOSED;
+            m_state = State::CLOSED;
         }
 
         if (next_dir != m_current_dir) {
@@ -145,16 +121,45 @@ std::optional<std::filesystem::path> FileDialog::update()
             }
         }
 
-        if (m_state == 0) {
+        if (output) {
+            m_state = State::CLOSED;
+        }
+
+        if (m_state == State::CLOSED) {
             ImGui::CloseCurrentPopup();
         }
 
         ImGui::EndPopup();
     }
 
-    if (m_path_to_confirm) {
+    if (m_flags == FileDialog::WRITE && output && fs::exists(*output)) {
+        m_path_to_confirm = output;
         return std::nullopt;
     }
+
+    return output;
+}
+
+std::optional<std::filesystem::path> FileDialog::draw_overwrite_confirm()
+{
+    std::optional<std::filesystem::path> output;
+    ImGui::OpenPopup("Overwrite?");
+
+    if (ImGui::BeginPopupModal("Overwrite?")) {
+        if (ImGui::Button("Yes", ImVec2(0, 0))) {
+            output = m_path_to_confirm;
+            ImGui::CloseCurrentPopup();
+            m_state = State::CLOSED;
+            m_path_to_confirm.reset();
+        }
+        if (ImGui::Button("No", ImVec2(0, 0))) {
+          ImGui::CloseCurrentPopup();
+          m_state = State::CLOSED;
+          m_path_to_confirm.reset();
+        }
+        ImGui::EndPopup();
+    }
+
     return output;
 }
 
@@ -172,6 +177,9 @@ void FileDialog::iterate_dir()
             m_files.push_back(entry);
         }
     }
+
+    std::sort(m_subdirs.begin(), m_subdirs.end());
+    std::sort(m_files.begin(), m_files.end());
 }
 
 bool FileDialog::backtrack_path_needs_update()

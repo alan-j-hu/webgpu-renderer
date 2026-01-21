@@ -102,11 +102,11 @@ void Editor::draw_menubar()
         if (ImGui::BeginMenu("File")) {
             if (ImGui::MenuItem("Open")) {
                 m_io_state = Editor::IOState::OPENING;
-                m_main_file_dialog.open(FileDialog::READ);
+                m_main_file_dialog.open();
             }
             if (ImGui::MenuItem("Save As")) {
                 m_io_state = Editor::IOState::SAVING;
-                m_main_file_dialog.open(FileDialog::CREATE);
+                m_main_file_dialog.open(FileDialog::WRITE);
             }
 
             ImGui::EndMenu();
@@ -300,15 +300,15 @@ void Editor::load_project(const std::filesystem::path& path)
 
 void Editor::save_project(const std::filesystem::path& path)
 {
-    /*try {*/
+    try {
         std::ofstream f(path);
         nlohmann::json json = m_app_state->serializer().save_project(
             m_app_state->project()
         );
         f << json << std::flush;
-    /*} catch (std::exception& ex) {
+    } catch (std::exception& ex) {
         m_error_modal.open(ex.what());
-    }*/
+    }
 }
 
 void Editor::destroy_scene()

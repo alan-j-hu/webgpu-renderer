@@ -9,22 +9,23 @@
 class FileDialog
 {
 public:
-    enum Mode
+    enum Flags
     {
-        CLOSED = 0,
-        CREATE = 1,
-        READ = 2
+        READ = 0,
+        WRITE = 1
     };
 
     FileDialog(std::string name, std::filesystem::path path);
 
     const std::string& name() const;
 
-    void open(Mode mode = READ);
+    void open(Flags flags = READ, short width = 500, short height = 500);
 
     std::optional<std::filesystem::path> update();
 
 private:
+    enum class State { OPEN, CLOSED };
+
     std::string m_name;
     std::string m_new_file;
     std::filesystem::path m_current_dir;
@@ -33,16 +34,21 @@ private:
     std::vector<std::filesystem::directory_entry> m_files;
     std::filesystem::directory_entry* m_selected;
 
-    // 0 represents closed, non-zero indicates the Mode enum.
-    //
+    short m_width;
+    short m_height;
+
     // Keeping the open/close state is necessary because ImGui::OpenPopup does
     // not work if Imgui::BeginPopup is in a different ID stack scope. This
     // problem often occurs when attempting to open a popup from MenuItem from
     // within BeginMenu, from within BeginMenuBar.
     //
     // See https://github.com/ocornut/imgui/issues/5468#issuecomment-1184017711
-    Mode m_state;
+    State m_state;
+
+    Flags m_flags;
     std::optional<std::filesystem::path> m_path_to_confirm;
+
+    std::optional<std::filesystem::path> draw_overwrite_confirm();
 
     void iterate_dir();
     bool backtrack_path_needs_update();
