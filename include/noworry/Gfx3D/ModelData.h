@@ -12,35 +12,34 @@ class Material;
 class ModelData
 {
 public:
+    /// Model indices are 2 bytes, but WebGPU requires the length of buffer
+    /// writes to be a multiple of 4 bytes, so the index vector has padding
+    /// when its length is odd.
     struct Part
     {
     public:
+        Part() = default;
         Part(std::vector<Vertex>,
              std::vector<std::uint16_t>,
              std::shared_ptr<Material>,
              int index_count);
+        Part(Part&&);
 
-        std::span<const Vertex> vertices() const
-        {
-            return m_vertices;
-        }
+        Part& operator=(Part&&);
 
-        std::span<const std::uint16_t> indices_with_padding() const
-        {
-            return m_indices;
-        }
+        std::span<const Vertex> vertices() const;
 
-        std::span<const std::uint16_t> indices() const
-        {
-            return std::span<const std::uint16_t>(
-                m_indices.begin(),
-                m_index_count);
-        }
+        std::span<const std::uint16_t> indices_with_padding() const;
 
-        std::shared_ptr<Material> material() const
-        {
-            return m_material;
-        }
+        std::span<const std::uint16_t> indices() const;
+
+        std::shared_ptr<Material> material() const;
+
+        void clear();
+
+        void append(std::span<const Vertex>, std::span<const std::uint16_t>);
+
+        void append(const Part& other);
 
     private:
         std::vector<Vertex> m_vertices;
