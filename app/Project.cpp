@@ -1,6 +1,48 @@
 #include "Project.h"
+#include "glm/ext/matrix_transform.hpp"
 #include <algorithm>
 #include <utility>
+
+glm::mat4 transform(
+    float x, float y, float z,
+    float width, float depth, Rotation rotation)
+{
+    static constexpr glm::vec3 XY_PLANE = glm::vec3(0, 0, 1);
+
+    switch (rotation) {
+    case Rotation::Rotate0:
+        return glm::translate(glm::mat4(1), glm::vec3(x, y, z));
+    case Rotation::Rotate90: {
+        glm::mat4 translation = glm::translate(
+            glm::mat4(1),
+            glm::vec3(x + depth, y, z));
+        return glm::rotate(
+            translation,
+            0.5f * std::numbers::pi_v<float>,
+            XY_PLANE);
+    }
+    case Rotation::Rotate180: {
+        glm::mat4 translation = glm::translate(
+            glm::mat4(1),
+            glm::vec3(x + width, y + depth, z));
+        return glm::rotate(
+            translation,
+            std::numbers::pi_v<float>,
+            XY_PLANE);
+    }
+    case Rotation::Rotate270: {
+        glm::mat4 translation = glm::translate(
+            glm::mat4(1),
+            glm::vec3(x, y + width, z));
+        return glm::rotate(
+            translation,
+            1.5f * std::numbers::pi_v<float>,
+            XY_PLANE);
+    }
+    default:
+        return glm::mat4(1);
+    }
+}
 
 LayerLocation::LayerLocation()
     : world(0), level(0, 0), layer(0)
@@ -133,6 +175,31 @@ void Layer::set(int x, int y, std::optional<TileInst> option)
 {
     m_tiles[y * 16 + x] = std::move(option);
     m_listenable.notify(&Layer::Listener::layer_changed);
+}
+
+void Layer::fill_model(DynamicModel& model) const
+{
+    for (int y = 0; y < 16; ++y) {
+        for (int x = 0; x < 16; ++x) {
+            auto& opt = at(x, y);
+            if (!opt) {
+                continue;
+            }
+
+            auto& inst = opt.value();
+            auto def = inst.def();
+            if (!def->model_data()) {
+                continue;
+            }
+
+            glm::mat4 matrix = transform(
+                x, y, inst.z(),
+                def->width(), def->depth(),
+                inst.rotation());
+
+            model.add_model(**inst.def()->model_data(), matrix);
+        }
+    }
 }
 
 Level::Level()

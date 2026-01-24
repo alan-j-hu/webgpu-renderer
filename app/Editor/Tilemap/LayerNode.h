@@ -17,9 +17,9 @@ public:
     LayerNode(AppState&, const Layer&);
     LayerNode(LayerNode&&);
     LayerNode& operator=(LayerNode&&);
-    ~LayerNode();
+    virtual ~LayerNode();
 
-    const Texture& thumbnail() { return m_thumbnail.texture(); }
+    const Texture& thumbnail();
 
     virtual void layer_changed() override;
 

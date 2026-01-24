@@ -2,50 +2,7 @@
 #include "noworry/grid.h"
 #include "noworry/Gfx3D/ModelInstance.h"
 
-#include "glm/ext/matrix_transform.hpp"
-#include <numbers>
 #include <utility>
-
-glm::mat4 transform(
-    float x, float y, float z,
-    float width, float depth, Rotation rotation)
-{
-    static constexpr glm::vec3 XY_PLANE = glm::vec3(0, 0, 1);
-
-    switch (rotation) {
-    case Rotation::Rotate0:
-        return glm::translate(glm::mat4(1), glm::vec3(x, y, z));
-    case Rotation::Rotate90: {
-        glm::mat4 translation = glm::translate(
-            glm::mat4(1),
-            glm::vec3(x + depth, y, z));
-        return glm::rotate(
-            translation,
-            0.5f * std::numbers::pi_v<float>,
-            XY_PLANE);
-    }
-    case Rotation::Rotate180: {
-        glm::mat4 translation = glm::translate(
-            glm::mat4(1),
-            glm::vec3(x + width, y + depth, z));
-        return glm::rotate(
-            translation,
-            std::numbers::pi_v<float>,
-            XY_PLANE);
-    }
-    case Rotation::Rotate270: {
-        glm::mat4 translation = glm::translate(
-            glm::mat4(1),
-            glm::vec3(x, y + width, z));
-        return glm::rotate(
-            translation,
-            1.5f * std::numbers::pi_v<float>,
-            XY_PLANE);
-    }
-    default:
-        return glm::mat4(1);
-    }
-}
 
 LayerNode::LayerNode(AppState& app_state, const Layer& layer)
     : m_app_state(&app_state),
@@ -69,25 +26,48 @@ LayerNode::LayerNode(AppState& app_state, const Layer& layer)
 }
 
 LayerNode::LayerNode(LayerNode&& other)
+    : m_app_state {other.m_app_state},
+      m_model(std::move(other.m_model)),
+      m_grid_mesh(std::move(other.m_grid_mesh)),
+      m_instance(std::move(other.m_instance)),
+      m_layer {other.m_layer}
 {
-    m_app_state = nullptr;
-    *this = std::move(other);
+    if (m_layer != nullptr) {
+        m_layer->listenable().remove_listener(other);
+        m_layer->listenable().add_listener(*this);
+    }
 }
 
 LayerNode& LayerNode::operator=(LayerNode&& other)
 {
-    std::swap(m_app_state, other.m_app_state);
-    std::swap(m_model, other.m_model);
-    std::swap(m_grid_mesh, other.m_grid_mesh);
-    std::swap(m_instance, other.m_instance);
-    m_layer = other.m_layer;
+    if (m_layer != nullptr) {
+        m_layer->listenable().remove_listener(*this);
+    }
+
+    m_app_state = std::exchange(other.m_app_state, nullptr);
+    m_model = std::move(other.m_model);
+    m_grid_mesh = std::move(other.m_grid_mesh);
+    m_instance = std::move(other.m_instance);
+    m_layer = std::exchange(other.m_layer, nullptr);
+
+    if (m_layer != nullptr) {
+        m_layer->listenable().remove_listener(other);
+        m_layer->listenable().add_listener(*this);
+    }
 
     return *this;
 }
 
 LayerNode::~LayerNode()
 {
-    m_layer->listenable().remove_listener(*this);
+    if (m_layer != nullptr) {
+        m_layer->listenable().remove_listener(*this);
+    }
+}
+
+const Texture& LayerNode::thumbnail()
+{
+    return m_thumbnail.texture();
 }
 
 void LayerNode::layer_changed()
@@ -103,29 +83,7 @@ void LayerNode::render(Frame& frame)
 void LayerNode::update()
 {
     m_model->reset();
-
-    for (int y = 0; y < 16; ++y) {
-        for (int x = 0; x < 16; ++x) {
-            auto& opt = m_layer->at(x, y);
-            if (!opt) {
-                continue;
-            }
-
-            auto& inst = opt.value();
-            auto def = inst.def();
-            if (!def->model_data()) {
-                continue;
-            }
-
-            m_model->add_model(**inst.def()->model_data(),
-                               transform(x, y, inst.z(),
-                                         def->width(),
-                                         def->depth(),
-                                         inst.rotation()));
-        }
-    }
-
+    m_layer->fill_model(*m_model);
     m_model->flush(m_app_state->renderer().device());
-
     m_app_state->thumbnail_util().capture(m_thumbnail, *m_instance);
 }

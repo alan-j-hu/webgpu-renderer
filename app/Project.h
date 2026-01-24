@@ -4,6 +4,7 @@
 #include "Listener.h"
 #include "NameMap.h"
 
+#include "noworry/Gfx3D/DynamicModel.h"
 #include "noworry/Gfx3D/Model.h"
 #include "noworry/Material/TextureMaterial.h"
 
@@ -144,6 +145,8 @@ public:
     const std::optional<TileInst>& at(int x, int y) const;
 
     void set(int x, int y, std::optional<TileInst> option);
+
+    void fill_model(DynamicModel&) const;
 
     Listenable<Listener>& listenable() const
     {
