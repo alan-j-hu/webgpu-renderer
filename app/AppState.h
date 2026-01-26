@@ -2,6 +2,7 @@
 #define APPSTATE_H
 
 #include "Deserialize.h"
+#include "Export.h"
 #include "Project.h"
 #include "Serialize.h"
 #include "ThumbnailUtil.h"
@@ -103,6 +104,8 @@ public:
     Material& wireframe_material() { return *m_wireframe_material; }
     BasicMesh& small_grid_mesh() { return m_small_grid_mesh; }
 
+    Exporter& exporter() { return m_exporter; }
+
     JsonDeserializer& deserializer() { return m_deserializer; }
 
     JsonSerializer& serializer() { return m_serializer; }
@@ -155,6 +158,7 @@ private:
     Renderer m_renderer;
     SpriteRenderer m_sprite_renderer;
     ResourceTable m_resources;
+    Exporter m_exporter;
     JsonDeserializer m_deserializer;
     JsonSerializer m_serializer;
 

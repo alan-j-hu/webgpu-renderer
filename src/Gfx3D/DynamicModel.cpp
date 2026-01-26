@@ -7,7 +7,9 @@ void DynamicModel::add_model(const ModelData& data, const glm::mat4& transform)
     std::vector<Vertex> transformed;
     auto parts = data.parts();
     for (auto& part : parts) {
-        auto [it, inserted] = m_parts.try_emplace(part.material().get());
+        auto [it, inserted] = m_parts.try_emplace(
+            part.material().get(),
+            part.material());
 
         transformed.clear();
         auto vertices = part.vertices();

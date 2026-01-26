@@ -19,6 +19,7 @@ public:
     {
     public:
         Part() = default;
+        Part(std::shared_ptr<Material>);
         Part(std::vector<Vertex>,
              std::vector<std::uint16_t>,
              std::shared_ptr<Material>,

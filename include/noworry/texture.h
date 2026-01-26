@@ -38,9 +38,15 @@ public:
     WGPUTextureView view() const { return m_view; }
 
     void upload(WGPUDevice device, void* data);
+
+    const std::optional<std::filesystem::path>& path() const;
+
+    void set_path(std::filesystem::path);
+
 private:
     WGPUTexture m_texture;
     WGPUTextureView m_view;
+    std::optional<std::filesystem::path> m_path;
 
     void init(WGPUDevice, int w, int h,
               WGPUTextureFormat format, WGPUTextureUsage usage);

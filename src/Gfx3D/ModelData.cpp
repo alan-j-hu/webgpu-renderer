@@ -1,6 +1,11 @@
 #include "noworry/Gfx3D/ModelData.h"
 #include <utility>
 
+ModelData::Part::Part(std::shared_ptr<Material> material)
+    : m_material(std::move(material))
+{
+}
+
 ModelData::Part::Part(std::vector<Vertex> vertices,
                       std::vector<std::uint16_t> indices,
                       std::shared_ptr<Material> material,

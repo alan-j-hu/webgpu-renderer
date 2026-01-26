@@ -12,6 +12,7 @@ class DynamicMesh : public Mesh
 {
 public:
     DynamicMesh();
+    DynamicMesh(std::shared_ptr<Material>);
     DynamicMesh(DynamicMesh&& other);
     DynamicMesh& operator=(DynamicMesh&& other);
 
@@ -26,6 +27,8 @@ public:
     virtual std::size_t index_count() const override;
 
     virtual WGPUPrimitiveTopology topology() const override;
+
+    const ModelData::Part& mesh_data() const;
 
     void clear();
 

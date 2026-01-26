@@ -109,6 +109,23 @@ void Editor::draw_menubar()
                 m_main_file_dialog.open(FileDialog::WRITE);
             }
 
+            if (ImGui::BeginMenu("Export")) {
+                Exporter& exporter = m_app_state->exporter();
+                Assimp::Exporter& ai_exporter = exporter.ai_exporter();
+                size_t count = ai_exporter.GetExportFormatCount();
+                for (int i = 0; i < count; ++i) {
+                    auto* desc = ai_exporter.GetExportFormatDescription(i);
+                    if (ImGui::MenuItem(desc->id)) {
+                        exporter.export_project(
+                            m_app_state->project(),
+                            *desc,
+                            std::filesystem::path("./export"));
+                    }
+                }
+
+                ImGui::EndMenu();
+            }
+
             ImGui::EndMenu();
         }
         if (ImGui::BeginMenu("Edit")) {
@@ -122,6 +139,9 @@ void Editor::draw_menubar()
                 save_project(*path);
             }
             m_io_state = IOState::NONE;
+        }
+
+        if (m_io_state == IOState::EXPORTING) {
         }
 
         ImGui::EndMenuBar();

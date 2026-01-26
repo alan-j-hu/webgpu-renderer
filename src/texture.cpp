@@ -89,6 +89,8 @@ std::optional<Texture> Texture::from_path(
     texture.upload(device, data);
     stbi_image_free(data);
 
+    texture.set_path(path);
+
     return std::optional(std::move(texture));
 }
 
@@ -125,6 +127,16 @@ void Texture::upload(WGPUDevice device, void* data)
     extent.depthOrArrayLayers = 1;
 
     wgpuQueueWriteTexture(queue, &dst, data, 4 * w * h, &src, &extent);
+}
+
+const std::optional<fs::path>& Texture::path() const
+{
+    return m_path;
+}
+
+void Texture::set_path(fs::path path)
+{
+    m_path = std::move(path);
 }
 
 void Texture::init(

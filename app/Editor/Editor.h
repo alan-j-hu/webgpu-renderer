@@ -61,6 +61,7 @@ private:
     enum class IOState
     {
         NONE,
+        EXPORTING,
         OPENING,
         SAVING
     } m_io_state;

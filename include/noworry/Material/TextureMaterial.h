@@ -17,10 +17,11 @@ public:
         std::shared_ptr<const Texture>,
         WGPUSampler sampler);
 
-    int id() { return m_id; }
-    const Texture& texture() { return *m_texture; }
-    virtual WGPUBindGroup bind_group() const override { return m_bind_group; }
-    virtual TextureEffect& effect() const override { return *m_effect; }
+    int id() const;
+    const Texture& texture();
+    virtual WGPUBindGroup bind_group() const override;
+    virtual TextureEffect& effect() const override;
+    virtual std::optional<const Texture*> diffuse_map() const override;
 
 private:
     int m_id;

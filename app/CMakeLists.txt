@@ -12,6 +12,7 @@ set(IMGUI_SRC
 add_executable(demo
   AppState.cpp
   Deserialize.cpp
+  Export.cpp
   main.cpp
   Project.cpp
   Serialize.cpp

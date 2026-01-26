@@ -9,6 +9,14 @@ DynamicMesh::DynamicMesh()
 {
 }
 
+DynamicMesh::DynamicMesh(std::shared_ptr<Material> material)
+    : m_vertex_buffer {nullptr},
+      m_index_buffer {nullptr},
+      m_topology {WGPUPrimitiveTopology_TriangleList},
+      m_model_part(std::move(material))
+{
+}
+
 DynamicMesh::DynamicMesh(DynamicMesh&& other)
     : m_model_part(std::move(other.m_model_part)),
       m_vertex_buffer {nullptr},
@@ -67,6 +75,11 @@ std::size_t DynamicMesh::index_count() const
 WGPUPrimitiveTopology DynamicMesh::topology() const
 {
     return m_topology;
+}
+
+const ModelData::Part& DynamicMesh::mesh_data() const
+{
+    return m_model_part;
 }
 
 void DynamicMesh::clear()

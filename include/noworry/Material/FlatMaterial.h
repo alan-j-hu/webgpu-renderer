@@ -14,11 +14,13 @@ public:
         FlatEffect&,
         float r, float g, float b);
 
-    int id() { return m_id; }
-    virtual WGPUBindGroup bind_group() const override { return m_bind_group; }
-    virtual FlatEffect& effect() const override { return *m_effect; }
+    int id() const;
+    virtual WGPUBindGroup bind_group() const override;
+    virtual FlatEffect& effect() const override;
+    virtual glm::vec4 diffuse_factor() const override;
 
 private:
+    glm::vec4 m_color;
     int m_id;
     FlatEffect* m_effect;
     WGPUBuffer m_buffer;
