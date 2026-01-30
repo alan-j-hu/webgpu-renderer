@@ -46,6 +46,10 @@ public:
     glm::vec3 map_2d_to_3d(const glm::vec2&) const;
     glm::vec2 map_3d_to_2d(const glm::vec3&) const;
 
+    bool viewer_mouse_down() const { return m_viewer_mouse_down; }
+
+    bool viewer_mouse_over() const { return m_viewer_mouse_over; }
+
     std::optional<std::pair<int, int>> mouseover_cell();
 
     glm::vec2 mouse_pos() const;
@@ -78,6 +82,8 @@ private:
     RenderTarget m_subwindow_2d;
     RenderTarget m_subwindow_3d;
     Spritesheet m_spritesheet;
+    bool m_viewer_mouse_down;
+    bool m_viewer_mouse_over;
 
     LayerLocation m_selected_layer;
 

@@ -5,7 +5,7 @@
 #include "noworry/grid.h"
 
 #include <fstream>
-#include <imgui.h>
+#include "imgui.h"
 
 Editor::Editor(AppState& app_state)
     : m_camera_selection(0),
@@ -18,6 +18,8 @@ Editor::Editor(AppState& app_state)
                     app_state.sprite_renderer().pipeline(),
                     m_subwindow_3d.texture(),
                     app_state.renderer().default_sampler()),
+      m_viewer_mouse_down(false),
+      m_viewer_mouse_over(false),
       m_scene(app_state.renderer()),
       m_height_mode(app_state, *this),
       m_tile_mode(app_state, *this),
@@ -195,8 +197,22 @@ void Editor::draw_tilemap_editor()
         ImVec2 mouse_pos = ImGui::GetMousePos();
         m_mouse_rel_x = mouse_pos.x - screen_pos.x;
         m_mouse_rel_y = mouse_pos.y - screen_pos.y;
+
+        auto size = ImVec2(m_subwindow_2d.width(), m_subwindow_2d.height());
+        auto pos = ImGui::GetCursorScreenPos();
+
+        // If the mouse happens to click down while interacting with
+        // overlapping UI widgets, the mouse event should not be sent to the
+        // canvas. See the solution at https://github.com/ocornut/imgui/issues/4234#issuecomment-863344948.
+        ImGui::InvisibleButton(
+            "canvas", size,
+            ImGuiButtonFlags_MouseButtonLeft
+            | ImGuiButtonFlags_MouseButtonRight);
+        m_viewer_mouse_over = ImGui::IsItemHovered();
+        m_viewer_mouse_down = ImGui::IsItemActive();
+        ImGui::SetCursorScreenPos(pos);
         ImGui::Image((ImTextureID)(intptr_t)m_subwindow_2d.texture().view(),
-                     ImVec2(m_subwindow_2d.width(), m_subwindow_2d.height()));
+                     size);
     }
     ImGui::EndChild();
 

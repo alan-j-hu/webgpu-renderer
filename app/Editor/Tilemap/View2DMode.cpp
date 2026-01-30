@@ -19,14 +19,16 @@ void View2DMode::handle_input()
         int x = cell_opt->first;
         int y = cell_opt->second;
 
-        if (ImGui::IsMouseDown(ImGuiMouseButton_Left)) {
-            handle_left_mouse_down(x, y);
-        } else if (ImGui::IsMouseReleased(ImGuiMouseButton_Left)) {
-            handle_left_mouse_released(x, y);
-        } else if (ImGui::IsMouseDown(ImGuiMouseButton_Right)) {
-            handle_right_mouse_down(x, y);
-        } else if (ImGui::IsMouseReleased(ImGuiMouseButton_Right)) {
-            handle_right_mouse_released(x, y);
+        if (editor().viewer_mouse_down()) {
+            if (ImGui::IsMouseDown(ImGuiMouseButton_Left)) {
+                handle_left_mouse_down(x, y);
+            } else if (ImGui::IsMouseReleased(ImGuiMouseButton_Left)) {
+                handle_left_mouse_released(x, y);
+            } else if (ImGui::IsMouseDown(ImGuiMouseButton_Right)) {
+                handle_right_mouse_down(x, y);
+            } else if (ImGui::IsMouseReleased(ImGuiMouseButton_Right)) {
+                handle_right_mouse_released(x, y);
+            }
         }
     }
 }
