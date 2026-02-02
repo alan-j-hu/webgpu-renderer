@@ -26,6 +26,7 @@ add_executable(demo
   Commands/UpdateTileCommand.cpp
   Editor/Editor.cpp
   Editor/ErrorModal.cpp
+  Editor/ExportDialog.cpp
   Editor/FileDialog.cpp
   Editor/Tilemap/HeightMode.cpp
   Editor/Tilemap/LayerNode.cpp

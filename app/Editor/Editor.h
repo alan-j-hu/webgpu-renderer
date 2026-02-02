@@ -3,6 +3,7 @@
 
 #include "FileDialog.h"
 #include "ErrorModal.h"
+#include "ExportDialog.h"
 #include "Tilemap/HeightMode.h"
 #include "Tilemap/LayerNode.h"
 #include "Tilemap/LevelNode.h"
@@ -73,6 +74,7 @@ private:
     int m_camera_selection;
 
     AppState* m_app_state;
+    ExportDialog m_export_dialog;
     FileDialog m_main_file_dialog;
     ErrorModal m_error_modal;
 

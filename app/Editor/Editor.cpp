@@ -11,6 +11,7 @@ Editor::Editor(AppState& app_state)
     : m_camera_selection(0),
       m_app_state(&app_state),
       m_main_file_dialog("Choose File", std::filesystem::current_path()),
+      m_export_dialog(app_state),
       m_tile_list(app_state, *this),
       m_subwindow_2d(app_state.renderer().device(), 500, 500),
       m_subwindow_3d(app_state.renderer().device(), 500, 500),
@@ -111,21 +112,9 @@ void Editor::draw_menubar()
                 m_main_file_dialog.open(FileDialog::WRITE);
             }
 
-            if (ImGui::BeginMenu("Export")) {
-                Exporter& exporter = m_app_state->exporter();
-                Assimp::Exporter& ai_exporter = exporter.ai_exporter();
-                size_t count = ai_exporter.GetExportFormatCount();
-                for (int i = 0; i < count; ++i) {
-                    auto* desc = ai_exporter.GetExportFormatDescription(i);
-                    if (ImGui::MenuItem(desc->id)) {
-                        exporter.export_project(
-                            m_app_state->project(),
-                            *desc,
-                            std::filesystem::path("./export"));
-                    }
-                }
-
-                ImGui::EndMenu();
+            if (ImGui::MenuItem("Export")) {
+                m_io_state = Editor::IOState::EXPORTING;
+                m_export_dialog.open();
             }
 
             ImGui::EndMenu();
@@ -144,6 +133,9 @@ void Editor::draw_menubar()
         }
 
         if (m_io_state == IOState::EXPORTING) {
+            if (m_export_dialog.update() == ExportDialog::State::CLOSED) {
+                m_io_state = IOState::NONE;
+            }
         }
 
         ImGui::EndMenuBar();
