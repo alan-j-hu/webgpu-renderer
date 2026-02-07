@@ -25,7 +25,8 @@ Texture::Texture(WGPUDevice device, int w, int h,
 
 Texture::Texture(Texture&& other)
     : m_texture {other.m_texture},
-      m_view {other.m_view}
+      m_view {other.m_view},
+      m_path(std::move(other.m_path))
 {
     other.m_texture = nullptr;
     other.m_view = nullptr;
@@ -37,9 +38,13 @@ Texture& Texture::operator=(Texture&& other)
     wgpuTextureRelease(m_texture);
 
     m_texture = other.m_texture;
-    m_view = other.m_view;
     other.m_texture = nullptr;
+
+    m_view = other.m_view;
     other.m_view = nullptr;
+
+    m_path = std::move(other.m_path);
+
     return *this;
 }
 
