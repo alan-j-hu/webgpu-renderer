@@ -15,6 +15,7 @@
 #include "noworry/camera/orthographiccamera.h"
 #include "noworry/scene/scene.h"
 
+#include <optional>
 #include <stdexcept>
 #include <type_traits>
 #include <vector>
@@ -118,7 +119,7 @@ public:
 
     template <class C,
               class = std::enable_if_t<std::is_convertible_v<C*, Command*>>>
-    void push_command(
+    std::optional<std::string> push_command(
         std::unique_ptr<C> command,
         CommandHolder<C>* holder = nullptr)
     {
@@ -128,6 +129,9 @@ public:
         }
 
         auto outcome = command->first_do(m_project);
+        if (!outcome) {
+            return outcome.error();
+        }
         if (outcome != Command::Outcome::UNCHANGED) {
             m_redo_stack.clear();
         }
@@ -137,6 +141,8 @@ public:
         } else {
             m_current_command.set(std::move(command), holder);
         }
+
+        return std::nullopt;
     }
 
     void update_current_command();

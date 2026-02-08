@@ -15,7 +15,9 @@ PlaceTilesCommand::PlaceTilesCommand(Layer& layer)
 {
 }
 
-Command::Outcome PlaceTilesCommand::up(Project& project)
+auto PlaceTilesCommand::up(
+    Project& project
+) -> std::expected<Command::Outcome, std::string>
 {
     bool changed = false;
     for (auto& pair : m_old_tiles) {

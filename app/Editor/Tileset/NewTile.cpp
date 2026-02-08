@@ -12,8 +12,9 @@ NewTile::NewTile(AppState& app_state)
 {
 }
 
-void NewTile::open()
+void NewTile::open(int index)
 {
+    m_index = index;
     ImGui::OpenPopup("New Tile");
 }
 
@@ -27,8 +28,9 @@ void NewTile::update()
 
         if (ImGui::Button("Add Tile")) {
             m_app_state->push_command(
-                std::make_unique<CreateTileCommand>(*m_definition)
-            );
+                std::make_unique<CreateTileCommand>(
+                    *m_definition,
+                    m_index));
             ImGui::CloseCurrentPopup();
         }
         ImGui::SameLine();

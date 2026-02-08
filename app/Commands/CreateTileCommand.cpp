@@ -1,12 +1,14 @@
 #include "CreateTileCommand.h"
 #include <utility>
 
-CreateTileCommand::CreateTileCommand(TileDef tile_def)
-    : m_tile_def(std::move(tile_def))
+CreateTileCommand::CreateTileCommand(TileDef tile_def, int index)
+    : m_tile_def(std::move(tile_def)), m_index(index)
 {
 }
 
-Command::Outcome CreateTileCommand::up(Project& project)
+auto CreateTileCommand::up(
+    Project& project
+) -> std::expected<Command::Outcome, std::string>
 {
     project.tileset_at(0)->add(m_tile_def);
     return Outcome::DONE;
@@ -14,7 +16,7 @@ Command::Outcome CreateTileCommand::up(Project& project)
 
 void CreateTileCommand::down(Project& project)
 {
-    project.tileset_at(0)->remove(project.tileset_at(0)->count() - 1);
+    project.tileset_at(0)->remove(m_index);
 }
 
 const char* CreateTileCommand::name()

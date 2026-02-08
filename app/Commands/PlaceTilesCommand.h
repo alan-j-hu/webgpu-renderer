@@ -23,7 +23,7 @@ public:
     void add_placement(int x, int y);
 
 protected:
-    Command::Outcome up(Project&) override;
+    std::expected<Outcome, std::string> up(Project&) override;
     void down(Project&) override;
 
 private:

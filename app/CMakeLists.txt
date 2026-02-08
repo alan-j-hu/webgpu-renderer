@@ -22,6 +22,7 @@ add_executable(demo
   Commands/CreateLayerCommand.cpp
   Commands/CreateTileCommand.cpp
   Commands/DeleteLayerCommand.cpp
+  Commands/DeleteTileCommand.cpp
   Commands/PlaceTilesCommand.cpp
   Commands/UpdateTileCommand.cpp
   Editor/Editor.cpp

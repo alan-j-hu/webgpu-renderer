@@ -100,7 +100,9 @@ public:
     std::shared_ptr<const TileDef> at(int idx) const;
     void set(int idx, TileDef tiledef);
 
+    void add(TileDef tiledef, int idx);
     void add(TileDef tiledef);
+
     std::shared_ptr<TileDef> remove(int idx);
 
     Listenable<Listener>& listenable() const { return m_listenable; }
@@ -147,6 +149,8 @@ public:
     void set(int x, int y, std::optional<TileInst> option);
 
     void fill_model(DynamicModel&) const;
+
+    bool uses_tiledef(const TileDef&) const;
 
     Listenable<Listener>& listenable() const
     {
@@ -201,6 +205,8 @@ public:
     void add_layer();
     void add_layer(std::unique_ptr<Layer>, int idx);
     std::unique_ptr<Layer> remove_layer(int idx);
+
+    bool uses_tiledef(const TileDef&) const;
 
     Listenable<Listener>& listenable() const
     {
@@ -279,6 +285,8 @@ public:
 
     bool insert_level(InsertionInfo);
 
+    bool uses_tiledef(const TileDef&) const;
+
     Listenable<Listener>& listenable() const
     {
         return m_listenable;
@@ -342,6 +350,8 @@ public:
 
     Layer& layer_at(const LayerLocation&);
     const Layer& layer_at(const LayerLocation&) const;
+
+    bool tiledef_in_use(const TileDef&) const;
 
     Listenable<Listener>& listenable() const
     {

@@ -62,6 +62,8 @@ public:
         return *m_tileset_thumbnails.at(idx);
     }
 
+    void open_error_modal(const std::string& message);
+
 private:
     enum class IOState
     {

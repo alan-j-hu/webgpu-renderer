@@ -127,10 +127,21 @@ void Tileset::set(int idx, TileDef tiledef)
     m_listenable.notify(&Tileset::Listener::tile_replaced, idx);
 }
 
+void Tileset::add(TileDef tiledef, int idx)
+{
+    if (idx < 0 || idx > m_tiles.size()) {
+        return;
+    }
+
+    m_tiles.insert(
+        m_tiles.begin() + idx,
+        std::make_shared<TileDef>(std::move(tiledef)));
+    m_listenable.notify(&Tileset::Listener::tile_added, idx);
+}
+
 void Tileset::add(TileDef tiledef)
 {
-    m_tiles.push_back(std::make_shared<TileDef>(std::move(tiledef)));
-    m_listenable.notify(&Tileset::Listener::tile_added, m_tiles.size() - 1);
+    add(std::move(tiledef), m_tiles.size());
 }
 
 std::shared_ptr<TileDef> Tileset::remove(int idx)
@@ -202,6 +213,23 @@ void Layer::fill_model(DynamicModel& model) const
     }
 }
 
+bool Layer::uses_tiledef(const TileDef& tiledef) const
+{
+    for (int y = 0; y < 16; ++y) {
+        for (int x = 0; x < 16; ++x) {
+            auto& opt = at(x, y);
+            if (!opt) {
+                continue;
+            }
+            if (opt->def().get() == &tiledef) {
+                return true;
+            }
+        }
+    }
+
+    return false;
+}
+
 Level::Level()
 {
     m_layers.push_back(std::make_unique<Layer>());
@@ -252,6 +280,16 @@ std::unique_ptr<Layer> Level::remove_layer(int idx)
     m_layers.erase(m_layers.begin() + idx);
     m_listenable.notify(&Level::Listener::layer_removed, *layer, idx);
     return layer;
+}
+
+bool Level::uses_tiledef(const TileDef& tiledef) const
+{
+    for (auto& layer : m_layers) {
+        if (layer->uses_tiledef(tiledef)) {
+            return true;
+        }
+    }
+    return false;
 }
 
 World::World(std::shared_ptr<const Tileset> tileset)
@@ -331,6 +369,16 @@ bool World::insert_level(World::InsertionInfo info)
     m_levels_by_coord.emplace(ivec2, v.get());
     v->set_loc(info.x, info.y);
     return true;
+}
+
+bool World::uses_tiledef(const TileDef& tiledef) const
+{
+    for (auto& entry : *this) {
+        if (entry.second->uses_tiledef(tiledef)) {
+            return true;
+        }
+    }
+    return false;
 }
 
 Project::Project()
@@ -421,4 +469,14 @@ const Layer& Project::layer_at(const LayerLocation& location) const
     return world_at(location.world)
         .level_at(location.level.x, location.level.y)
         .layer_at(location.layer);
+}
+
+bool Project::tiledef_in_use(const TileDef& tiledef) const
+{
+    for (auto& world : m_worlds) {
+        if (world->uses_tiledef(tiledef)) {
+            return true;
+        }
+    }
+    return false;
 }

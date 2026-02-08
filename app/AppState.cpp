@@ -63,7 +63,8 @@ void AppState::update_current_command()
 {
     if (m_current_command.get() != nullptr) {
         if (auto* command = m_current_command.get()) {
-            if (command->first_do(m_project) == Command::Outcome::DONE) {
+            auto expected = command->first_do(m_project);
+            if (expected && *expected == Command::Outcome::DONE) {
                 finish_current_command();
             }
         }

@@ -1,4 +1,6 @@
 #include "TileList.h"
+#include "../Editor.h"
+#include "../../Commands/DeleteTileCommand.h"
 #include "../../Commands/UpdateTileCommand.h"
 #include <utility>
 #include "imgui.h"
@@ -18,10 +20,20 @@ void TileList::draw()
     std::shared_ptr<const Tileset> tileset =
         m_app_state->project().tileset_at(0);
 
-    if (ImGui::Button("Add New Tile")) {
-        m_new_tile.open();
+    if (ImGui::Button("+")) {
+        m_new_tile.open(m_selected + 1);
     }
     m_new_tile.update();
+
+    ImGui::SameLine();
+    if (ImGui::Button("-") && m_selected != -1) {
+        auto error = m_app_state->push_command(
+            std::make_unique<DeleteTileCommand>(m_selected));
+        if (error) {
+            m_editor->open_error_modal(*error);
+        }
+        m_selected = -1;
+    }
 
     auto& project = m_app_state->project();
     m_tile_picker.render(m_selected);
@@ -31,8 +43,7 @@ void TileList::draw()
         if (optional) {
             m_app_state->push_command(std::make_unique<UpdateTileCommand>(
                 m_selected,
-                optional.value())
-            );
+                optional.value()));
         }
     }
 }

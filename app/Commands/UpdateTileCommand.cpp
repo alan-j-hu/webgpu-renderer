@@ -7,7 +7,9 @@ UpdateTileCommand::UpdateTileCommand(
 {
 }
 
-Command::Outcome UpdateTileCommand::up(Project& project)
+auto UpdateTileCommand::up(
+    Project& project
+) -> std::expected<Command::Outcome, std::string>
 {
     std::shared_ptr<Tileset> tileset = project.tileset_at(0);
     std::shared_ptr<TileDef> old_tiledef = tileset->at(m_idx);

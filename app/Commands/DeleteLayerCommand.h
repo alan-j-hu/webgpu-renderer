@@ -14,7 +14,7 @@ public:
     virtual const char* name() override;
 
 protected:
-    virtual Command::Outcome up(Project&) override;
+    virtual std::expected<Outcome, std::string> up(Project&) override;
     virtual void down(Project&) override;
 
 private:

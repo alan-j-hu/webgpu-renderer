@@ -1,12 +1,13 @@
-#ifndef CREATE_TILE_COMMAND_H
-#define CREATE_TILE_COMMAND_H
+#ifndef DELETE_TILE_COMMAND_H
+#define DELETE_TILE_COMMAND_H
 
 #include "Command.h"
+#include <memory>
 
-class CreateTileCommand : public Command
+class DeleteTileCommand : public Command
 {
 public:
-    CreateTileCommand(TileDef, int index);
+    DeleteTileCommand(int index);
 
     virtual const char* name() override;
 
@@ -15,7 +16,7 @@ protected:
     virtual void down(Project&) override;
 
 private:
-    TileDef m_tile_def;
+    std::shared_ptr<TileDef> m_tiledef;
     int m_index;
 };
 

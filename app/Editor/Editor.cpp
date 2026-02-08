@@ -92,6 +92,11 @@ glm::vec2 Editor::mouse_pos() const
     return glm::vec2(m_mouse_rel_x, m_mouse_rel_y);
 }
 
+void Editor::open_error_modal(const std::string& message)
+{
+    m_error_modal.open(message.c_str());
+}
+
 void Editor::draw()
 {
     draw_menubar();

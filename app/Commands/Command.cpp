@@ -6,13 +6,15 @@ Command::Command()
 {
 }
 
-Command::Outcome Command::first_do(Project& project)
+auto Command::first_do(
+    Project& project
+) -> std::expected<Command::Outcome, std::string>
 {
     if (m_state != State::PENDING) {
         throw std::logic_error("Command already executed!");
     }
-    Command::Outcome outcome = up(project);
-    if (outcome == Command::Outcome::DONE) {
+    auto outcome = up(project);
+    if (outcome && *outcome == Command::Outcome::DONE) {
         m_state = State::UP;
     }
     return outcome;

@@ -10,7 +10,9 @@ CreateLayerCommand::CreateLayerCommand(Level& level, int idx)
 {
 }
 
-Command::Outcome CreateLayerCommand::up(Project& project)
+auto CreateLayerCommand::up(
+    Project& project
+) -> std::expected<Command::Outcome, std::string>
 {
     m_level.add_layer(std::move(m_layer), m_idx);
     return Outcome::DONE;

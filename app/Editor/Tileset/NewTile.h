@@ -11,7 +11,7 @@ class NewTile
 public:
     NewTile(AppState&);
 
-    void open();
+    void open(int index);
 
     void update();
 
@@ -19,6 +19,7 @@ private:
     AppState* m_app_state;
     std::shared_ptr<TileDef> m_definition;
     TileDefinitionEditor m_edit;
+    int m_index;
 };
 
 #endif

@@ -2,6 +2,7 @@
 #define COMMAND_H
 
 #include "../Project.h"
+#include <expected>
 
 /// Abstract class for undo/redo functionality.
 class Command
@@ -26,7 +27,7 @@ public:
 
     /// Perform the command for the first time. This function may be called
     /// multiple times in a row.
-    Outcome first_do(Project&);
+    std::expected<Outcome, std::string> first_do(Project&);
 
     /// Signals that the initial command has finished. Now, the command can
     /// be undone.
@@ -39,7 +40,7 @@ public:
 
 protected:
     /// Override to implement the logic for redo.
-    virtual Outcome up(Project&) = 0;
+    virtual std::expected<Outcome, std::string> up(Project&) = 0;
     /// Override to implement the logic for undo.
     virtual void down(Project&) = 0;
 
