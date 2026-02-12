@@ -141,7 +141,7 @@ bool ResourceLoader<ModelData>::load_node(
             v.y = output.y;
             v.z = output.z;
             v.u = ai_mesh->mTextureCoords[0][j].x;
-            v.v = ai_mesh->mTextureCoords[0][j].y;
+            v.v = 1 - ai_mesh->mTextureCoords[0][j].y;
             vertices.push_back(v);
         }
 

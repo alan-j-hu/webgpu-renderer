@@ -128,7 +128,7 @@ std::unique_ptr<aiMesh> Exporter::create_mesh(const DynamicMesh& mesh)
     for (int i = 0; i < vertex_count; ++i) {
         auto& vertex = vertices[i];
         ai_positions.get()[i] = aiVector3D(vertex.x, vertex.z, -vertex.y);
-        ai_texture_coords.get()[i] = aiVector3D(vertex.u, vertex.v, 0);
+        ai_texture_coords.get()[i] = aiVector3D(vertex.u, 1 - vertex.v, 0);
     }
 
     auto face_count = mesh.index_count() / 3;
