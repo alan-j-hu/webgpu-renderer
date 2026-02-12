@@ -13,7 +13,11 @@ struct FragmentInput {
 
 @fragment
 fn fs_main(input: FragmentInput) -> @location(0) vec4f {
-  return textureSample(the_texture, the_sampler, input.tex_coords);
+  let color = textureSample(the_texture, the_sampler, input.tex_coords);
+  if (color.a < 0.5) {
+    discard;
+  }
+  return color;
 }
 )";
     WGPUShaderSourceWGSL frag_wgsl_desc = { 0 };
