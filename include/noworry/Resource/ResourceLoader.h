@@ -52,7 +52,6 @@ private:
         const std::filesystem::path& path,
         ModelData& model,
         const aiScene* ai_scene,
-        const glm::mat4& parent_transform,
         aiNode* ai_node);
 };
 

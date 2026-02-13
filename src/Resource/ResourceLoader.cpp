@@ -60,24 +60,17 @@ std::optional<std::shared_ptr<ModelData>> ResourceLoader<ModelData>::load(
         aiProcess_CalcTangentSpace      |
         aiProcess_GlobalScale           |
         aiProcess_JoinIdenticalVertices |
+        aiProcess_PreTransformVertices  |
         aiProcess_SortByPType           |
         aiProcess_Triangulate);
     if (scene == nullptr) {
         return std::nullopt;
     }
 
-    // Swap y and z
-    glm::mat4 initial_transform;
-    initial_transform[0] = glm::vec4(1, 0, 0, 0); // Col 1
-    initial_transform[1] = glm::vec4(0, 0, 1, 0); // Col 2
-    initial_transform[2] = glm::vec4(0, -1, 0, 0); // Col 3
-    initial_transform[3] = glm::vec4(0, 0, 0, 1); // Col 4
-
     if (!load_node(resources,
                    path,
                    *model,
                    scene,
-                   initial_transform,
                    scene->mRootNode)) {
 
         return std::nullopt;
@@ -91,34 +84,8 @@ bool ResourceLoader<ModelData>::load_node(
     const std::filesystem::path& path,
     ModelData& model,
     const aiScene* ai_scene,
-    const glm::mat4& parent_transform,
     aiNode* ai_node)
 {
-    // Assimp matrix is row-major, but glm matrix is column-major
-    glm::mat4 transform;
-    transform[0] = glm::vec4(
-        ai_node->mTransformation.a1,
-        ai_node->mTransformation.b1,
-        ai_node->mTransformation.c1,
-        ai_node->mTransformation.d1);
-    transform[1] = glm::vec4(
-        ai_node->mTransformation.a2,
-        ai_node->mTransformation.b2,
-        ai_node->mTransformation.c2,
-        ai_node->mTransformation.d2);
-    transform[2] = glm::vec4(
-        ai_node->mTransformation.a3,
-        ai_node->mTransformation.b3,
-        ai_node->mTransformation.c3,
-        ai_node->mTransformation.d3);
-    transform[3] = glm::vec4(
-        ai_node->mTransformation.a4,
-        ai_node->mTransformation.b4,
-        ai_node->mTransformation.c4,
-        ai_node->mTransformation.d4);
-
-    transform = transform * parent_transform;
-
     for (int i = 0; i < ai_node->mNumMeshes; ++i) {
         int mesh_idx = ai_node->mMeshes[i];
         int material_idx = ai_scene->mMeshes[mesh_idx]->mMaterialIndex;
@@ -129,17 +96,10 @@ bool ResourceLoader<ModelData>::load_node(
         const int vc = ai_mesh->mNumVertices;
         vertices.reserve(vc);
         for (int j = 0; j < vc; ++j) {
-            glm::vec4 input(
-                ai_mesh->mVertices[j].x,
-                ai_mesh->mVertices[j].y,
-                ai_mesh->mVertices[j].z,
-                1);
-            glm::vec4 output = transform * input;
-
             Vertex v;
-            v.x = output.x;
-            v.y = output.y;
-            v.z = output.z;
+            v.x =  ai_mesh->mVertices[j].x;
+            v.y = -ai_mesh->mVertices[j].z;
+            v.z = ai_mesh->mVertices[j].y;
             v.u = ai_mesh->mTextureCoords[0][j].x;
             v.v = 1 - ai_mesh->mTextureCoords[0][j].y;
             vertices.push_back(v);
@@ -192,7 +152,6 @@ bool ResourceLoader<ModelData>::load_node(
                        path,
                        model,
                        ai_scene,
-                       transform,
                        ai_node->mChildren[i])) {
 
             return false;
