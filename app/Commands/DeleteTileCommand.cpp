@@ -21,7 +21,7 @@ auto DeleteTileCommand::up(
 
 void DeleteTileCommand::down(Project& project)
 {
-    project.tileset_at(0)->add(*m_tiledef, m_index);
+    project.tileset_at(0)->add(std::move(*m_tiledef), m_index);
     m_tiledef.reset();
 }
 

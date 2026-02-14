@@ -15,7 +15,7 @@ protected:
     virtual void down(Project&) override;
 
 private:
-    TileDef m_tile_def;
+    TileDef m_tiledef;
     int m_index;
 };
 

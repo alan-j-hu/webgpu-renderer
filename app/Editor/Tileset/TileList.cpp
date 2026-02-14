@@ -39,11 +39,10 @@ void TileList::draw()
     m_tile_picker.render(m_selected);
 
     if (m_selected != -1) {
-        auto optional = m_tile_editor.render(*tileset->at(m_selected));
-        if (optional) {
+        if (auto optional = m_tile_editor.render(*tileset->at(m_selected))) {
             m_app_state->push_command(std::make_unique<UpdateTileCommand>(
                 m_selected,
-                optional.value()));
+                std::move(*optional.value())));
         }
     }
 }

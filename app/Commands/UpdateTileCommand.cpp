@@ -1,9 +1,7 @@
 #include "UpdateTileCommand.h"
 
-UpdateTileCommand::UpdateTileCommand(
-    int idx,
-    std::shared_ptr<TileDef> tile_def)
-    : m_idx(idx), m_tiledef(std::move(tile_def))
+UpdateTileCommand::UpdateTileCommand(int idx, TileDef tiledef)
+    : m_idx(idx), m_tiledef(std::move(tiledef))
 {
 }
 
@@ -13,7 +11,7 @@ auto UpdateTileCommand::up(
 {
     std::shared_ptr<Tileset> tileset = project.tileset_at(0);
     std::shared_ptr<TileDef> old_tiledef = tileset->at(m_idx);
-    std::swap(old_tiledef, m_tiledef);
+    std::swap(*old_tiledef, m_tiledef);
     return Outcome::DONE;
 }
 

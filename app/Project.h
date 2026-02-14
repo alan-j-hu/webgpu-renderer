@@ -60,6 +60,11 @@ public:
     };
 
     TileDef();
+    TileDef(const TileDef&) = default;
+    TileDef(TileDef&&) = default;
+
+    TileDef& operator=(TileDef&) = default;
+    TileDef& operator=(TileDef&&) = default;
 
     const std::filesystem::path& model_path() const;
     const std::optional<std::shared_ptr<ModelData>>& model_data() const;

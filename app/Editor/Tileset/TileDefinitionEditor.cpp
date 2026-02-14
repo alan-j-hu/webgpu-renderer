@@ -18,22 +18,22 @@ TileDefinitionEditor::TileDefinitionEditor(AppState& app_state)
     m_camera.set_position(glm::vec3(2.0f, -0.5f, 2.0f));
     m_camera.set_target(glm::vec3(2.0f, 0.5f, 1.0f));
 
+    auto model_instance = std::make_unique<ModelInstance>();
+    m_instance = model_instance.get();
     m_scene.children().push_back(std::make_unique<RenderObject>(
         m_app_state->renderer(),
         Transform(),
         m_app_state->small_grid_mesh(),
         m_app_state->wireframe_material()));
-    m_scene.children().push_back(std::make_unique<ModelInstance>());
-    m_instance = dynamic_cast<ModelInstance*>(m_scene.children()[1].get());
+    m_scene.children().push_back(std::move(model_instance));
 }
 
-std::optional<std::shared_ptr<TileDef>>
+std::optional<std::unique_ptr<TileDef>>
 TileDefinitionEditor::render(const TileDef& definition)
 {
     render_preview();
 
-    std::shared_ptr<TileDef> new_definition =
-        std::make_shared<TileDef>(definition);
+    auto new_definition = std::make_unique<TileDef>(definition);
     bool changed = false;
 
     if (ImGui::Button("Choose File")) {
@@ -57,6 +57,8 @@ TileDefinitionEditor::render(const TileDef& definition)
     if (model_opt && model_data_opt) {
         m_model = model_opt;
         m_instance->set_model(model_opt->get());
+    } else {
+        m_instance->set_model(nullptr);
     }
 
     int width = definition.width();
@@ -74,7 +76,7 @@ TileDefinitionEditor::render(const TileDef& definition)
                  ImVec2(150, 150));
 
     if (changed) {
-        return std::make_optional<std::shared_ptr<TileDef>>(new_definition);
+        return std::make_optional(std::move(new_definition));
     }
     return std::nullopt;
 }

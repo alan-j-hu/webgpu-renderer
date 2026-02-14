@@ -17,7 +17,7 @@ public:
 
 private:
     AppState* m_app_state;
-    std::shared_ptr<TileDef> m_definition;
+    std::unique_ptr<TileDef> m_definition;
     TileDefinitionEditor m_edit;
     int m_index;
 };
