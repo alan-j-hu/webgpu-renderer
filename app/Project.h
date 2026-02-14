@@ -285,8 +285,8 @@ public:
     Level* level_at(const std::string&);
     const Level* level_at(const std::string&) const;
 
-    Level& level_at(int x, int y);
-    const Level& level_at(int x, int y) const;
+    Level* level_at(int x, int y);
+    const Level* level_at(int x, int y) const;
 
     bool insert_level(InsertionInfo);
 

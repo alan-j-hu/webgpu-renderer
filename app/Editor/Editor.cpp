@@ -155,15 +155,67 @@ void Editor::draw_main_pane()
             ImGui::EndTabItem();
         }
         if (ImGui::BeginTabItem("Tileset Editor")) {
-            m_tile_list.draw();
+            draw_tileset_editor();
+            ImGui::EndTabItem();
+        }
+        if (ImGui::BeginTabItem("World Editor")) {
+            draw_world_editor();
             ImGui::EndTabItem();
         }
         ImGui::EndTabBar();
     }
 }
 
+void Editor::draw_world_editor()
+{
+    const int THUMBNAIL_SIZE = 64;
+
+    auto& world = m_app_state->project().world_at(0);
+    const int width = world.grid_width();
+    const int depth = world.grid_depth();
+    ImGuiTableFlags flags =
+        ImGuiTableFlags_BordersOuterH
+      | ImGuiTableFlags_BordersOuterV;
+
+    if (ImGui::BeginTable("World Grid", width, flags)) {
+        for (int y = 0; y < depth; ++y) {
+          ImGui::PushID(y);
+          ImGui::TableNextRow(ImGuiTableRowFlags_None, THUMBNAIL_SIZE);
+          for (int x = 0; x < width; ++x) {
+              ImGui::TableNextColumn();
+              Level* level = world.level_at(x, y);
+              if (level == nullptr) {
+              }
+
+              ImGui::PushID(x);
+
+              auto& level_node = m_level_nodes.at(level);
+              auto& layer_node = level_node->layer_at(0);
+              auto tex_id =
+                  (ImTextureID)(intptr_t)layer_node.thumbnail().view();
+
+              if (ImGui::ImageButton(
+                      "#Button",
+                      tex_id,
+                      ImVec2(THUMBNAIL_SIZE, THUMBNAIL_SIZE),
+                      ImVec2(0, 0),
+                      ImVec2(1, 1))) {
+
+              }
+
+              ImGui::PopID();
+          }
+
+          ImGui::PopID();
+        }
+
+        ImGui::EndTable();
+    }
+}
+
 void Editor::draw_tileset_editor()
 {
+    m_tile_list.draw();
 }
 
 void Editor::draw_tilemap_editor()
@@ -295,7 +347,7 @@ void Editor::draw_layer_item(int i)
     const ImVec4 tint_color =
         selected ? ImVec4(0.8, 0.8, 0.8, 1) : ImVec4(1, 1, 1, 1);
 
-    auto& level_node = *m_level_nodes.at(&project.world_at(0).level_at(0, 0));
+    auto& level_node = *m_level_nodes.at(project.world_at(0).level_at(0, 0));
     ImTextureID tex_id =
         (ImTextureID)(intptr_t)level_node.layer_at(i).thumbnail().view();
 
@@ -388,6 +440,6 @@ void Editor::setup_scene()
         m_app_state->wireframe_material()
     ));
     m_scene.children().push_back(std::make_unique<RenderableRef>(
-        *m_level_nodes.at(&world.level_at(0, 0))
+        *m_level_nodes.at(world.level_at(0, 0))
     ));
 }

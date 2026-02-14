@@ -349,14 +349,22 @@ const Level* World::level_at(const std::string& name) const
     return ptr->get();
 }
 
-Level& World::level_at(int x, int y)
+Level* World::level_at(int x, int y)
 {
-    return *m_levels_by_coord.at(glm::ivec2(x, y));
+    auto it = m_levels_by_coord.find(glm::ivec2(x, y));
+    if (it == m_levels_by_coord.end()) {
+        return nullptr;
+    }
+    return it->second;
 }
 
-const Level& World::level_at(int x, int y) const
+const Level* World::level_at(int x, int y) const
 {
-    return *m_levels_by_coord.at(glm::ivec2(x, y));
+    auto it = m_levels_by_coord.find(glm::ivec2(x, y));
+    if (it == m_levels_by_coord.end()) {
+        return nullptr;
+    }
+    return it->second;
 }
 
 bool World::insert_level(World::InsertionInfo info)
@@ -447,13 +455,13 @@ std::unique_ptr<World> Project::remove_world(int idx)
 
 Level& Project::level_at(const LayerLocation& location)
 {
-    return world_at(location.world)
+    return *world_at(location.world)
         .level_at(location.level.x, location.level.y);
 }
 
 const Level& Project::level_at(const LayerLocation& location) const
 {
-    return world_at(location.world)
+    return *world_at(location.world)
         .level_at(location.level.x, location.level.y);
 }
 
@@ -461,14 +469,14 @@ Layer& Project::layer_at(const LayerLocation& location)
 {
     return world_at(location.world)
         .level_at(location.level.x, location.level.y)
-        .layer_at(location.layer);
+        ->layer_at(location.layer);
 }
 
 const Layer& Project::layer_at(const LayerLocation& location) const
 {
     return world_at(location.world)
         .level_at(location.level.x, location.level.y)
-        .layer_at(location.layer);
+        ->layer_at(location.layer);
 }
 
 bool Project::tiledef_in_use(const TileDef& tiledef) const
