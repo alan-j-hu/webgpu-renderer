@@ -10,7 +10,7 @@ class TilePicker
 public:
     TilePicker(AppState&, Editor&);
 
-    void render(int& selected_tile);
+    void render(std::optional<int>& selected_tile);
 
 private:
     AppState* m_app_state;

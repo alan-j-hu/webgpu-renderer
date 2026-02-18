@@ -6,7 +6,6 @@
 
 TileMode::TileMode(AppState& app_state, Editor& editor)
     : View2DMode(app_state, editor),
-      m_selected_tile(-1),
       m_tile_picker(app_state, editor),
       m_rotation(Rotation::Rotate0)
 {
@@ -17,17 +16,16 @@ void TileMode::draw_overlay(
     SpriteRenderer& sprite_renderer)
 {
     const Project& project = app_state().project();
-    auto selected = editor().selected_layer();
-    auto& world = project.world_at(selected.world);
+    auto& world = project.world_at(0);
 
     TileThumbnail* thumb = nullptr;
     const TileDef* tiledef = nullptr;
 
-    if (m_selected_tile >= 0
-        && m_selected_tile < project.tileset_at(0)->count()) {
+    auto tiledef_idx = app_state().selected_tiledef_idx();
+    if (tiledef_idx) {
 
-        thumb = &editor().tileset_thumbnails(0).at(m_selected_tile);
-        tiledef = world.tileset()->at(m_selected_tile).get();
+        thumb = &editor().tileset_thumbnails(0).at(*tiledef_idx);
+        tiledef = world.tileset()->at(*tiledef_idx).get();
     }
 
     std::optional<std::pair<int, int>> cell_opt = editor().mouseover_cell();
@@ -94,23 +92,25 @@ void TileMode::draw_controls()
         m_rotation = Rotation::Rotate270;
     }
 
-    m_tile_picker.render(m_selected_tile);
+    auto idx = app_state().selected_tiledef_idx();
+    m_tile_picker.render(idx);
+    app_state().select_tiledef(idx);
 }
 
 void TileMode::handle_left_mouse_down(int x, int y)
 {
     auto& project = app_state().project();
-    auto selected = editor().selected_layer();
-    auto& world = project.world_at(selected.world);
+    auto selected_tiledef = app_state().selected_tiledef();
+    Layer* selected_layer = app_state().selected_layer();
 
-    if (selected.layer != -1 && m_selected_tile != -1) {
-        auto& layer = project.layer_at(selected);
+    if (selected_layer != nullptr && selected_tiledef) {
+        Layer& layer = *selected_layer;
         short z = editor().z_palette().selected_z();
 
         if (m_command.get() == nullptr) {
             auto command = std::make_unique<PlaceTilesCommand>(
                 layer, z, m_rotation,
-                world.tileset()->at(m_selected_tile));
+                *selected_tiledef);
             app_state().push_command(std::move(command), &m_command);
         }
 
@@ -129,12 +129,11 @@ void TileMode::handle_left_mouse_released(int x, int y)
 void TileMode::handle_right_mouse_down(int x, int y)
 {
     auto& project = app_state().project();
-    auto selected = editor().selected_layer();
+    Layer* layer = app_state().selected_layer();
 
-    if (selected.layer != -1 && m_selected_tile != -1) {
-        auto& layer = project.layer_at(selected);
+    if (layer != nullptr) {
         if (m_command.get() == nullptr) {
-            auto command = std::make_unique<PlaceTilesCommand>(layer);
+            auto command = std::make_unique<PlaceTilesCommand>(*layer);
             app_state().push_command(std::move(command), &m_command);
         }
 

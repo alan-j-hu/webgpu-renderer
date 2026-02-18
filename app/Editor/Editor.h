@@ -55,8 +55,6 @@ public:
 
     glm::vec2 mouse_pos() const;
 
-    const LayerLocation& selected_layer() const { return m_selected_layer; }
-
     TilesetThumbnails& tileset_thumbnails(int idx)
     {
         return *m_tileset_thumbnails.at(idx);
@@ -88,8 +86,6 @@ private:
     Spritesheet m_spritesheet;
     bool m_viewer_mouse_down;
     bool m_viewer_mouse_over;
-
-    LayerLocation m_selected_layer;
 
     float m_mouse_rel_x;
     float m_mouse_rel_y;

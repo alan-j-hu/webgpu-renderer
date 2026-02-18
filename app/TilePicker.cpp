@@ -8,7 +8,7 @@ TilePicker::TilePicker(AppState& app_state, Editor& editor)
 {
 }
 
-void TilePicker::render(int& selected_tile)
+void TilePicker::render(std::optional<int>& selected_tile)
 {
     const int PADDING = 5;
 

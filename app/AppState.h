@@ -31,6 +31,14 @@ class AppState
         virtual void reset() = 0;
     };
 
+    struct Snapshot
+    {
+        std::optional<int> selected_tiledef_idx;
+        glm::ivec2 selected_level_idx;
+        std::optional<int> selected_layer_idx;
+        std::unique_ptr<Command> command;
+    };
+
 public:
     template <class C>
     class CommandHolder : public CommandHolderBase
@@ -117,6 +125,17 @@ public:
 
     void set_project(Project);
 
+    std::optional<int> selected_tiledef_idx() const;
+    std::optional<std::shared_ptr<TileDef>> selected_tiledef();
+    void select_tiledef(std::optional<int>);
+
+    Level* selected_level();
+    void select_level(glm::ivec2);
+
+    std::optional<int> selected_layer_idx() const;
+    Layer* selected_layer();
+    void select_layer(std::optional<int>);
+
     template <class C,
               class = std::enable_if_t<std::is_convertible_v<C*, Command*>>>
     std::optional<std::string> push_command(
@@ -125,7 +144,12 @@ public:
     {
         if (m_current_command.get() != nullptr) {
             auto ptr = m_current_command.clear();
-            m_undo_stack.push_back(std::move(ptr));
+            m_undo_stack.push_back({
+                m_selected_tiledef_idx,
+                m_selected_level_idx,
+                m_selected_layer_idx,
+                std::move(ptr)
+            });
         }
 
         auto outcome = command->first_do(m_project);
@@ -137,7 +161,12 @@ public:
         }
 
         if (outcome == Command::Outcome::DONE) {
-            m_undo_stack.push_back(std::move(command));
+            m_undo_stack.push_back({
+                m_selected_tiledef_idx,
+                m_selected_level_idx,
+                m_selected_layer_idx,
+                std::move(command)
+            });
         } else {
             m_current_command.set(std::move(command), holder);
         }
@@ -156,8 +185,8 @@ public:
     ThumbnailUtil& thumbnail_util() { return m_thumbnail_util; }
 
 private:
-    std::vector<std::unique_ptr<Command>> m_undo_stack;
-    std::vector<std::unique_ptr<Command>> m_redo_stack;
+    std::vector<Snapshot> m_undo_stack;
+    std::vector<Snapshot> m_redo_stack;
     CurrentCommand m_current_command;
 
     WGPUColor m_background_color;
@@ -173,6 +202,9 @@ private:
     BasicMesh m_small_grid_mesh;
 
     Project m_project;
+    std::optional<int> m_selected_tiledef_idx;
+    glm::ivec2 m_selected_level_idx;
+    std::optional<int> m_selected_layer_idx;
 
     ThumbnailUtil m_thumbnail_util;
 };

@@ -313,25 +313,27 @@ void Editor::draw_toolbar()
 void Editor::draw_layer_list()
 {
     auto& project = m_app_state->project();
-    auto& level = project.level_at(m_selected_layer);
+    auto* level = m_app_state->selected_level();
+    if (level == nullptr) {
+        return;
+    }
 
     if (ImGui::Button("-")) {
-        if (m_selected_layer.layer != -1) {
-            auto& layer = project.layer_at(m_selected_layer);
+        if (auto* layer = m_app_state->selected_layer()) {
             m_app_state->push_command(
                 std::make_unique<DeleteLayerCommand>(
-                   level,
-                   m_selected_layer.layer));
-            m_selected_layer.layer = std::max(-1, m_selected_layer.layer - 1);
+                    *level,
+                    *m_app_state->selected_layer_idx()));
+            m_app_state->select_layer(std::nullopt);
         }
     }
     ImGui::SameLine();
     if (ImGui::Button("+")) {
         m_app_state->push_command(
-            std::make_unique<CreateLayerCommand>(level));
+            std::make_unique<CreateLayerCommand>(*level));
     }
 
-    for (int i = 0; i < level.layer_count(); ++i) {
+    for (int i = 0; i < level->layer_count(); ++i) {
         draw_layer_item(i);
     }
 }
@@ -339,15 +341,15 @@ void Editor::draw_layer_list()
 void Editor::draw_layer_item(int i)
 {
     auto& project = m_app_state->project();
-    const Layer& layer = project.level_at(m_selected_layer).layer_at(i);
+    const Layer& layer = m_app_state->selected_level()->layer_at(i);
 
-    const bool selected = i == m_selected_layer.layer;
+    const bool selected = m_app_state->selected_layer() == &layer;
     const ImVec4 bg_color =
         selected ? ImVec4(1, 1, 1, 1) : ImVec4(0.5, 0.5, 0.5, 1);
     const ImVec4 tint_color =
         selected ? ImVec4(0.8, 0.8, 0.8, 1) : ImVec4(1, 1, 1, 1);
 
-    auto& level_node = *m_level_nodes.at(project.world_at(0).level_at(0, 0));
+    auto& level_node = *m_level_nodes.at(m_app_state->selected_level());
     ImTextureID tex_id =
         (ImTextureID)(intptr_t)level_node.layer_at(i).thumbnail().view();
 
@@ -360,7 +362,7 @@ void Editor::draw_layer_item(int i)
             bg_color,
             tint_color)) {
 
-        m_selected_layer.layer = i;
+        m_app_state->select_layer(i);
     }
 }
 

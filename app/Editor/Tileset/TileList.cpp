@@ -10,8 +10,7 @@ TileList::TileList(AppState& state, Editor& editor)
       m_tile_picker(state, editor),
       m_editor(&editor),
       m_new_tile(state),
-      m_tile_editor(state),
-      m_selected{-1}
+      m_tile_editor(state)
 {
 }
 
@@ -19,29 +18,32 @@ void TileList::draw()
 {
     std::shared_ptr<const Tileset> tileset =
         m_app_state->project().tileset_at(0);
+    std::optional<int> selected = m_app_state->selected_tiledef_idx();
 
     if (ImGui::Button("+")) {
-        m_new_tile.open(m_selected + 1);
+        int next_idx = selected ? *selected + 1 : 0;
+        m_new_tile.open(next_idx);
     }
     m_new_tile.update();
 
     ImGui::SameLine();
-    if (ImGui::Button("-") && m_selected != -1) {
+    if (ImGui::Button("-") && selected) {
         auto error = m_app_state->push_command(
-            std::make_unique<DeleteTileCommand>(m_selected));
+            std::make_unique<DeleteTileCommand>(*selected));
         if (error) {
             m_editor->open_error_modal(*error);
         }
-        m_selected = -1;
+        m_app_state->select_tiledef(std::nullopt);
     }
 
     auto& project = m_app_state->project();
-    m_tile_picker.render(m_selected);
+    m_tile_picker.render(selected);
+    m_app_state->select_tiledef(selected);
 
-    if (m_selected != -1) {
-        if (auto optional = m_tile_editor.render(*tileset->at(m_selected))) {
+    if (selected) {
+        if (auto optional = m_tile_editor.render(*tileset->at(*selected))) {
             m_app_state->push_command(std::make_unique<UpdateTileCommand>(
-                m_selected,
+                *selected,
                 std::move(*optional.value())));
         }
     }

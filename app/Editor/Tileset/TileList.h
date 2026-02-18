@@ -22,7 +22,6 @@ private:
     TilePicker m_tile_picker;
     NewTile m_new_tile;
     TileDefinitionEditor m_tile_editor;
-    int m_selected;
 };
 
 #endif

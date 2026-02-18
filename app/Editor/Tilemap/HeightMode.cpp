@@ -8,18 +8,15 @@ HeightMode::HeightMode(AppState& app_state, Editor& editor)
 
 void HeightMode::draw_overlay(RenderTarget&, SpriteRenderer& sprite_renderer)
 {
-    auto& selected = editor().selected_layer();
-
-    if (selected.layer == -1) {
+    const Project& project = app_state().project();
+    const Layer* layer = app_state().selected_layer();
+    if (layer == nullptr) {
         return;
     }
 
-    const Project& project = app_state().project();
-    const Layer& layer = project.layer_at(selected);
-
     for (int y = 0; y < 16; ++y) {
         for (int x = 0; x < 16; ++x) {
-            auto& opt = layer.at(x, y);
+            auto& opt = layer->at(x, y);
             if (!opt) {
                 continue;
             }
@@ -53,17 +50,19 @@ void HeightMode::draw_controls()
 void HeightMode::handle_left_mouse_down(int tile_x, int tile_y)
 {
     auto& project = app_state().project();
-    auto& selected = editor().selected_layer();
-    auto& layer = project.layer_at(selected);
+    Layer* layer = app_state().selected_layer();
+    if (layer == nullptr) {
+        return;
+    }
 
-    std::optional<TileInst> inst_opt = layer.at(tile_x, tile_y);
+    std::optional<TileInst> inst_opt = layer->at(tile_x, tile_y);
 
     if (inst_opt) {
         short z = editor().z_palette().selected_z();
 
         if (m_command.get() == nullptr) {
             auto command = std::make_unique<PlaceTilesCommand>(
-                layer, z, inst_opt->rotation(), inst_opt->def());
+                *layer, z, inst_opt->rotation(), inst_opt->def());
             app_state().push_command(std::move(command), &m_command);
         }
 
