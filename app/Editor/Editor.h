@@ -33,12 +33,13 @@
 #include <glm/vec3.hpp>
 
 /// Level map editor.
-class Editor
+class Editor : public World::Listener
 {
 public:
     Editor(AppState&);
 
-    ~Editor();
+    virtual void level_added(Level&, int x, int y) override;
+    virtual void level_removed(Level&, int x, int y) override;
 
     const ZPalette& z_palette() const;
 

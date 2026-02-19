@@ -1,7 +1,9 @@
 #include "Editor.h"
 #include "Tilemap/LayerNode.h"
 #include "../Commands/CreateLayerCommand.h"
+#include "../Commands/CreateLevelCommand.h"
 #include "../Commands/DeleteLayerCommand.h"
+#include "../Commands/ResizeWorldCommand.h"
 #include "noworry/grid.h"
 
 #include <fstream>
@@ -35,11 +37,21 @@ Editor::Editor(AppState& app_state)
                       glm::vec3(0, 16, 0))),
       m_z_palette(app_state)
 {
+    m_app_state->project().world_at(0).listenable().add_listener(*this);
+
     setup_scene();
 }
 
-Editor::~Editor()
+void Editor::level_added(Level& level, int x, int y)
 {
+    m_level_nodes.emplace(
+        &level,
+        std::make_unique<LevelNode>(*m_app_state, level));
+}
+
+void Editor::level_removed(Level& level, int x, int y)
+{
+    m_level_nodes.erase(&level);
 }
 
 const ZPalette& Editor::z_palette() const
@@ -169,38 +181,65 @@ void Editor::draw_main_pane()
 void Editor::draw_world_editor()
 {
     const int THUMBNAIL_SIZE = 64;
+    const int EXPAND_BY = 2;
 
     auto& world = m_app_state->project().world_at(0);
+
+    if (ImGui::Button("Expand World")) {
+        auto* level = m_app_state->selected_level();
+        m_app_state->push_command(std::make_unique<ResizeWorldCommand>(
+            world,
+            EXPAND_BY,
+            EXPAND_BY,
+            EXPAND_BY,
+            EXPAND_BY));
+        if (level != nullptr) {
+            m_app_state->select_level(
+                glm::ivec2(level->x() + EXPAND_BY, level->y() + EXPAND_BY));
+        }
+    }
+
     const int width = world.grid_width();
     const int depth = world.grid_depth();
     ImGuiTableFlags flags =
         ImGuiTableFlags_BordersOuterH
-      | ImGuiTableFlags_BordersOuterV;
+      | ImGuiTableFlags_BordersOuterV
+      | ImGuiTableFlags_SizingFixedFit;
 
     if (ImGui::BeginTable("World Grid", width, flags)) {
+        for (int x = 0; x < width; ++x) {
+            ImGui::PushID(x);
+            ImGui::TableSetupColumn(
+                "#Col", ImGuiTableColumnFlags_None, THUMBNAIL_SIZE);
+            ImGui::PopID();
+        }
+
         for (int y = 0; y < depth; ++y) {
           ImGui::PushID(y);
           ImGui::TableNextRow(ImGuiTableRowFlags_None, THUMBNAIL_SIZE);
           for (int x = 0; x < width; ++x) {
+              ImGui::PushID(x);
               ImGui::TableNextColumn();
               Level* level = world.level_at(x, y);
               if (level == nullptr) {
-              }
+                  if (ImGui::Button("+")) {
+                      m_app_state->push_command(
+                          std::make_unique<CreateLevelCommand>(world, x, y));
+                  }
+              } else {
+                  auto& level_node = m_level_nodes.at(level);
+                  auto& layer_node = level_node->layer_at(0);
+                  auto tex_id =
+                      (ImTextureID)(intptr_t)layer_node.thumbnail().view();
 
-              ImGui::PushID(x);
+                  if (ImGui::ImageButton(
+                          "#Button",
+                          tex_id,
+                          ImVec2(THUMBNAIL_SIZE, THUMBNAIL_SIZE),
+                          ImVec2(0, 0),
+                          ImVec2(1, 1))) {
 
-              auto& level_node = m_level_nodes.at(level);
-              auto& layer_node = level_node->layer_at(0);
-              auto tex_id =
-                  (ImTextureID)(intptr_t)layer_node.thumbnail().view();
-
-              if (ImGui::ImageButton(
-                      "#Button",
-                      tex_id,
-                      ImVec2(THUMBNAIL_SIZE, THUMBNAIL_SIZE),
-                      ImVec2(0, 0),
-                      ImVec2(1, 1))) {
-
+                  }
               }
 
               ImGui::PopID();

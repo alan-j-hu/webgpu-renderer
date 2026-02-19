@@ -8,10 +8,14 @@ template <class T>
 class NameMap
 {
 public:
-    using iterator = std::map<std::string, T>::const_iterator;
+    using iterator = std::map<std::string, T>::iterator;
+    using const_iterator = std::map<std::string, T>::const_iterator;
 
-    iterator begin() const { return m_names_in_use.begin(); }
-    iterator end() const { return m_names_in_use.end(); }
+    iterator begin() { return m_names_in_use.begin(); }
+    iterator end() { return m_names_in_use.end(); }
+
+    const_iterator cbegin() const { return m_names_in_use.cbegin(); }
+    const_iterator cend() const { return m_names_in_use.cend(); }
 
     std::size_t size() const { return m_names_in_use.size(); }
 
@@ -55,6 +59,11 @@ public:
     void erase(const std::string& name)
     {
         m_names_in_use.erase(name);
+    }
+
+    void erase(iterator pos)
+    {
+        m_names_in_use.erase(pos);
     }
 
 private:

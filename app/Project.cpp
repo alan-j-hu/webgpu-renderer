@@ -311,12 +311,12 @@ std::shared_ptr<const Tileset> World::tileset() const
 
 World::iterator World::begin() const
 {
-    return m_levels_by_name.begin();
+    return m_levels_by_name.cbegin();
 }
 
 World::iterator World::end() const
 {
-    return m_levels_by_name.end();
+    return m_levels_by_name.cend();
 }
 
 int World::grid_width() const
@@ -376,7 +376,45 @@ bool World::insert_level(World::InsertionInfo info)
     auto [k, v] = m_levels_by_name.insert(info.name, std::move(info.level));
     m_levels_by_coord.emplace(ivec2, v.get());
     v->set_loc(info.x, info.y);
+    m_listenable.notify(&World::Listener::level_added, *v, info.x, info.y);
     return true;
+}
+
+std::unique_ptr<Level> World::remove_level(int x, int y)
+{
+    auto it = m_levels_by_coord.find(glm::ivec2(x, y));
+    if (it == m_levels_by_coord.end()) {
+        return nullptr;
+    }
+
+    auto end = m_levels_by_name.end();
+    for (auto it2 = m_levels_by_name.begin(); it2 != end; ++it2) {
+        if (it2->second.get() == it->second) {
+            std::unique_ptr<Level> ptr = std::move(it2->second);
+            m_levels_by_coord.erase(it);
+            m_levels_by_name.erase(it2);
+            m_listenable.notify(&World::Listener::level_removed, *ptr, x, y);
+            return ptr;
+        }
+    }
+
+    return nullptr;
+}
+
+void World::expand(int top, int bottom, int left, int right)
+{
+    std::unordered_map<glm::ivec2, Level*> new_map;
+    for (auto& [k, v] : m_levels_by_coord) {
+        glm::ivec2 new_k = k + glm::ivec2(bottom, left);
+        if (new_k.x < 0 || new_k.y < 0) {
+            return;
+        }
+        new_map.emplace(new_k, v);
+    }
+    m_levels_by_coord = std::move(new_map);
+
+    m_grid_width += left + right;
+    m_grid_depth += top + bottom;
 }
 
 bool World::uses_tiledef(const TileDef& tiledef) const

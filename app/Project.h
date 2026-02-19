@@ -228,7 +228,7 @@ private:
 class World
 {
 public:
-    using iterator = NameMap<std::unique_ptr<Level>>::iterator;
+    using iterator = NameMap<std::unique_ptr<Level>>::const_iterator;
 
     class Listener
     {
@@ -289,6 +289,10 @@ public:
     const Level* level_at(int x, int y) const;
 
     bool insert_level(InsertionInfo);
+
+    std::unique_ptr<Level> remove_level(int x, int y);
+
+    void expand(int top, int bottom, int left, int right);
 
     bool uses_tiledef(const TileDef&) const;
 

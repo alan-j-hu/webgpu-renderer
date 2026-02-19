@@ -20,10 +20,12 @@ add_executable(demo
   ThumbnailUtil.cpp
   Commands/Command.cpp
   Commands/CreateLayerCommand.cpp
+  Commands/CreateLevelCommand.cpp
   Commands/CreateTileCommand.cpp
   Commands/DeleteLayerCommand.cpp
   Commands/DeleteTileCommand.cpp
   Commands/PlaceTilesCommand.cpp
+  Commands/ResizeWorldCommand.cpp
   Commands/UpdateTileCommand.cpp
   Editor/Editor.cpp
   Editor/ErrorModal.cpp
