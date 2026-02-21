@@ -47,6 +47,7 @@ void TilePicker::render(std::optional<int>& selected_tile)
             ImGui::Image((ImTextureID)view, inner_dim, uv_tl, uv_br);
 
             ImGui::SetCursorPos(cursor_after);
+            ImGui::Dummy(ImVec2(0, 0));
 
             ImGui::PopID();
         }

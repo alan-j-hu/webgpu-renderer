@@ -417,6 +417,7 @@ void Editor::load_project(const std::filesystem::path& path)
         destroy_scene();
 
         m_app_state->set_project(std::move(project));
+        m_app_state->project().world_at(0).listenable().add_listener(*this);
 
         setup_scene();
     } catch (std::exception& ex) {

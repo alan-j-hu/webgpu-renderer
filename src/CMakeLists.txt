@@ -33,7 +33,9 @@ add_library(noworry
   Resource/ResourceLoader.cpp
   scene/renderobject.cpp
   scene/scene.cpp)
-target_include_directories(noworry PRIVATE ../include)
+target_include_directories(noworry PRIVATE
+  ../include
+  ${stb_SOURCE_DIR})
 target_link_libraries(noworry
   assimp dawn::webgpu_dawn glm::glm glfw webgpu_glfw)
 set_property(TARGET noworry PROPERTY CXX_STANDARD 23)
