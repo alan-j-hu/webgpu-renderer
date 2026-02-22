@@ -22,6 +22,7 @@ add_executable(demo
   Commands/CreateLevelCommand.cpp
   Commands/CreateTileCommand.cpp
   Commands/DeleteLayerCommand.cpp
+  Commands/DeleteLevelCommand.cpp
   Commands/DeleteTileCommand.cpp
   Commands/PlaceTilesCommand.cpp
   Commands/ResizeWorldCommand.cpp

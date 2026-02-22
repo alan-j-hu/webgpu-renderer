@@ -29,6 +29,8 @@ class AppState
     public:
         virtual Command* get() = 0;
         virtual void reset() = 0;
+        virtual bool needs_update() = 0;
+        virtual void set_needs_update(bool) = 0;
     };
 
     struct Snapshot
@@ -44,8 +46,7 @@ public:
     class CommandHolder : public CommandHolderBase
     {
     public:
-        CommandHolder()
-            : m_command(nullptr)
+        CommandHolder() : m_command(nullptr), m_needs_update(false)
         {
         }
 
@@ -64,40 +65,19 @@ public:
             m_command = &command;
         }
 
-    private:
-        C* m_command;
-    };
-
-private:
-    class CurrentCommand
-    {
-    public:
-        CurrentCommand();
-        CurrentCommand(std::unique_ptr<Command> command,
-                       CommandHolderBase* holder);
-
-        Command* get();
-
-        std::unique_ptr<Command> clear();
-
-        template <class C>
-        void set(std::unique_ptr<C> command,
-                 CommandHolder<C>* holder)
+        bool needs_update() override
         {
-            if (m_command.get() != nullptr) {
-                throw std::logic_error("Current command set without clear!");
-            }
+            return m_needs_update;
+        }
 
-            if (holder != nullptr) {
-                holder->set(*command);
-            }
-            m_command = std::move(command);
-            m_holder = holder;
+        void set_needs_update(bool b) override
+        {
+            m_needs_update = b;
         }
 
     private:
-        std::unique_ptr<Command> m_command;
-        CommandHolderBase* m_holder;
+        C* m_command;
+        bool m_needs_update;
     };
 
 public:
@@ -138,56 +118,40 @@ public:
 
     template <class C,
               class = std::enable_if_t<std::is_convertible_v<C*, Command*>>>
-    std::optional<std::string> push_command(
+    void push_command(
         std::unique_ptr<C> command,
         CommandHolder<C>* holder = nullptr)
     {
-        if (m_current_command.get() != nullptr) {
-            auto ptr = m_current_command.clear();
-            m_undo_stack.push_back({
-                m_selected_tiledef_idx,
-                m_selected_level_idx,
-                m_selected_layer_idx,
-                std::move(ptr)
-            });
+        if (m_command_holder != nullptr) {
+            m_command_holder->reset();
         }
 
-        auto outcome = command->first_do(m_project);
-        if (!outcome) {
-            return outcome.error();
-        }
-        if (outcome != Command::Outcome::UNCHANGED) {
-            m_redo_stack.clear();
+        if (holder != nullptr) {
+            holder->set(*command);
         }
 
-        if (outcome == Command::Outcome::DONE) {
-            m_undo_stack.push_back({
-                m_selected_tiledef_idx,
-                m_selected_level_idx,
-                m_selected_layer_idx,
-                std::move(command)
-            });
-        } else {
-            m_current_command.set(std::move(command), holder);
-        }
-
-        return std::nullopt;
+        m_command_queue.push_back(std::move(command));
+        m_command_holder = holder;
     }
 
-    void update_current_command();
+    void finish_long_command();
 
-    void finish_current_command();
+    void run_pending_commands();
 
     void undo();
 
     void redo();
+
+    std::optional<std::string> check_error();
 
     ThumbnailUtil& thumbnail_util() { return m_thumbnail_util; }
 
 private:
     std::vector<Snapshot> m_undo_stack;
     std::vector<Snapshot> m_redo_stack;
-    CurrentCommand m_current_command;
+    std::vector<std::unique_ptr<Command>> m_command_queue;
+    CommandHolderBase* m_command_holder;
+    std::optional<std::string> m_error;
 
     WGPUColor m_background_color;
     Renderer m_renderer;
@@ -207,6 +171,8 @@ private:
     std::optional<int> m_selected_layer_idx;
 
     ThumbnailUtil m_thumbnail_util;
+
+    void update_long_command();
 };
 
 #endif

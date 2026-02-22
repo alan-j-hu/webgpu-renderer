@@ -3,6 +3,7 @@
 #include "../Commands/CreateLayerCommand.h"
 #include "../Commands/CreateLevelCommand.h"
 #include "../Commands/DeleteLayerCommand.h"
+#include "../Commands/DeleteLevelCommand.h"
 #include "../Commands/ResizeWorldCommand.h"
 #include "noworry/grid.h"
 
@@ -113,6 +114,11 @@ void Editor::draw()
 {
     draw_menubar();
     draw_main_pane();
+
+    if (auto error = m_app_state->check_error()) {
+        m_error_modal.open(error->c_str());
+    }
+
     m_error_modal.update("Error");
 }
 
@@ -239,6 +245,13 @@ void Editor::draw_world_editor()
                           ImVec2(0, 0),
                           ImVec2(1, 1))) {
 
+                  } else if (ImGui::BeginPopupContextItem()) {
+                      if (ImGui::MenuItem("Delete")) {
+                          m_app_state->push_command(
+                              std::make_unique<DeleteLevelCommand>(
+                                  world, *level));
+                      }
+                      ImGui::EndPopup();
                   }
               }
 

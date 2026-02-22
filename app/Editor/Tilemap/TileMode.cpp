@@ -112,17 +112,18 @@ void TileMode::handle_left_mouse_down(int x, int y)
                 layer, z, m_rotation,
                 *selected_tiledef);
             app_state().push_command(std::move(command), &m_command);
+            m_command.get()->add_placement(x, y);
+        } else {
+            m_command.get()->add_placement(x, y);
+            m_command.set_needs_update(true);
         }
-
-        m_command.get()->add_placement(x, y);
-        app_state().update_current_command();
     }
 }
 
 void TileMode::handle_left_mouse_released(int x, int y)
 {
     if (m_command.get() != nullptr) {
-        app_state().finish_current_command();
+        app_state().finish_long_command();
     }
 }
 
@@ -135,16 +136,17 @@ void TileMode::handle_right_mouse_down(int x, int y)
         if (m_command.get() == nullptr) {
             auto command = std::make_unique<PlaceTilesCommand>(*layer);
             app_state().push_command(std::move(command), &m_command);
+            m_command.get()->add_placement(x, y);
+        } else {
+            m_command.get()->add_placement(x, y);
+            m_command.set_needs_update(true);
         }
-
-        m_command.get()->add_placement(x, y);
-        app_state().update_current_command();
     }
 }
 
 void TileMode::handle_right_mouse_released(int x, int y)
 {
     if (m_command.get() != nullptr) {
-        app_state().finish_current_command();
+        app_state().finish_long_command();
     }
 }

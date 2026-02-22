@@ -9,7 +9,7 @@
 class DeleteLayerCommand : public Command
 {
 public:
-    DeleteLayerCommand(Level& world, int idx);
+    DeleteLayerCommand(Level&, int idx);
 
     virtual const char* name() override;
 

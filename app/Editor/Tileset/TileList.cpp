@@ -28,12 +28,9 @@ void TileList::draw()
 
     ImGui::SameLine();
     if (ImGui::Button("-") && selected) {
-        auto error = m_app_state->push_command(
+        m_app_state->push_command(
             std::make_unique<DeleteTileCommand>(*selected));
-        if (error) {
-            m_editor->open_error_modal(*error);
-        }
-        m_app_state->select_tiledef(std::nullopt);
+        selected = std::nullopt;
     }
 
     auto& project = m_app_state->project();

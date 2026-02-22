@@ -115,6 +115,9 @@ private:
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
 
+        // Not safe to run between ImGui::Render and ImGui_ImplWGPU_NewFrame
+        m_app_state.run_pending_commands();
+
         ImGuiViewport* viewport = ImGui::GetMainViewport();
         ImGui::SetNextWindowPos(viewport->Pos);
         ImGui::SetNextWindowSize(viewport->Size);

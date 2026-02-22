@@ -47,7 +47,7 @@ void HeightMode::draw_controls()
 {
 }
 
-void HeightMode::handle_left_mouse_down(int tile_x, int tile_y)
+void HeightMode::handle_left_mouse_down(int x, int y)
 {
     auto& project = app_state().project();
     Layer* layer = app_state().selected_layer();
@@ -55,7 +55,7 @@ void HeightMode::handle_left_mouse_down(int tile_x, int tile_y)
         return;
     }
 
-    std::optional<TileInst> inst_opt = layer->at(tile_x, tile_y);
+    std::optional<TileInst> inst_opt = layer->at(x, y);
 
     if (inst_opt) {
         short z = editor().z_palette().selected_z();
@@ -64,16 +64,17 @@ void HeightMode::handle_left_mouse_down(int tile_x, int tile_y)
             auto command = std::make_unique<PlaceTilesCommand>(
                 *layer, z, inst_opt->rotation(), inst_opt->def());
             app_state().push_command(std::move(command), &m_command);
+            m_command.get()->add_placement(x, y);
+        } else {
+            m_command.get()->add_placement(x, y);
+            m_command.set_needs_update(true);
         }
-
-        m_command.get()->add_placement(tile_x, tile_y);
-        app_state().update_current_command();
     }
 }
 
 void HeightMode::handle_left_mouse_released(int x, int y)
 {
     if (m_command.get() != nullptr) {
-        app_state().finish_current_command();
+        app_state().finish_long_command();
     }
 }
