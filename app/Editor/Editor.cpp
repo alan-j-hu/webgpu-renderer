@@ -201,7 +201,8 @@ void Editor::draw_world_editor()
             EXPAND_BY));
         if (level != nullptr) {
             m_app_state->select_level(
-                glm::ivec2(level->x() + EXPAND_BY, level->y() + EXPAND_BY));
+                level->x() + EXPAND_BY,
+                level->y() + EXPAND_BY);
         }
     }
 
@@ -244,6 +245,8 @@ void Editor::draw_world_editor()
                           ImVec2(THUMBNAIL_SIZE, THUMBNAIL_SIZE),
                           ImVec2(0, 0),
                           ImVec2(1, 1))) {
+
+                      m_app_state->select_level(x, y);
 
                   } else if (ImGui::BeginPopupContextItem()) {
                       if (ImGui::MenuItem("Delete")) {

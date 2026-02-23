@@ -110,7 +110,7 @@ public:
     void select_tiledef(std::optional<int>);
 
     Level* selected_level();
-    void select_level(glm::ivec2);
+    void select_level(int x, int y);
 
     std::optional<int> selected_layer_idx() const;
     Layer* selected_layer();
@@ -173,6 +173,8 @@ private:
     ThumbnailUtil m_thumbnail_util;
 
     void update_long_command();
+
+    void reset_selection_state();
 };
 
 #endif

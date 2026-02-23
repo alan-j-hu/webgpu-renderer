@@ -31,6 +31,7 @@ AppState::AppState(WGPUDevice device)
 void AppState::set_project(Project project)
 {
     m_project = std::move(project);
+    reset_selection_state();
 }
 
 std::optional<int> AppState::selected_tiledef_idx() const
@@ -58,9 +59,9 @@ Level* AppState::selected_level()
         .level_at(m_selected_level_idx.x, m_selected_level_idx.y);
 }
 
-void AppState::select_level(glm::ivec2 idx)
+void AppState::select_level(int x, int y)
 {
-    m_selected_level_idx = idx;
+    m_selected_level_idx = glm::ivec2(x, y);
 }
 
 std::optional<int> AppState::selected_layer_idx() const
@@ -217,4 +218,35 @@ std::optional<std::string> AppState::check_error()
     std::optional<std::string> optional;
     std::swap(optional, m_error);
     return optional;
+}
+
+void AppState::reset_selection_state()
+{
+    auto tileset = m_project.tileset_at(0);
+
+    if (m_selected_tiledef_idx) {
+        int idx = *m_selected_tiledef_idx;
+        if (tileset->count() == 0) {
+            m_selected_tiledef_idx = std::nullopt;
+        } else if (idx >= tileset->count()) {
+            m_selected_tiledef_idx = tileset->count() - 1;
+        }
+    }
+
+    auto& world = m_project.world_at(0);
+    const Level* level = world.level_at(
+        m_selected_level_idx.x,
+        m_selected_level_idx.y);
+
+    if (world.begin() == world.end()) {
+    } else if (level == nullptr) {
+        level = world.begin()->second.get();
+        m_selected_level_idx = glm::ivec2(level->x(), level->y());
+    }
+
+    if (level->layer_count() == 0) {
+        m_selected_layer_idx = std::nullopt;
+    } else if (*m_selected_layer_idx < level->layer_count()) {
+        m_selected_layer_idx = level->layer_count() - 1;
+    }
 }
