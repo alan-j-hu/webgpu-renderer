@@ -4,7 +4,6 @@
 #include "MeshVertexShader.h"
 #include "../Material/Effect.h"
 
-#include "../scene/renderobject.h"
 #include <unordered_map>
 #include <vector>
 

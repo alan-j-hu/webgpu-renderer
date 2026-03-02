@@ -5,8 +5,6 @@
 #include "noworry/renderer.h"
 #include "noworry/rendertarget.h"
 #include "noworry/resourcetable.h"
-#include "noworry/scene/renderobject.h"
-#include "noworry/scene/scene.h"
 
 #include <array>
 #include <filesystem>

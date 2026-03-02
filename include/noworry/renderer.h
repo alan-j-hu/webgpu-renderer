@@ -15,24 +15,11 @@
 #include <vector>
 
 class Camera;
-class RenderObject;
+class RenderContext;
 class RenderTarget;
+class Renderable;
 class Renderer;
-class Scene;
 class Transform;
-
-/// Builds a single frame. Create a new Frame object for each render frame.
-class Frame
-{
-public:
-    Frame(Renderer& renderer);
-    Frame& add(const Mesh&, const Material&, const glm::mat4&);
-
-    Renderer& renderer() { return *m_renderer; }
-
-private:
-    Renderer* m_renderer;
-};
 
 /// Renderer. The same renderer can be used for multiple scenes and
 /// render targets, so one Renderer object should generally exist in the
@@ -80,7 +67,11 @@ public:
 
     RenderBatcher& batcher() { return m_batcher; }
 
-    void render(RenderTarget&, Scene& scene, Camera& camera);
+    void render(
+        RenderContext& context,
+        Renderable& renderable,
+        RenderTarget& target,
+        Camera& camera);
 
 private:
     WGPUDevice m_device;
@@ -92,7 +83,11 @@ private:
     ObjectBindGroupPool m_object_group_pool;
     RenderBatcher m_batcher;
 
-    void do_render(Scene&, Camera&, WGPURenderPassEncoder);
+    void do_render(
+        RenderContext& ctx,
+        Renderable& renderable,
+        Camera& camera,
+        WGPURenderPassEncoder encoder);
 };
 
 #endif

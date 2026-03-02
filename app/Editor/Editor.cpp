@@ -24,7 +24,7 @@ Editor::Editor(AppState& app_state)
                     app_state.renderer().default_sampler()),
       m_viewer_mouse_down(false),
       m_viewer_mouse_over(false),
-      m_scene(app_state.renderer()),
+      m_render_ctx(app_state.renderer()),
       m_height_mode(app_state, *this),
       m_tile_mode(app_state, *this),
       m_view_3d_mode(app_state, *this),
@@ -38,8 +38,6 @@ Editor::Editor(AppState& app_state)
                       glm::vec3(0, 16, 0))),
       m_z_palette(app_state)
 {
-    m_app_state->project().world_at(0).listenable().add_listener(*this);
-
     setup_scene();
 }
 
@@ -53,6 +51,12 @@ void Editor::level_added(Level& level, int x, int y)
 void Editor::level_removed(Level& level, int x, int y)
 {
     m_level_nodes.erase(&level);
+}
+
+void Editor::render(RenderContext& ctx)
+{
+    ctx.add(m_grid_mesh, m_app_state->wireframe_material(), glm::mat4(1));
+    m_level_nodes.at(m_app_state->selected_level())->render(ctx);
 }
 
 const ZPalette& Editor::z_palette() const
@@ -336,7 +340,11 @@ void Editor::draw_tilemap_editor()
 
 void Editor::render_preview()
 {
-    m_app_state->renderer().render(m_subwindow_3d, m_scene, *m_current_camera);
+    m_app_state->renderer().render(
+        m_render_ctx,
+        *this,
+        m_subwindow_3d,
+        *m_current_camera);
 }
 
 void Editor::draw_toolbar()
@@ -433,7 +441,6 @@ void Editor::load_project(const std::filesystem::path& path)
         destroy_scene();
 
         m_app_state->set_project(std::move(project));
-        m_app_state->project().world_at(0).listenable().add_listener(*this);
 
         setup_scene();
     } catch (std::exception& ex) {
@@ -456,7 +463,6 @@ void Editor::save_project(const std::filesystem::path& path)
 
 void Editor::destroy_scene()
 {
-    m_scene.children().clear();
     m_tileset_thumbnails.clear();
     m_level_nodes.clear();
 }
@@ -464,6 +470,7 @@ void Editor::destroy_scene()
 void Editor::setup_scene()
 {
     auto& project = m_app_state->project();
+    project.world_at(0).listenable().add_listener(*this);
 
     for (int i = 0; i < project.tileset_count(); ++i) {
         m_tileset_thumbnails.push_back(std::make_unique<TilesetThumbnails>(
@@ -487,17 +494,4 @@ void Editor::setup_scene()
     m_ortho_camera.set_target(glm::vec3(0.0f, 0.0f, 0.0f));
 
     m_current_camera = &m_persp_camera;
-
-    Transform transform;
-
-    m_scene.children().clear();
-    m_scene.children().push_back(std::make_unique<RenderObject>(
-        m_app_state->renderer(),
-        transform,
-        m_grid_mesh,
-        m_app_state->wireframe_material()
-    ));
-    m_scene.children().push_back(std::make_unique<RenderableRef>(
-        *m_level_nodes.at(world.level_at(0, 0))
-    ));
 }

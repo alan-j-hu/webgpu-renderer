@@ -11,7 +11,7 @@ class DynamicModelInstance : public Renderable
 public:
     DynamicModelInstance(const DynamicModel&);
 
-    virtual void render(Frame& frame) override;
+    virtual void render(RenderContext&) override;
 
 private:
     glm::mat4 m_transform;

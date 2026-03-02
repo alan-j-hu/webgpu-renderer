@@ -5,13 +5,13 @@
 #include "noworry/rendertarget.h"
 #include "noworry/Gfx3D/DynamicModel.h"
 #include "noworry/Gfx3D/DynamicModelInstance.h"
-#include "noworry/Gfx3D/Renderable.h"
+#include "noworry/Gfx3D/RenderContext.h"
 #include <memory>
 #include <optional>
 
 class LayerNode;
 
-class LayerNode : public Layer::Listener, public Renderable
+class LayerNode : public Layer::Listener
 {
 public:
     LayerNode(AppState&, const Layer&);
@@ -19,11 +19,11 @@ public:
     LayerNode& operator=(LayerNode&&);
     virtual ~LayerNode();
 
+    Renderable& renderable();
+
     const Texture& thumbnail();
 
     virtual void layer_changed() override;
-
-    virtual void render(Frame& frame) override;
 
     void update();
 
@@ -33,6 +33,7 @@ private:
     std::unique_ptr<DynamicModel> m_model;
     std::optional<DynamicModelInstance> m_instance;
     std::optional<BasicMesh> m_grid_mesh;
+    RenderContext m_thumbnail_ctx;
     RenderTarget m_thumbnail;
 };
 

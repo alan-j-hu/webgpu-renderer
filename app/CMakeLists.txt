@@ -16,7 +16,6 @@ add_executable(demo
   Project.cpp
   Serialize.cpp
   TilePicker.cpp
-  ThumbnailUtil.cpp
   Commands/Command.cpp
   Commands/CreateLayerCommand.cpp
   Commands/CreateLevelCommand.cpp

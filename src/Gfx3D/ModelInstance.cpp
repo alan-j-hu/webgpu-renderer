@@ -1,5 +1,6 @@
 #include "noworry/Gfx3D/ModelInstance.h"
 #include "noworry/Gfx3D/Model.h"
+#include "noworry/Gfx3D/RenderContext.h"
 #include "noworry/renderer.h"
 
 ModelInstance::ModelInstance()
@@ -27,12 +28,12 @@ void ModelInstance::set_model(const Model* model)
     m_model = model;
 }
 
-void ModelInstance::render(Frame& frame)
+void ModelInstance::render(RenderContext& ctx)
 {
     if (m_model != nullptr) {
         auto parts = m_model->parts();
         for (auto& part : parts) {
-            frame.add(part.mesh(), part.material(), m_transform);
+            ctx.add(part.mesh(), part.material(), m_transform);
         }
     }
 }

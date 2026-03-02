@@ -24,15 +24,14 @@ add_library(noworry
   Gfx3D/ModelInstance.cpp
   Gfx3D/ObjectBindGroup.cpp
   Gfx3D/RenderBatch.cpp
+  Gfx3D/RenderContext.cpp
   Pipeline/MeshVertexShader.cpp
   Pipeline/PipelineFactory.cpp
   Material/FlatMaterial.cpp
   Material/FlatEffect.cpp
   Material/TextureMaterial.cpp
   Material/TextureEffect.cpp
-  Resource/ResourceLoader.cpp
-  scene/renderobject.cpp
-  scene/scene.cpp)
+  Resource/ResourceLoader.cpp)
 target_include_directories(noworry PRIVATE
   ../include
   ${stb_SOURCE_DIR})

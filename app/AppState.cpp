@@ -18,7 +18,6 @@ AppState::AppState(WGPUDevice device)
                       5,
                       glm::vec3(5, 0, 0),
                       glm::vec3(0, 5, 0))),
-      m_thumbnail_util(*this),
       m_selected_tiledef_idx(),
       m_selected_level_idx(0, 0),
       m_selected_layer_idx()
@@ -87,13 +86,13 @@ void AppState::select_layer(std::optional<int> idx)
     m_selected_layer_idx = idx;
 }
 
-void AppState::update_long_command()
+bool AppState::update_long_command()
 {
     if (m_command_holder == nullptr) {
-        return;
+        return false;
     }
     if (!m_command_holder->needs_update()) {
-        return;
+        return false;
     }
 
     if (auto command = m_command_holder->get()) {
@@ -104,6 +103,8 @@ void AppState::update_long_command()
             m_command_holder->reset();
         }
     }
+
+    return true;
 }
 
 void AppState::finish_long_command()
@@ -123,27 +124,19 @@ void AppState::run_pending_commands()
     std::swap(commands, m_command_queue);
     m_error.reset();
 
-    update_long_command();
+    bool changed = update_long_command();
 
     auto size = commands.size();
-    if (commands.size() == 0) {
-        return;
-    }
-
-    for (int i = 0; i < size - 1; ++i) {
+    for (int i = 0; i < size; ++i) {
         auto& command = commands.at(i);
         auto outcome = command->first_do(m_project);
         if (!outcome) {
             m_error = std::make_optional<std::string>(outcome.error());
-            return;
+            break;
         }
 
         if (*outcome != Command::Outcome::UNCHANGED) {
-            if (*outcome == Command::Outcome::IN_PROGRESS) {
-                command->finish();
-            }
-
-            m_redo_stack.clear();
+            changed = true;
             m_undo_stack.push_back({
                 m_selected_tiledef_idx,
                 m_selected_level_idx,
@@ -151,24 +144,16 @@ void AppState::run_pending_commands()
                 std::move(command)
             });
         }
+
+        if (i != size - 1 && *outcome == Command::Outcome::IN_PROGRESS) {
+            command->finish();
+        }
     }
 
-    auto& command = commands.at(size - 1);
-    auto outcome = command->first_do(m_project);
-    if (!outcome) {
-        m_error = std::make_optional<std::string>(outcome.error());
-        return;
-    }
-    if (outcome != Command::Outcome::UNCHANGED) {
+    if (changed) {
         m_redo_stack.clear();
+        reset_selection_state();
     }
-
-    m_undo_stack.push_back({
-        m_selected_tiledef_idx,
-        m_selected_level_idx,
-        m_selected_layer_idx,
-        std::move(command)
-    });
 }
 
 void AppState::undo()
@@ -246,7 +231,7 @@ void AppState::reset_selection_state()
 
     if (level->layer_count() == 0) {
         m_selected_layer_idx = std::nullopt;
-    } else if (*m_selected_layer_idx < level->layer_count()) {
+    } else if (*m_selected_layer_idx >= level->layer_count()) {
         m_selected_layer_idx = level->layer_count() - 1;
     }
 }

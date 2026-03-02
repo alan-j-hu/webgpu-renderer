@@ -1,25 +1,10 @@
 #include "noworry/renderer.h"
 #include "noworry/rendertarget.h"
 #include "noworry/transform.h"
+#include "noworry/Gfx3D/RenderContext.h"
 #include "noworry/Material/FlatEffect.h"
 #include "noworry/Material/TextureEffect.h"
-#include "noworry/scene/scene.h"
 #include <utility>
-
-Frame::Frame(Renderer& renderer)
-{
-    m_renderer = &renderer;
-}
-
-Frame& Frame::add(const Mesh& mesh,
-                  const Material& material,
-                  const glm::mat4& transform)
-{
-    if (mesh.vertex_count() != 0 && mesh.index_count() != 0) {
-        m_renderer->batcher().enqueue_parts(mesh, material, transform);
-    }
-    return *this;
-}
 
 Renderer::Renderer(WGPUDevice device)
     : m_device(device),
@@ -49,7 +34,11 @@ Renderer::~Renderer()
     wgpuSamplerRelease(m_sampler);
 }
 
-void Renderer::render(RenderTarget& target, Scene& scene, Camera& camera)
+void Renderer::render(
+    RenderContext& ctx,
+    Renderable& renderable,
+    RenderTarget& target,
+    Camera& camera)
 {
     WGPUQueue queue = wgpuDeviceGetQueue(m_device);
 
@@ -83,8 +72,8 @@ void Renderer::render(RenderTarget& target, Scene& scene, Camera& camera)
     WGPURenderPassEncoder pass = wgpuCommandEncoderBeginRenderPass(
         encoder, &render_pass_desc);
     wgpuRenderPassEncoderSetBindGroup(
-        pass, 0, scene.bind_group(), 0, nullptr);
-    do_render(scene, camera, pass);
+        pass, 0, ctx.bind_group(), 0, nullptr);
+    do_render(ctx, renderable, camera, pass);
     wgpuRenderPassEncoderEnd(pass);
 
     WGPUCommandBufferDescriptor buffer_desc = { 0 };
@@ -100,11 +89,12 @@ void Renderer::render(RenderTarget& target, Scene& scene, Camera& camera)
 }
 
 void Renderer::do_render(
-    Scene& scene,
+    RenderContext& ctx,
+    Renderable& renderable,
     Camera& camera,
     WGPURenderPassEncoder encoder)
 {
-    Frame frame(*this);
-    scene.render(frame, camera);
+    ctx.setup_camera(camera);
+    renderable.render(ctx);
     m_batcher.draw(encoder);
 }

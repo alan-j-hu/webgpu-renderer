@@ -7,19 +7,21 @@
 #include "noworry/transform.h"
 #include "noworry/camera/perspectivecamera.h"
 #include "noworry/Gfx3D/ModelInstance.h"
+#include "noworry/Gfx3D/RenderContext.h"
 #include "noworry/Material/TextureMaterial.h"
-#include "noworry/scene/scene.h"
 #include <filesystem>
 #include <memory>
 #include <vector>
 
 /// Editor for tile definition. Also used in AddNewTile.
-class TileDefinitionEditor
+class TileDefinitionEditor : public Renderable
 {
 public:
     TileDefinitionEditor(AppState&);
 
     std::optional<std::unique_ptr<TileDef>> render(const TileDef& definition);
+
+    virtual void render(RenderContext&) override;
 
 private:
     AppState* m_app_state;
@@ -28,8 +30,8 @@ private:
 
     RenderTarget m_preview;
     PerspectiveCamera m_camera;
-    Scene m_scene;
-    ModelInstance* m_instance;
+    RenderContext m_render_ctx;
+    ModelInstance m_instance;
 
     void render_preview();
 };

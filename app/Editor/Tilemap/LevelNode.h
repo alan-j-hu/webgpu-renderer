@@ -18,7 +18,7 @@ public:
 
     virtual void layer_removed(Layer&, int idx) override;
 
-    virtual void render(Frame& frame) override;
+    virtual void render(RenderContext&) override;
 
     LayerNode& layer_at(int idx);
 

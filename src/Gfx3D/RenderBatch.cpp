@@ -17,12 +17,6 @@ void RenderBatch::set_pipeline(Pipeline& pipeline)
     m_pipeline = &pipeline;
 }
 
-void RenderBatch::enqueue(RenderObject& object)
-{
-    m_draw_calls.emplace_back(
-        object.mesh(), object.material(), object.transform().matrix());
-}
-
 void RenderBatch::enqueue_parts(const Mesh& mesh,
                                 const Material& mat,
                                 const glm::mat4& transform)
@@ -68,12 +62,6 @@ RenderBatcher::RenderBatcher(Renderer& renderer)
 {
     m_pool_index = 0;
     m_renderer = &renderer;
-}
-
-void RenderBatcher::enqueue(RenderObject& object)
-{
-    RenderBatch* batch = search(object.material(), object.mesh());
-    batch->enqueue(object);
 }
 
 void RenderBatcher::enqueue_parts(const Mesh& mesh,

@@ -8,13 +8,11 @@
 class TileThumbnail
 {
 public:
-    TileThumbnail(AppState&, const TileDef&);
+    TileThumbnail(AppState&);
 
     RenderTarget& render_target() { return m_render_target; }
     Spritesheet& spritesheet() { return *m_spritesheet; }
     WGPUTextureView texture_view() { return m_render_target.texture().view(); }
-
-    void capture(const TileDef&);
 
 private:
     AppState* m_app_state;

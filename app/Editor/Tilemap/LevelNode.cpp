@@ -26,10 +26,10 @@ void LevelNode::layer_removed(Layer&, int idx)
     remove_layer(idx);
 }
 
-void LevelNode::render(Frame& frame)
+void LevelNode::render(RenderContext& ctx)
 {
     for (auto& layer_ptr : m_layer_nodes) {
-        layer_ptr->render(frame);
+        layer_ptr->renderable().render(ctx);
     }
 }
 

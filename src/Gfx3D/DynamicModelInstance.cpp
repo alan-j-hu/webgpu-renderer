@@ -1,5 +1,6 @@
 #include "noworry/Gfx3D/DynamicModelInstance.h"
 #include "noworry/Gfx3D/DynamicModel.h"
+#include "noworry/Gfx3D/RenderContext.h"
 #include "noworry/renderer.h"
 
 DynamicModelInstance::DynamicModelInstance(const DynamicModel& dynamic)
@@ -7,9 +8,9 @@ DynamicModelInstance::DynamicModelInstance(const DynamicModel& dynamic)
 {
 }
 
-void DynamicModelInstance::render(Frame& frame)
+void DynamicModelInstance::render(RenderContext& ctx)
 {
     for (const auto& part : *m_dynamic) {
-        frame.add(part.second, *part.first, m_transform);
+        ctx.add(part.second, *part.first, m_transform);
     }
 }

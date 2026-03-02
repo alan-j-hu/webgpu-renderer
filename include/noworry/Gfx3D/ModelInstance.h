@@ -19,12 +19,11 @@ public:
 
     void set_model(const Model*);
 
-    virtual void render(Frame& frame) override;
+    virtual void render(RenderContext&) override;
 
 private:
     glm::mat4 m_transform;
     const Model* m_model;
-    std::vector<glm::mat4> m_parts;
 };
 
 #endif

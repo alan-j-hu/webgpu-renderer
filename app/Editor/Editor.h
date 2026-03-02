@@ -20,10 +20,10 @@
 #include "noworry/rendertarget.h"
 #include "noworry/Draw2D/Spritesheet.h"
 #include "noworry/Gfx3D/BasicMesh.h"
+#include "noworry/Gfx3D/RenderContext.h"
 #include "noworry/transform.h"
 #include "noworry/camera/orthographiccamera.h"
 #include "noworry/camera/perspectivecamera.h"
-#include "noworry/scene/scene.h"
 
 #include <memory>
 #include <unordered_map>
@@ -33,13 +33,15 @@
 #include <glm/vec3.hpp>
 
 /// Level map editor.
-class Editor : public World::Listener
+class Editor : public World::Listener, public Renderable
 {
 public:
     Editor(AppState&);
 
     virtual void level_added(Level&, int x, int y) override;
     virtual void level_removed(Level&, int x, int y) override;
+
+    virtual void render(RenderContext&) override;
 
     const ZPalette& z_palette() const;
 
@@ -91,7 +93,7 @@ private:
     float m_mouse_rel_x;
     float m_mouse_rel_y;
 
-    Scene m_scene;
+    RenderContext m_render_ctx;
     Transform m_transform;
     OrthographicCamera m_ortho_camera;
     PerspectiveCamera m_persp_camera;

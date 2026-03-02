@@ -1,14 +1,16 @@
 #ifndef RENDER_BATCH_H
 #define RENDER_BATCH_H
 
+#include "../Material/Material.h"
 #include "../Pipeline/PipelineFactory.h"
-#include "../scene/renderobject.h"
 #include <webgpu/webgpu.h>
 #include <memory>
 #include <unordered_map>
 #include <vector>
 
 #include <glm/mat4x4.hpp>
+
+class Mesh;
 
 struct DrawCall
 {
@@ -26,8 +28,6 @@ class RenderBatch
 public:
     void set_pipeline(Pipeline& pipeline);
 
-    void enqueue(RenderObject&);
-
     void enqueue_parts(const Mesh& mesh,
                        const Material& mat,
                        const glm::mat4& transform);
@@ -43,8 +43,6 @@ class RenderBatcher
 {
 public:
     RenderBatcher(Renderer&);
-
-    void enqueue(RenderObject&);
 
     void enqueue_parts(const Mesh& mesh,
                        const Material& mat,

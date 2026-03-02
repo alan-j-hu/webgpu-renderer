@@ -5,7 +5,6 @@
 #include "Export.h"
 #include "Project.h"
 #include "Serialize.h"
-#include "ThumbnailUtil.h"
 #include "Commands/Command.h"
 
 #include "noworry/renderer.h"
@@ -13,7 +12,6 @@
 #include "noworry/rendertarget.h"
 #include "noworry/resourcetable.h"
 #include "noworry/camera/orthographiccamera.h"
-#include "noworry/scene/scene.h"
 
 #include <optional>
 #include <stdexcept>
@@ -144,8 +142,6 @@ public:
 
     std::optional<std::string> check_error();
 
-    ThumbnailUtil& thumbnail_util() { return m_thumbnail_util; }
-
 private:
     std::vector<Snapshot> m_undo_stack;
     std::vector<Snapshot> m_redo_stack;
@@ -170,9 +166,7 @@ private:
     glm::ivec2 m_selected_level_idx;
     std::optional<int> m_selected_layer_idx;
 
-    ThumbnailUtil m_thumbnail_util;
-
-    void update_long_command();
+    bool update_long_command();
 
     void reset_selection_state();
 };
