@@ -25,11 +25,12 @@ void Exporter::export_world(
 {
     std::filesystem::create_directory(path);
 
-    for (auto& [name, level] : world) {
-        export_level(
-            *level,
-            format,
-            path / (name + '.' + format.fileExtension));
+    for (auto& [coord, level] : world) {
+        auto filename =
+          std::to_string(coord.x) + "," + std::to_string(coord.y)
+          + '.' + format.fileExtension;
+
+        export_level(*level, format, path / filename);
     }
 }
 

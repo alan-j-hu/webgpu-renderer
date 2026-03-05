@@ -131,32 +131,18 @@ World JsonDeserializer::load_world(
         throw DeserializeError("Expected levels to be array");
     }
 
-    m_level_buf.clear();
+    World world(tilesets[tileset_idx], grid_width, grid_depth);
+
     for (auto& elt : levels_json) {
         int x;
         int y;
         elt.at("x").get_to(x);
         elt.at("y").get_to(y);
-
-        std::string name;
-        elt.at("name").get_to(name);
-
         Level level = load_level(*tilesets[tileset_idx], 16, 16, elt);
-        m_level_buf.push_back({
-            x,
-            y,
-            name,
-            std::make_unique<Level>(std::move(level))
-        });
+        world.insert_level(x, y, std::make_unique<Level>(std::move(level)));
     }
 
-    return World(
-        tilesets[tileset_idx],
-        grid_width,
-        grid_depth,
-        m_level_buf.begin(),
-        m_level_buf.end()
-    );
+    return world;
 }
 
 Level JsonDeserializer::load_level(

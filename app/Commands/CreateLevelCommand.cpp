@@ -9,9 +9,7 @@ auto CreateLevelCommand::up(
     Project& project
 ) -> std::expected<Command::Outcome, std::string>
 {
-    World::InsertionInfo info = { m_x, m_y, "level", std::move(m_level) };
-
-    if (m_world->insert_level(std::move(info))) {
+    if (m_world->insert_level(m_x, m_y, std::move(m_level))) {
         return Outcome::DONE;
     }
 

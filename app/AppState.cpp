@@ -25,6 +25,7 @@ AppState::AppState(WGPUDevice device)
     m_background_color = {0.0f, 0.5f, 0.5f, 1.0f};
     m_default_material = &m_resources.add_flat_material(0.5, 0.5, 0.5);
     m_wireframe_material = &m_resources.add_wireframe_material(1, 1, 1);
+    reset_selection_state();
 }
 
 void AppState::set_project(Project project)
@@ -219,12 +220,17 @@ void AppState::reset_selection_state()
     }
 
     auto& world = m_project.world_at(0);
+    // Ensure world is nonempty
+    if (world.begin() == world.end()) {
+        world.insert_level(0, 0, std::make_unique<Level>());
+        m_selected_level_idx.x = 0;
+        m_selected_level_idx.y = 0;
+    }
+
     const Level* level = world.level_at(
         m_selected_level_idx.x,
         m_selected_level_idx.y);
-
-    if (world.begin() == world.end()) {
-    } else if (level == nullptr) {
+    if (level == nullptr) {
         level = world.begin()->second.get();
         m_selected_level_idx = glm::ivec2(level->x(), level->y());
     }

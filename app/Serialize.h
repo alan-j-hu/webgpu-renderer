@@ -23,7 +23,6 @@ private:
 
     nlohmann::json save_level(
         const std::unordered_map<const TileDef*, int>&,
-        const std::string& name,
         const Level&);
 
     nlohmann::json save_layer(

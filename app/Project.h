@@ -228,7 +228,8 @@ private:
 class World
 {
 public:
-    using iterator = NameMap<std::unique_ptr<Level>>::const_iterator;
+    using iterator =
+        std::unordered_map<glm::ivec2, std::unique_ptr<Level>>::const_iterator;
 
     class Listener
     {
@@ -237,37 +238,13 @@ public:
         virtual void level_removed(Level&, int x, int y) = 0;
     };
 
-    struct InsertionInfo
-    {
-        int x;
-        int y;
-        std::string name;
-        std::unique_ptr<Level> level;
-    };
-
     World(std::shared_ptr<const Tileset>);
 
-    template<class It>
-    World(std::shared_ptr<const Tileset> tileset,
-          int width, int depth,
-          It it, It end)
+    World(std::shared_ptr<const Tileset> tileset, int width, int depth)
         : m_tileset(std::move(tileset)),
           m_grid_width(width),
           m_grid_depth(depth)
     {
-        for (; it != end; ++it) {
-            insert_level(std::move(*it));
-        }
-
-        if (m_levels_by_name.size() == 0) {
-            InsertionInfo info = {
-                0,
-                0,
-                "default",
-                std::make_unique<Level>()
-            };
-            insert_level(std::move(info));
-        }
     }
 
     World(World&&) = default;
@@ -282,13 +259,10 @@ public:
     int grid_width() const;
     int grid_depth() const;
 
-    Level* level_at(const std::string&);
-    const Level* level_at(const std::string&) const;
-
     Level* level_at(int x, int y);
     const Level* level_at(int x, int y) const;
 
-    bool insert_level(InsertionInfo);
+    bool insert_level(int x, int y, std::unique_ptr<Level>);
 
     std::unique_ptr<Level> remove_level(int x, int y);
 
@@ -302,8 +276,7 @@ public:
     }
 
 private:
-    NameMap<std::unique_ptr<Level>> m_levels_by_name;
-    std::unordered_map<glm::ivec2, Level*> m_levels_by_coord;
+    std::unordered_map<glm::ivec2, std::unique_ptr<Level>> m_levels;
     std::shared_ptr<const Tileset> m_tileset;
     int m_grid_width;
     int m_grid_depth;

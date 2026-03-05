@@ -61,10 +61,7 @@ nlohmann::json JsonSerializer::save_world(
 
     std::vector<nlohmann::json> levels;
     for (auto it = world.begin(); it != world.end(); ++it) {
-        levels.push_back(save_level(
-            tiledef_mapping,
-            it->first,
-            *it->second));
+        levels.push_back(save_level(tiledef_mapping, *it->second));
     }
 
     return {
@@ -77,7 +74,6 @@ nlohmann::json JsonSerializer::save_world(
 
 nlohmann::json JsonSerializer::save_level(
     const std::unordered_map<const TileDef*, int>& mapping,
-    const std::string& name,
     const Level& level)
 {
      std::vector<nlohmann::json> layer_json;
@@ -86,7 +82,6 @@ nlohmann::json JsonSerializer::save_level(
      }
 
      return {
-         {"name", name},
          {"layers", layer_json},
          {"x", level.x()},
          {"y", level.y()}

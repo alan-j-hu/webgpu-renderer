@@ -21,12 +21,8 @@ auto DeleteLevelCommand::up(
 
 void DeleteLevelCommand::down(Project&)
 {
-    World::InsertionInfo info {
+    m_world.insert_level(
         m_level_ref.x(),
         m_level_ref.y(),
-        "",
-        std::move(m_level_ptr)
-    };
-
-    m_world.insert_level(std::move(info));
+        std::move(m_level_ptr));
 }
