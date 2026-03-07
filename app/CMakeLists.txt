@@ -15,21 +15,22 @@ add_executable(demo
   main.cpp
   Project.cpp
   Serialize.cpp
-  TilePicker.cpp
   Commands/Command.cpp
   Commands/CreateLayerCommand.cpp
   Commands/CreateLevelCommand.cpp
-  Commands/CreateTileCommand.cpp
+  Commands/CreateTiledefCommand.cpp
   Commands/DeleteLayerCommand.cpp
   Commands/DeleteLevelCommand.cpp
-  Commands/DeleteTileCommand.cpp
+  Commands/DeleteTiledefCommand.cpp
+  Commands/MoveTiledefCommand.cpp
   Commands/PlaceTilesCommand.cpp
   Commands/ResizeWorldCommand.cpp
-  Commands/UpdateTileCommand.cpp
+  Commands/UpdateTiledefCommand.cpp
   Editor/Editor.cpp
   Editor/ErrorModal.cpp
   Editor/ExportDialog.cpp
   Editor/FileDialog.cpp
+  Editor/ListBox.cpp
   Editor/Tilemap/HeightMode.cpp
   Editor/Tilemap/LayerNode.cpp
   Editor/Tilemap/LevelNode.cpp

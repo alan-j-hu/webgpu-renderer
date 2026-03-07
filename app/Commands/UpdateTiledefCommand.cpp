@@ -1,11 +1,11 @@
-#include "UpdateTileCommand.h"
+#include "UpdateTiledefCommand.h"
 
-UpdateTileCommand::UpdateTileCommand(int idx, TileDef tiledef)
+UpdateTiledefCommand::UpdateTiledefCommand(int idx, TileDef tiledef)
     : m_idx(idx), m_tiledef(std::move(tiledef))
 {
 }
 
-auto UpdateTileCommand::up(
+auto UpdateTiledefCommand::up(
     Project& project
 ) -> std::expected<Command::Outcome, std::string>
 {
@@ -15,12 +15,12 @@ auto UpdateTileCommand::up(
     return Outcome::DONE;
 }
 
-void UpdateTileCommand::down(Project& project)
+void UpdateTiledefCommand::down(Project& project)
 {
     up(project);
 }
 
-const char* UpdateTileCommand::name()
+const char* UpdateTiledefCommand::name()
 {
-    return "Update Tile";
+    return "update tile definition";
 }

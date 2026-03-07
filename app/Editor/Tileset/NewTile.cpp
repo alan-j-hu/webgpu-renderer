@@ -1,6 +1,6 @@
 #include "NewTile.h"
 #include "../FileDialog.h"
-#include "../../Commands/CreateTileCommand.h"
+#include "../../Commands/CreateTiledefCommand.h"
 #include "noworry/resourcetable.h"
 #include "imgui.h"
 #include <utility>
@@ -28,7 +28,7 @@ void NewTile::update()
         if (ImGui::Button("Add Tile")) {
             auto holder = std::make_unique<TileDef>();
             m_definition.swap(holder);
-            m_app_state->push_command(std::make_unique<CreateTileCommand>(
+            m_app_state->push_command(std::make_unique<CreateTiledefCommand>(
                 std::move(*holder),
                 m_index));
             ImGui::CloseCurrentPopup();

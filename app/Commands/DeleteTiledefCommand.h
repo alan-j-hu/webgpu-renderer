@@ -1,13 +1,13 @@
-#ifndef DELETE_TILE_COMMAND_H
-#define DELETE_TILE_COMMAND_H
+#ifndef DELETE_TILEDEF_COMMAND_H
+#define DELETE_TILEDEF_COMMAND_H
 
 #include "Command.h"
 #include <memory>
 
-class DeleteTileCommand : public Command
+class DeleteTiledefCommand : public Command
 {
 public:
-    DeleteTileCommand(int index);
+    DeleteTiledefCommand(Tileset&, int index);
 
     virtual const char* name() override;
 
@@ -17,6 +17,7 @@ protected:
 
 private:
     std::shared_ptr<TileDef> m_tiledef;
+    Tileset* m_tileset;
     int m_index;
 };
 

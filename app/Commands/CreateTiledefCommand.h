@@ -1,12 +1,12 @@
-#ifndef CREATE_TILE_COMMAND_H
-#define CREATE_TILE_COMMAND_H
+#ifndef CREATE_TILEDEF_COMMAND_H
+#define CREATE_TILEDEF_COMMAND_H
 
 #include "Command.h"
 
-class CreateTileCommand : public Command
+class CreateTiledefCommand : public Command
 {
 public:
-    CreateTileCommand(TileDef, int index);
+    CreateTiledefCommand(TileDef, int index);
 
     virtual const char* name() override;
 

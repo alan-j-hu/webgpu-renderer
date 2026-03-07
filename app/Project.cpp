@@ -157,6 +157,26 @@ std::shared_ptr<TileDef> Tileset::remove(int idx)
     return ptr;
 }
 
+void Tileset::move(int old_idx, int new_idx)
+{
+    if (old_idx < 0 || old_idx >= m_tiles.size()) {
+        return;
+    }
+    if (new_idx < 0 || new_idx >= m_tiles.size()) {
+        return;
+    }
+
+    if (old_idx < new_idx) {
+        for (int i = old_idx; i < new_idx - 1; ++i) {
+            std::swap(m_tiles.at(i), m_tiles.at(i + 1));
+        }
+    } else if (old_idx > new_idx) {
+        for (int i = old_idx; i > new_idx; --i) {
+            std::swap(m_tiles.at(i), m_tiles.at(i - 1));
+        }
+    }
+}
+
 TileInst::TileInst(
     std::shared_ptr<const TileDef> def,
     int z,

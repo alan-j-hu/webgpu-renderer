@@ -110,6 +110,8 @@ public:
 
     std::shared_ptr<TileDef> remove(int idx);
 
+    void move(int old_idx, int new_idx);
+
     Listenable<Listener>& listenable() const { return m_listenable; }
 
 private:

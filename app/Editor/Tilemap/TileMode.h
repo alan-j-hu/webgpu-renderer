@@ -3,8 +3,8 @@
 
 #include "View2DMode.h"
 #include "../../AppState.h"
-#include "../../TilePicker.h"
 #include "../../Commands/PlaceTilesCommand.h"
+#include "../Tileset/TileList.h"
 #include "noworry/rendertarget.h"
 #include "noworry/Draw2D/SpriteRenderer.h"
 
@@ -29,7 +29,7 @@ protected:
     virtual void handle_right_mouse_released(int tile_x, int tile_y) override;
 
 private:
-    TilePicker m_tile_picker;
+    TileList m_tile_list;
     Rotation m_rotation;
     AppState::CommandHolder<PlaceTilesCommand> m_command;
 };

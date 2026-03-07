@@ -14,7 +14,6 @@
 #include "Tileset/TileList.h"
 #include "Tileset/TilesetThumbnails.h"
 #include "../AppState.h"
-#include "../TilePicker.h"
 
 #include "noworry/renderer.h"
 #include "noworry/rendertarget.h"

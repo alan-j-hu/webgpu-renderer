@@ -1,12 +1,12 @@
-#ifndef UPDATE_TILE_COMMAND_H
-#define UPDATE_TILE_COMMAND_H
+#ifndef UPDATE_TILEDEF_COMMAND_H
+#define UPDATE_TILEDEF_COMMAND_H
 
 #include "Command.h"
 
-class UpdateTileCommand : public Command
+class UpdateTiledefCommand : public Command
 {
 public:
-    UpdateTileCommand(int, TileDef);
+    UpdateTiledefCommand(int, TileDef);
 
     const char* name() override;
 

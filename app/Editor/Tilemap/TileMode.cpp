@@ -6,7 +6,7 @@
 
 TileMode::TileMode(AppState& app_state, Editor& editor)
     : View2DMode(app_state, editor),
-      m_tile_picker(app_state, editor),
+      m_tile_list(app_state, editor),
       m_rotation(Rotation::Rotate0)
 {
 }
@@ -92,9 +92,7 @@ void TileMode::draw_controls()
         m_rotation = Rotation::Rotate270;
     }
 
-    auto idx = app_state().selected_tiledef_idx();
-    m_tile_picker.render(idx);
-    app_state().select_tiledef(idx);
+    m_tile_list.draw();
 }
 
 void TileMode::handle_left_mouse_down(int x, int y)

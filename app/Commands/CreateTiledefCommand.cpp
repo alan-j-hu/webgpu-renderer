@@ -1,12 +1,12 @@
-#include "CreateTileCommand.h"
+#include "CreateTiledefCommand.h"
 #include <utility>
 
-CreateTileCommand::CreateTileCommand(TileDef tiledef, int index)
+CreateTiledefCommand::CreateTiledefCommand(TileDef tiledef, int index)
     : m_tiledef(std::move(tiledef)), m_index(index)
 {
 }
 
-auto CreateTileCommand::up(
+auto CreateTiledefCommand::up(
     Project& project
 ) -> std::expected<Command::Outcome, std::string>
 {
@@ -14,13 +14,13 @@ auto CreateTileCommand::up(
     return Outcome::DONE;
 }
 
-void CreateTileCommand::down(Project& project)
+void CreateTiledefCommand::down(Project& project)
 {
     auto tiledef = project.tileset_at(0)->remove(m_index);
     m_tiledef = std::move(*tiledef);
 }
 
-const char* CreateTileCommand::name()
+const char* CreateTiledefCommand::name()
 {
-    return "Create Tile";
+    return "create tile definition";
 }
