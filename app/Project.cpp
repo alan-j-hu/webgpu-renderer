@@ -1,4 +1,5 @@
 #include "Project.h"
+#include "Util.h"
 #include "glm/ext/matrix_transform.hpp"
 #include <algorithm>
 #include <utility>
@@ -157,24 +158,9 @@ std::shared_ptr<TileDef> Tileset::remove(int idx)
     return ptr;
 }
 
-void Tileset::move(int old_idx, int new_idx)
+void Tileset::move(int idx, int delta)
 {
-    if (old_idx < 0 || old_idx >= m_tiles.size()) {
-        return;
-    }
-    if (new_idx < 0 || new_idx >= m_tiles.size()) {
-        return;
-    }
-
-    if (old_idx < new_idx) {
-        for (int i = old_idx; i < new_idx - 1; ++i) {
-            std::swap(m_tiles.at(i), m_tiles.at(i + 1));
-        }
-    } else if (old_idx > new_idx) {
-        for (int i = old_idx; i > new_idx; --i) {
-            std::swap(m_tiles.at(i), m_tiles.at(i - 1));
-        }
-    }
+    reorder(m_tiles, idx, delta);
 }
 
 TileInst::TileInst(
@@ -300,6 +286,16 @@ std::unique_ptr<Layer> Level::remove_layer(int idx)
     m_layers.erase(m_layers.begin() + idx);
     m_listenable.notify(&Level::Listener::layer_removed, *layer, idx);
     return layer;
+}
+
+void Level::move_layer(int idx, int delta)
+{
+    if (reorder(m_layers, idx, delta)) {
+        m_listenable.notify(&Level::Listener::layer_reordered,
+                            *m_layers.at(idx + delta),
+                            idx,
+                            delta);
+    }
 }
 
 bool Level::uses_tiledef(const TileDef& tiledef) const

@@ -1,18 +1,16 @@
-#ifndef TILE_LIST_H
-#define TILE_LIST_H
+#ifndef LAYER_LIST_H
+#define LAYER_LIST_H
 
-#include "NewTile.h"
-#include "TileDefinitionEditor.h"
 #include "../ListBox.h"
-#include "../../AppState.h"
 
+class AppState;
 class Editor;
+class Level;
 
-/// Edits the list of tiles.
-class TileList : public ListBox
+class LayerList : public ListBox
 {
 public:
-    TileList(AppState&, Editor&);
+    LayerList(AppState&, Editor&);
 
     virtual int count() override;
 
@@ -27,10 +25,8 @@ public:
 private:
     AppState* m_app_state;
     Editor* m_editor;
-    NewTile m_new_tile;
-    TileDefinitionEditor m_tile_editor;
 
-    void context_menu(int idx);
+    void context_menu(Level& level, int idx);
 };
 
 #endif

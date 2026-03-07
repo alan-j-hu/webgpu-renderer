@@ -1,7 +1,7 @@
 #include "TileList.h"
 #include "../Editor.h"
 #include "../../Commands/DeleteTiledefCommand.h"
-#include "../../Commands/MoveTiledefCommand.h"
+#include "../../Commands/ReorderTiledefCommand.h"
 #include "../../Commands/UpdateTiledefCommand.h"
 #include <utility>
 #include "imgui.h"
@@ -69,11 +69,11 @@ void TileList::select(int idx)
     m_app_state->select_tiledef(idx);
 }
 
-void TileList::request_reorder(int old_idx, int new_idx)
+void TileList::request_reorder(int idx, int delta)
 {
     auto& tileset = *m_app_state->project().tileset_at(0);
     m_app_state->push_command(
-        std::make_unique<MoveTiledefCommand>(tileset, old_idx, new_idx));
+        std::make_unique<ReorderTiledefCommand>(tileset, idx, delta));
 }
 
 void TileList::draw()

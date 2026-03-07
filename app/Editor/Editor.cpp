@@ -36,7 +36,8 @@ Editor::Editor(AppState& app_state)
                       16,
                       glm::vec3(16, 0, 0),
                       glm::vec3(0, 16, 0))),
-      m_z_palette(app_state)
+    m_z_palette(app_state),
+    m_layer_list(app_state, *this)
 {
     setup_scene();
 }
@@ -112,6 +113,15 @@ glm::vec2 Editor::mouse_pos() const
 void Editor::open_error_modal(const std::string& message)
 {
     m_error_modal.open(message.c_str());
+}
+
+LevelNode* Editor::level_node(Level& level)
+{
+    auto it = m_level_nodes.find(m_app_state->selected_level());
+    if (it == m_level_nodes.end()) {
+        return nullptr;
+    }
+    return it->second.get();
 }
 
 void Editor::draw()
@@ -333,7 +343,7 @@ void Editor::draw_tilemap_editor()
     if (ImGui::BeginChild("Side Pane", ImVec2(200, 700))) {
         m_current_mode->draw_controls();
 
-        draw_layer_list();
+        m_layer_list.draw();
     }
     ImGui::EndChild();
 }
@@ -370,62 +380,6 @@ void Editor::draw_toolbar()
     ImGui::SameLine();
     if (ImGui::Button("Redo")) {
         m_app_state->redo();
-    }
-}
-
-void Editor::draw_layer_list()
-{
-    auto& project = m_app_state->project();
-    auto* level = m_app_state->selected_level();
-    if (level == nullptr) {
-        return;
-    }
-
-    if (ImGui::Button("-")) {
-        if (auto* layer = m_app_state->selected_layer()) {
-            m_app_state->push_command(
-                std::make_unique<DeleteLayerCommand>(
-                    *level,
-                    *m_app_state->selected_layer_idx()));
-            m_app_state->select_layer(std::nullopt);
-        }
-    }
-    ImGui::SameLine();
-    if (ImGui::Button("+")) {
-        m_app_state->push_command(
-            std::make_unique<CreateLayerCommand>(*level));
-    }
-
-    for (int i = 0; i < level->layer_count(); ++i) {
-        draw_layer_item(i);
-    }
-}
-
-void Editor::draw_layer_item(int i)
-{
-    auto& project = m_app_state->project();
-    const Layer& layer = m_app_state->selected_level()->layer_at(i);
-
-    const bool selected = m_app_state->selected_layer() == &layer;
-    const ImVec4 bg_color =
-        selected ? ImVec4(1, 1, 1, 1) : ImVec4(0.5, 0.5, 0.5, 1);
-    const ImVec4 tint_color =
-        selected ? ImVec4(0.8, 0.8, 0.8, 1) : ImVec4(1, 1, 1, 1);
-
-    auto& level_node = *m_level_nodes.at(m_app_state->selected_level());
-    ImTextureID tex_id =
-        (ImTextureID)(intptr_t)level_node.layer_at(i).thumbnail().view();
-
-    if (ImGui::ImageButton(
-            std::to_string(i).c_str(),
-            tex_id,
-            ImVec2(100, 100),
-            ImVec2(0, 0),
-            ImVec2(1, 1),
-            bg_color,
-            tint_color)) {
-
-        m_app_state->select_layer(i);
     }
 }
 

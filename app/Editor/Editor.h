@@ -5,6 +5,7 @@
 #include "ErrorModal.h"
 #include "ExportDialog.h"
 #include "Tilemap/HeightMode.h"
+#include "Tilemap/LayerList.h"
 #include "Tilemap/LayerNode.h"
 #include "Tilemap/LevelNode.h"
 #include "Tilemap/Mode.h"
@@ -41,6 +42,8 @@ public:
     virtual void level_removed(Level&, int x, int y) override;
 
     virtual void render(RenderContext&) override;
+
+    LevelNode* level_node(Level&);
 
     const ZPalette& z_palette() const;
 
@@ -107,6 +110,7 @@ private:
 
     ZPalette m_z_palette;
 
+    LayerList m_layer_list;
     std::vector<std::unique_ptr<TilesetThumbnails>> m_tileset_thumbnails;
     std::unordered_map<const Level*, std::unique_ptr<LevelNode>> m_level_nodes;
 
@@ -123,10 +127,6 @@ private:
     void draw_tilemap_editor();
 
     void draw_toolbar();
-
-    void draw_layer_list();
-
-    void draw_layer_item(int i);
 
     void draw_error_modal();
 

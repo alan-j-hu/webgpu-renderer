@@ -22,7 +22,8 @@ add_executable(demo
   Commands/DeleteLayerCommand.cpp
   Commands/DeleteLevelCommand.cpp
   Commands/DeleteTiledefCommand.cpp
-  Commands/MoveTiledefCommand.cpp
+  Commands/ReorderLayerCommand.cpp
+  Commands/ReorderTiledefCommand.cpp
   Commands/PlaceTilesCommand.cpp
   Commands/ResizeWorldCommand.cpp
   Commands/UpdateTiledefCommand.cpp
@@ -30,6 +31,7 @@ add_executable(demo
   Editor/ErrorModal.cpp
   Editor/ExportDialog.cpp
   Editor/FileDialog.cpp
+  Editor/Tilemap/LayerList.cpp
   Editor/ListBox.cpp
   Editor/Tilemap/HeightMode.cpp
   Editor/Tilemap/LayerNode.cpp

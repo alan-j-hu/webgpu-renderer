@@ -1,6 +1,8 @@
 #include "ListBox.h"
 #include "imgui.h"
 
+#include <iostream>
+
 void ListBox::update()
 {
     ImGuiIO& io = ImGui::GetIO();
@@ -9,13 +11,8 @@ void ListBox::update()
     for (int i = 0; i < count(); ++i) {
         ImGui::PushID(i);
 
-        if (m_drag_drop && m_drag_drop->target == i) {
-            if (mouse_down) {
-                ImGui::Separator();
-            } else {
-                request_reorder(m_drag_drop->source, m_drag_drop->target);
-                m_drag_drop = std::nullopt;
-            }
+        if (mouse_down && m_drag_drop && m_drag_drop->cursor == i) {
+            ImGui::Separator();
         }
 
         ImVec2 cursor_before = ImGui::GetCursorScreenPos();
@@ -33,14 +30,35 @@ void ListBox::update()
                 float middle = cursor_before.y
                   + (cursor_after.y - cursor_before.y) / 2.0;
                 if (io.MousePos.y < middle) {
-                    m_drag_drop = { m_drag_drop->source, i };
+                    m_drag_drop = { m_drag_drop->idx, i };
                 } else {
-                    m_drag_drop = { m_drag_drop->source, i + 1 };
+                    m_drag_drop = { m_drag_drop->idx, i + 1 };
                 }
             }
             break;
         }
 
         ImGui::PopID();
+    }
+
+    if (m_drag_drop) {
+        int idx = m_drag_drop->idx;
+        int cursor = m_drag_drop->cursor;
+
+        if (mouse_down) {
+            if (cursor == count()) {
+                ImGui::Separator();
+            }
+        } else {
+            int starting_cursor = cursor > idx
+                ? idx + 1
+                : idx;
+            int delta = cursor - starting_cursor;
+            if (delta != 0) {
+                request_reorder(idx, delta);
+            }
+
+            m_drag_drop = std::nullopt;
+        }
     }
 }

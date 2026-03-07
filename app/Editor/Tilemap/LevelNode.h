@@ -18,6 +18,8 @@ public:
 
     virtual void layer_removed(Layer&, int idx) override;
 
+    virtual void layer_reordered(Layer&, int old_idx, int new_idx) override;
+
     virtual void render(RenderContext&) override;
 
     LayerNode& layer_at(int idx);
@@ -25,6 +27,8 @@ public:
     void add_layer(int idx);
 
     void remove_layer(int idx);
+
+    void reorder_layer(int idx, int delta);
 
 private:
     AppState* m_app_state;

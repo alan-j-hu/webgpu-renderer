@@ -110,7 +110,7 @@ public:
 
     std::shared_ptr<TileDef> remove(int idx);
 
-    void move(int old_idx, int new_idx);
+    void move(int idx, int delta);
 
     Listenable<Listener>& listenable() const { return m_listenable; }
 
@@ -177,6 +177,7 @@ public:
     public:
         virtual void layer_added(int idx) = 0;
         virtual void layer_removed(Layer&, int idx) = 0;
+        virtual void layer_reordered(Layer&, int idx, int delta) = 0;
     };
 
     Level();
@@ -212,6 +213,7 @@ public:
     void add_layer();
     void add_layer(std::unique_ptr<Layer>, int idx);
     std::unique_ptr<Layer> remove_layer(int idx);
+    void move_layer(int idx, int delta);
 
     bool uses_tiledef(const TileDef&) const;
 

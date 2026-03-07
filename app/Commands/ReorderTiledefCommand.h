@@ -1,12 +1,12 @@
-#ifndef MOVE_TILEDEF_COMMAND_H
-#define MOVE_TILEDEF_COMMAND_H
+#ifndef REORDER_TILEDEF_COMMAND_H
+#define REORDER_TILEDEF_COMMAND_H
 
 #include "Command.h"
 
-class MoveTiledefCommand : public Command
+class ReorderTiledefCommand : public Command
 {
 public:
-    MoveTiledefCommand(Tileset&, int, int);
+    ReorderTiledefCommand(Tileset&, int, int);
 
     virtual const char* name() override;
 
@@ -16,8 +16,8 @@ protected:
 
 private:
     Tileset* m_tileset;
-    int m_old_idx;
-    int m_new_idx;
+    int m_idx;
+    int m_delta;
 };
 
 #endif
