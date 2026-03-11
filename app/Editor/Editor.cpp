@@ -9,6 +9,9 @@
 
 #include <fstream>
 #include "imgui.h"
+#include "imgui_internal.h"
+
+#include <iostream>
 
 Editor::Editor(AppState& app_state)
     : m_camera_selection(0),
@@ -126,8 +129,75 @@ LevelNode* Editor::level_node(Level& level)
 
 void Editor::draw()
 {
+    ImGuiID dockspace_id = ImGui::GetID("My Dockspace");
+    ImGuiViewport* viewport = ImGui::GetMainViewport();
+
+    if (ImGui::DockBuilderGetNode(dockspace_id) == nullptr) {
+        std::cout << "Reached" << std::endl;
+        ImGui::DockBuilderAddNode(dockspace_id, ImGuiDockNodeFlags_DockSpace);
+        ImGui::DockBuilderSetNodeSize(dockspace_id, viewport->Size);
+
+        ImGuiID tile_editor_id = 0;
+        ImGuiID map_editor_id = 0;
+        ImGui::DockBuilderSplitNode(
+            dockspace_id,
+            ImGuiDir_Left,
+            0.20,
+            &tile_editor_id,
+            &map_editor_id);
+
+        ImGuiID map_screen_id = 0;
+        ImGuiID map_right_panel_id = 0;
+        ImGui::DockBuilderSplitNode(
+            map_editor_id,
+            ImGuiDir_Left,
+            0.75,
+            &map_screen_id,
+            &map_right_panel_id);
+
+        ImGuiID world_map_id = 0;
+        ImGuiID layer_list_id = 0;
+        ImGui::DockBuilderSplitNode(
+            map_right_panel_id,
+            ImGuiDir_Up,
+            0.25,
+            &world_map_id,
+            &layer_list_id);
+
+        ImGui::DockBuilderDockWindow("Tiles", tile_editor_id);
+        ImGui::DockBuilderDockWindow("Map", map_screen_id);
+        ImGui::DockBuilderDockWindow("World", world_map_id);
+        ImGui::DockBuilderDockWindow("Layers", layer_list_id);
+
+        ImGui::DockBuilderFinish(dockspace_id);
+    }
+    ImGui::DockSpaceOverViewport(dockspace_id);
+
     draw_menubar();
-    draw_main_pane();
+
+    ImGui::Begin("Tiles");
+    {
+        m_tile_list.draw();
+    }
+    ImGui::End();
+
+    ImGui::Begin("Map");
+    {
+        draw_tilemap_editor();
+    }
+    ImGui::End();
+
+    ImGui::Begin("World");
+    {
+        draw_world_editor();
+    }
+    ImGui::End();
+
+    ImGui::Begin("Layers");
+    {
+        m_layer_list.draw();
+    }
+    ImGui::End();
 
     if (auto error = m_app_state->check_error()) {
         m_error_modal.open(error->c_str());
@@ -138,7 +208,7 @@ void Editor::draw()
 
 void Editor::draw_menubar()
 {
-    if (ImGui::BeginMenuBar()) {
+    if (ImGui::BeginMainMenuBar()) {
         if (ImGui::BeginMenu("File")) {
             if (ImGui::MenuItem("Open")) {
                 m_io_state = Editor::IOState::OPENING;
@@ -175,26 +245,7 @@ void Editor::draw_menubar()
             }
         }
 
-        ImGui::EndMenuBar();
-    }
-}
-
-void Editor::draw_main_pane()
-{
-    if (ImGui::BeginTabBar("Tabs")) {
-        if (ImGui::BeginTabItem("Tilemap Editor")) {
-            draw_tilemap_editor();
-            ImGui::EndTabItem();
-        }
-        if (ImGui::BeginTabItem("Tileset Editor")) {
-            draw_tileset_editor();
-            ImGui::EndTabItem();
-        }
-        if (ImGui::BeginTabItem("World Editor")) {
-            draw_world_editor();
-            ImGui::EndTabItem();
-        }
-        ImGui::EndTabBar();
+        ImGui::EndMainMenuBar();
     }
 }
 
@@ -282,11 +333,6 @@ void Editor::draw_world_editor()
     }
 }
 
-void Editor::draw_tileset_editor()
-{
-    m_tile_list.draw();
-}
-
 void Editor::draw_tilemap_editor()
 {
     draw_toolbar();
@@ -310,7 +356,7 @@ void Editor::draw_tilemap_editor()
         m_app_state->sprite_renderer().end();
     }
 
-    if (ImGui::BeginChild("Map", ImVec2(500, 700))) {
+    {
         ImVec2 screen_pos = ImGui::GetCursorScreenPos();
         ImVec2 mouse_pos = ImGui::GetMousePos();
         m_mouse_rel_x = mouse_pos.x - screen_pos.x;
@@ -332,20 +378,10 @@ void Editor::draw_tilemap_editor()
         ImGui::Image((ImTextureID)(intptr_t)m_subwindow_2d.texture().view(),
                      size);
     }
-    ImGui::EndChild();
 
     ImGui::SameLine();
 
     m_z_palette.render();
-
-    ImGui::SameLine();
-
-    if (ImGui::BeginChild("Side Pane", ImVec2(200, 700))) {
-        m_current_mode->draw_controls();
-
-        m_layer_list.draw();
-    }
-    ImGui::EndChild();
 }
 
 void Editor::render_preview()

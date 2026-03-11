@@ -40,8 +40,8 @@ FetchContent_MakeAvailable(glm)
 FetchContent_Declare(
   imgui
   GIT_REPOSITORY https://github.com/ocornut/imgui.git
-  # v1.92.6
-  GIT_TAG 6ded5230d043aa32c755e65c910c2af5002fb9f9)
+  # v1.92.6-docking
+  GIT_TAG 2a1b69f05748ad909f03acf4533447cac1331611)
 FetchContent_MakeAvailable(imgui)
 
 FetchContent_Declare(

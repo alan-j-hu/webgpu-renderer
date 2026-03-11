@@ -90,7 +90,7 @@ private:
     {
         IMGUI_CHECKVERSION();
         ImGui::CreateContext();
-        ImGui::StyleColorsDark();
+        ImGui::StyleColorsLight();
         ImGui_ImplGlfw_InitForOther(window(), true);
         ImGui_ImplWGPU_InitInfo init_info;
         init_info.Device = device();
@@ -98,6 +98,7 @@ private:
         init_info.RenderTargetFormat = WGPUTextureFormat_BGRA8Unorm;
         init_info.DepthStencilFormat = WGPUTextureFormat_Undefined;
         ImGui_ImplWGPU_Init(&init_info);
+        ImGui::GetIO().ConfigFlags |= ImGuiConfigFlags_DockingEnable;
     }
 
     void shutdown_imgui()
@@ -111,19 +112,12 @@ private:
     {
         ImGui_ImplWGPU_NewFrame();
         ImGui_ImplGlfw_NewFrame();
-        ImGui::NewFrame();
 
         // Not safe to run between ImGui::Render and ImGui_ImplWGPU_NewFrame
         m_app_state.run_pending_commands();
 
-        ImGuiViewport* viewport = ImGui::GetMainViewport();
-        ImGui::SetNextWindowPos(viewport->Pos);
-        ImGui::SetNextWindowSize(viewport->Size);
-        ImGui::Begin("Window", nullptr, WINDOW_FLAGS);
-
+        ImGui::NewFrame();
         m_editor.draw();
-
-        ImGui::End();
 
         ImGui::Render();
     }

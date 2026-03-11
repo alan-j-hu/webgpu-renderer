@@ -118,11 +118,7 @@ private:
 
     void draw_menubar();
 
-    void draw_main_pane();
-
     void draw_world_editor();
-
-    void draw_tileset_editor();
 
     void draw_tilemap_editor();
 
