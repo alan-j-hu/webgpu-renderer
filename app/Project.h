@@ -34,22 +34,6 @@ enum class Rotation
     Rotate270
 };
 
-struct LayerLocation
-{
-    LayerLocation();
-
-    int world;
-    glm::ivec2 level;
-    int layer;
-};
-
-/// A TextureRef consists of a file path and a material for the texture.
-struct TextureRef
-{
-    std::filesystem::path path;
-    std::shared_ptr<TextureMaterial> material;
-};
-
 class TileDef
 {
 public:
@@ -330,12 +314,6 @@ public:
     const World& world_at(int idx) const;
     void add_world(std::unique_ptr<World>, int idx);
     std::unique_ptr<World> remove_world(int idx);
-
-    Level& level_at(const LayerLocation&);
-    const Level& level_at(const LayerLocation&) const;
-
-    Layer& layer_at(const LayerLocation&);
-    const Layer& layer_at(const LayerLocation&) const;
 
     bool tiledef_in_use(const TileDef&) const;
 
