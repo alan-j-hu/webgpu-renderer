@@ -10,8 +10,7 @@
 #include <fstream>
 #include "imgui.h"
 #include "imgui_internal.h"
-
-#include <iostream>
+#include "misc/cpp/imgui_stdlib.h"
 
 Editor::Editor(AppState& app_state)
     : m_camera_selection(0),
@@ -133,18 +132,26 @@ void Editor::draw()
     ImGuiViewport* viewport = ImGui::GetMainViewport();
 
     if (ImGui::DockBuilderGetNode(dockspace_id) == nullptr) {
-        std::cout << "Reached" << std::endl;
         ImGui::DockBuilderAddNode(dockspace_id, ImGuiDockNodeFlags_DockSpace);
         ImGui::DockBuilderSetNodeSize(dockspace_id, viewport->Size);
 
-        ImGuiID tile_editor_id = 0;
+        ImGuiID left_panel_id = 0;
         ImGuiID map_editor_id = 0;
         ImGui::DockBuilderSplitNode(
             dockspace_id,
             ImGuiDir_Left,
-            0.20,
-            &tile_editor_id,
+            0.2,
+            &left_panel_id,
             &map_editor_id);
+
+        ImGuiID tileset_editor_id = 0;
+        ImGuiID tile_editor_id = 0;
+        ImGui::DockBuilderSplitNode(
+            left_panel_id,
+            ImGuiDir_Up,
+            0.5,
+            &tileset_editor_id,
+            &tile_editor_id);
 
         ImGuiID map_screen_id = 0;
         ImGuiID map_right_panel_id = 0;
@@ -164,7 +171,8 @@ void Editor::draw()
             &world_map_id,
             &layer_list_id);
 
-        ImGui::DockBuilderDockWindow("Tiles", tile_editor_id);
+        ImGui::DockBuilderDockWindow("Tile", tile_editor_id);
+        ImGui::DockBuilderDockWindow("Tiles", tileset_editor_id);
         ImGui::DockBuilderDockWindow("Map", map_screen_id);
         ImGui::DockBuilderDockWindow("World", world_map_id);
         ImGui::DockBuilderDockWindow("Layers", layer_list_id);
@@ -176,27 +184,23 @@ void Editor::draw()
     draw_menubar();
 
     ImGui::Begin("Tiles");
-    {
-        m_tile_list.draw();
-    }
+    m_tile_list.draw();
+    ImGui::End();
+
+    ImGui::Begin("Tile");
+    m_tile_list.draw_tile_editor();
     ImGui::End();
 
     ImGui::Begin("Map");
-    {
-        draw_tilemap_editor();
-    }
+    draw_tilemap_editor();
     ImGui::End();
 
     ImGui::Begin("World");
-    {
-        draw_world_editor();
-    }
+    draw_world_editor();
     ImGui::End();
 
     ImGui::Begin("Layers");
-    {
-        m_layer_list.draw();
-    }
+    m_layer_list.draw();
     ImGui::End();
 
     if (auto error = m_app_state->check_error()) {

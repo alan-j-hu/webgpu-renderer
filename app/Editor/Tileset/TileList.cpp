@@ -85,7 +85,11 @@ void TileList::draw()
     m_new_tile.update();
 
     update();
+}
 
+void TileList::draw_tile_editor()
+{
+    auto& tileset = *m_app_state->project().tileset_at(0);
     if (auto selected = m_app_state->selected_tiledef_idx()) {
         if (auto optional = m_tile_editor.render(*tileset.at(*selected))) {
             m_app_state->push_command(std::make_unique<UpdateTiledefCommand>(

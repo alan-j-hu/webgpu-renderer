@@ -76,6 +76,8 @@ private:
         SAVING
     } m_io_state;
 
+    std::string m_temp_string;
+
     int m_camera_selection;
 
     AppState* m_app_state;

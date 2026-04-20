@@ -12,6 +12,7 @@
 #include <filesystem>
 #include <memory>
 #include <vector>
+#include <glm/ext/vector_int2.hpp>
 
 /// Editor for tile definition. Also used in AddNewTile.
 class TileDefinitionEditor : public Renderable
@@ -33,7 +34,11 @@ private:
     RenderContext m_render_ctx;
     ModelInstance m_instance;
 
+    std::optional<glm::ivec2> m_selected_collision;
+
     void render_preview();
+
+    bool collision_matrix(TileDef&);
 };
 
 #endif
