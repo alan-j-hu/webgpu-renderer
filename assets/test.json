@@ -3,9 +3,13 @@
         {
             "tiles": [
                 {
-                    "width": 1,
-                    "depth": 1,
-                    "model": "test.obj"
+                    "width": 2,
+                    "depth": 2,
+                    "model": "test.obj",
+                    "collision_matrix": [
+                        [2, 0],
+                        [0, 2]
+                    ]
                 }
             ]
         }

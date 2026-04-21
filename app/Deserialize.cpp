@@ -97,12 +97,36 @@ JsonDeserializer::load_tiledef(
         throw DeserializeError("Could not load model: " + full_path.string());
     }
 
+    const nlohmann::json& collision_matrix_json = json.at("collision_matrix");
+    if (!collision_matrix_json.is_array()) {
+        throw DeserializeError("Expected collision matrix to be array");
+    }
+
     std::unique_ptr<TileDef> tiledef = std::make_unique<TileDef>();
     tiledef->set_width(width);
     tiledef->set_depth(depth);
     tiledef->set_model_path(std::move(model_path));
     tiledef->set_model_data(*model_data_opt);
     tiledef->set_model(*model_opt);
+
+    std::array<int, TileDef::MAX_DIM * TileDef::MAX_DIM> collision_matrix;
+    if (collision_matrix_json.size() != depth) {
+        throw DeserializeError("Collision matrix size must match depth");
+    }
+
+    for (int y = 0; y < depth; ++y) {
+        auto& row = collision_matrix_json.at(y);
+        if (!row.is_array()) {
+            throw DeserializeError("Expected row to be array");
+        }
+        if (row.size() != width) {
+            throw DeserializeError("Collision row size must match width");
+        }
+
+        for (int x = 0; x < width; ++x) {
+            tiledef->set_collision(x, y, row.at(x));
+        }
+    }
 
     return tiledef;
 }

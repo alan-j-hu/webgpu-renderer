@@ -45,10 +45,29 @@ nlohmann::json JsonSerializer::save_tileset(
 
 nlohmann::json JsonSerializer::save_tiledef(const TileDef& tiledef)
 {
+    const int depth = tiledef.depth();
+    const int width = tiledef.width();
+
+    std::vector<nlohmann::json> collision_matrix;
+    std::vector<nlohmann::json> collision_row;
+
+    collision_matrix.reserve(depth);
+    collision_row.reserve(width);
+
+    for (int y = 0; y < depth; ++y) {
+        collision_row.clear();
+        for (int x = 0; x < width; ++x) {
+            collision_row.push_back(tiledef.collision_at(x, y));
+        }
+
+        collision_matrix.push_back(collision_row);
+    }
+
     return {
         {"depth", tiledef.depth()},
         {"model", tiledef.model_path()},
-        {"width", tiledef.width()}
+        {"width", tiledef.width()},
+        {"collision_matrix", collision_matrix}
     };
 }
 
