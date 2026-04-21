@@ -109,6 +109,10 @@ JsonDeserializer::load_tiledef(
     tiledef->set_model_data(*model_data_opt);
     tiledef->set_model(*model_opt);
 
+    // TileDef may clamp depth and width to value within range
+    depth = tiledef->depth();
+    width = tiledef->width();
+
     std::array<int, TileDef::MAX_DIM * TileDef::MAX_DIM> collision_matrix;
     if (collision_matrix_json.size() != depth) {
         throw DeserializeError("Collision matrix size must match depth");
