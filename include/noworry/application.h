@@ -7,7 +7,10 @@
 class Application
 {
 public:
-    Application(int width, int height, WGPUTextureFormat format);
+    Application(const char* title,
+                int width,
+                int height,
+                WGPUTextureFormat format);
 
     Application(const Application&) = delete;
     Application& operator=(const Application&) = delete;

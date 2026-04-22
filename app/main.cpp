@@ -19,7 +19,10 @@ class Main : public Application
 {
 public:
     Main(int width, int height)
-        : Application(width, height, WGPUTextureFormat_BGRA8Unorm),
+        : Application("Map Editor",
+                      width,
+                      height,
+                      WGPUTextureFormat_BGRA8Unorm),
           m_subwindow(device(), 500, 500),
           m_app_state(device()),
           m_editor(m_app_state)

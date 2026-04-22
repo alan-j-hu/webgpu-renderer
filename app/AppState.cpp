@@ -22,7 +22,7 @@ AppState::AppState(WGPUDevice device)
       m_selected_level_idx(0, 0),
       m_selected_layer_idx()
 {
-    m_background_color = {0.0f, 0.5f, 0.5f, 1.0f};
+    m_background_color = {0.5f, 0.5f, 0.5f, 1.0f};
     m_default_material = &m_resources.add_flat_material(0.5, 0.5, 0.5);
     m_wireframe_material = &m_resources.add_wireframe_material(1, 1, 1);
     reset_selection_state();

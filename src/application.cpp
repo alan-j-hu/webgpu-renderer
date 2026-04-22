@@ -2,7 +2,11 @@
 #include "noworry/init_wgpu.h"
 #include <webgpu/webgpu_glfw.h>
 
-Application::Application(int width, int height, WGPUTextureFormat format)
+Application::Application(
+    const char* title,
+    int width,
+    int height,
+    WGPUTextureFormat format)
 {
     m_width = width;
     m_height = height;
@@ -12,8 +16,8 @@ Application::Application(int width, int height, WGPUTextureFormat format)
         return;
     }
     glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
-    GLFWwindow* window = glfwCreateWindow(
-        width, height, "WebGPU window", nullptr, nullptr);
+    GLFWwindow* window =
+        glfwCreateWindow(width, height, title, nullptr, nullptr);
     if (window == nullptr) {
         return;
     }

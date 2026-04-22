@@ -69,6 +69,7 @@ void TilesetThumbnails::capture(const TileDef& tiledef, RenderTarget& target)
         m_instance.set_model(nullptr);
     }
 
+    target.set_clear_color(m_app_state->background_color());
     m_app_state->renderer().render(
         m_render_ctx,
         m_instance,
