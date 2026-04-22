@@ -37,6 +37,12 @@ enum class Rotation
 class TileDef
 {
 public:
+    static constexpr int MAX_DIM = 5;
+
+private:
+    using CollisionMatrix = std::array<int, MAX_DIM * MAX_DIM>;
+
+public:
     class Listener
     {
     public:
@@ -64,6 +70,9 @@ public:
     void set_width(short width);
     void set_depth(short depth);
 
+    int collision_at(int x, int y) const;
+    void set_collision(int x, int y, int c);
+
 private:
     std::filesystem::path m_model_path;
     std::optional<std::shared_ptr<ModelData>> m_model_data;
@@ -71,6 +80,7 @@ private:
 
     short m_width;
     short m_depth;
+    std::shared_ptr<CollisionMatrix> m_collision_matrix;
 };
 
 class Tileset

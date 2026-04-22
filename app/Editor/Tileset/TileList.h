@@ -24,6 +24,8 @@ public:
 
     void draw();
 
+    void draw_tile_editor();
+
 private:
     AppState* m_app_state;
     Editor* m_editor;

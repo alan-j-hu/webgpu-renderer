@@ -49,6 +49,7 @@ TileDef::TileDef()
 {
     m_width = 1;
     m_depth = 1;
+    m_collision_matrix = std::make_shared<CollisionMatrix>();
 }
 
 const std::filesystem::path& TileDef::model_path() const
@@ -94,12 +95,44 @@ void TileDef::set_model(std::optional<std::shared_ptr<Model>> model)
 
 void TileDef::set_width(short width)
 {
-    m_width = std::clamp<short>(width, 1, 5);
+    m_width = std::clamp<short>(width, 1, MAX_DIM);
 }
 
 void TileDef::set_depth(short depth)
 {
-    m_depth = std::clamp<short>(depth, 1, 5);
+    m_depth = std::clamp<short>(depth, 1, MAX_DIM);
+}
+
+int TileDef::collision_at(int x, int y) const
+{
+    if (x < 0 || x >= m_width) {
+        return 0;
+    }
+    if (y < 0 || y >= m_depth) {
+        return 0;
+    }
+    return m_collision_matrix->at(y * MAX_DIM + x);
+}
+
+void TileDef::set_collision(int x, int y, int collision)
+{
+    if (x < 0 || x >= m_width) {
+        return;
+    }
+    if (y < 0 || y >= m_depth) {
+        return;
+    }
+
+    int idx = y * MAX_DIM + x;
+
+    // Implement copy-on-write
+    int old = m_collision_matrix->at(idx);
+    if (old == collision) {
+        return;
+    }
+    m_collision_matrix =
+        std::make_shared<CollisionMatrix>(*m_collision_matrix);
+    m_collision_matrix->at(idx) = collision;
 }
 
 std::size_t Tileset::count() const
