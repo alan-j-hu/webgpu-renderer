@@ -10,6 +10,16 @@ CreateLayerCommand::CreateLayerCommand(Level& level, int idx)
 {
 }
 
+const char* CreateLayerCommand::undo_string()
+{
+    return "Undo create layer";
+}
+
+const char* CreateLayerCommand::redo_string()
+{
+    return "Redo create layer";
+}
+
 auto CreateLayerCommand::up(
     Project& project
 ) -> std::expected<Command::Outcome, std::string>
@@ -21,9 +31,4 @@ auto CreateLayerCommand::up(
 void CreateLayerCommand::down(Project& project)
 {
     m_layer = m_level.remove_layer(m_idx);
-}
-
-const char* CreateLayerCommand::name()
-{
-    return "Create Layer";
 }

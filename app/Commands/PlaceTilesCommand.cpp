@@ -15,6 +15,16 @@ PlaceTilesCommand::PlaceTilesCommand(Layer& layer)
 {
 }
 
+const char* PlaceTilesCommand::undo_string()
+{
+    return "Undo place tiles";
+}
+
+const char* PlaceTilesCommand::redo_string()
+{
+    return "Redo place tiles";
+}
+
 auto PlaceTilesCommand::up(
     Project& project
 ) -> std::expected<Command::Outcome, std::string>
@@ -38,11 +48,6 @@ void PlaceTilesCommand::down(Project& project)
     for (auto& pair : m_old_tiles) {
         m_layer.set(pair.first.x, pair.first.y, pair.second);
     }
-}
-
-const char* PlaceTilesCommand::name()
-{
-    return "Place Tile";
 }
 
 void PlaceTilesCommand::add_placement(int x, int y)

@@ -5,6 +5,16 @@ CreateLevelCommand::CreateLevelCommand(World& world, int x, int y)
 {
 }
 
+const char* CreateLevelCommand::undo_string()
+{
+    return "Undo create level";
+}
+
+const char* CreateLevelCommand::redo_string()
+{
+    return "Redo create level";
+}
+
 auto CreateLevelCommand::up(
     Project& project
 ) -> std::expected<Command::Outcome, std::string>
@@ -19,9 +29,4 @@ auto CreateLevelCommand::up(
 void CreateLevelCommand::down(Project& project)
 {
     m_level = m_world->remove_level(m_x, m_y);
-}
-
-const char* CreateLevelCommand::name()
-{
-    return "Create Level";
 }

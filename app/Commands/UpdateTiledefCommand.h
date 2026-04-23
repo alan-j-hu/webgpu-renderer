@@ -8,7 +8,8 @@ class UpdateTiledefCommand : public Command
 public:
     UpdateTiledefCommand(int, TileDef);
 
-    const char* name() override;
+    const char* undo_string() override;
+    const char* redo_string() override;
 
 protected:
     std::expected<Outcome, std::string> up(Project&) override;

@@ -5,11 +5,15 @@ DeleteLevelCommand::DeleteLevelCommand(World& world, Level& level)
 {
 }
 
-const char* DeleteLevelCommand::name()
+const char* DeleteLevelCommand::undo_string()
 {
-    return "Delete Level";
+    return "Undo delete level";
 }
 
+const char* DeleteLevelCommand::redo_string()
+{
+    return "Redo delete level";
+}
 
 auto DeleteLevelCommand::up(
     Project& project

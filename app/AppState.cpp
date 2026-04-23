@@ -157,6 +157,22 @@ void AppState::run_pending_commands()
     }
 }
 
+const char* AppState::has_undo()
+{
+    if (m_undo_stack.size() == 0) {
+        return nullptr;
+    }
+    return m_undo_stack.back().command->undo_string();
+}
+
+const char* AppState::has_redo()
+{
+    if (m_redo_stack.size() == 0) {
+        return nullptr;
+    }
+    return m_redo_stack.back().command->redo_string();
+}
+
 void AppState::undo()
 {
     if (m_undo_stack.size() == 0) {

@@ -5,6 +5,16 @@ UpdateTiledefCommand::UpdateTiledefCommand(int idx, TileDef tiledef)
 {
 }
 
+const char* UpdateTiledefCommand::undo_string()
+{
+    return "Undo edit tiledef";
+}
+
+const char* UpdateTiledefCommand::redo_string()
+{
+    return "Redo edit tiledef";
+}
+
 auto UpdateTiledefCommand::up(
     Project& project
 ) -> std::expected<Command::Outcome, std::string>
@@ -18,9 +28,4 @@ auto UpdateTiledefCommand::up(
 void UpdateTiledefCommand::down(Project& project)
 {
     up(project);
-}
-
-const char* UpdateTiledefCommand::name()
-{
-    return "update tile definition";
 }

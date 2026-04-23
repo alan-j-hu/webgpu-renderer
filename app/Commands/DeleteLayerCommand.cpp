@@ -5,9 +5,14 @@ DeleteLayerCommand::DeleteLayerCommand(Level& level, int idx)
 {
 }
 
-const char* DeleteLayerCommand::name()
+const char* DeleteLayerCommand::undo_string()
 {
-    return "Delete Layer";
+    return "Undo delete layer";
+}
+
+const char* DeleteLayerCommand::redo_string()
+{
+    return "Redo delete layer";
 }
 
 auto DeleteLayerCommand::up(

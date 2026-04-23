@@ -10,7 +10,8 @@ public:
     CreateLayerCommand(Level&);
     CreateLayerCommand(Level&, int);
 
-    virtual const char* name() override;
+    const char* undo_string() override;
+    const char* redo_string() override;
 
 protected:
     virtual std::expected<Outcome, std::string> up(Project&) override;

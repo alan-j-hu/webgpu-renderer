@@ -8,6 +8,16 @@ ReorderTiledefCommand::ReorderTiledefCommand(
 {
 }
 
+const char* ReorderTiledefCommand::undo_string()
+{
+    return "Undo move tile definition";
+}
+
+const char* ReorderTiledefCommand::redo_string()
+{
+    return "Redo move tile definition";
+}
+
 auto ReorderTiledefCommand::up(
     Project& project
 ) -> std::expected<Command::Outcome, std::string>
@@ -23,9 +33,4 @@ auto ReorderTiledefCommand::up(
 void ReorderTiledefCommand::down(Project& project)
 {
     m_tileset->move(m_idx + m_delta, -m_delta);
-}
-
-const char* ReorderTiledefCommand::name()
-{
-    return "move tile definition";
 }

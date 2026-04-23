@@ -6,6 +6,16 @@ CreateTiledefCommand::CreateTiledefCommand(TileDef tiledef, int index)
 {
 }
 
+const char* CreateTiledefCommand::undo_string()
+{
+    return "Undo create tile definition";
+}
+
+const char* CreateTiledefCommand::redo_string()
+{
+    return "Redo create tile definition";
+}
+
 auto CreateTiledefCommand::up(
     Project& project
 ) -> std::expected<Command::Outcome, std::string>
@@ -18,9 +28,4 @@ void CreateTiledefCommand::down(Project& project)
 {
     auto tiledef = project.tileset_at(0)->remove(m_index);
     m_tiledef = std::move(*tiledef);
-}
-
-const char* CreateTiledefCommand::name()
-{
-    return "create tile definition";
 }

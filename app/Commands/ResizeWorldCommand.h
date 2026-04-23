@@ -8,7 +8,8 @@ class ResizeWorldCommand : public Command
 public:
     ResizeWorldCommand(World&, int top, int bottom, int left, int right);
 
-    virtual const char* name() override;
+    const char* undo_string() override;
+    const char* redo_string() override;
 
 protected:
     virtual std::expected<Outcome, std::string> up(Project&) override;

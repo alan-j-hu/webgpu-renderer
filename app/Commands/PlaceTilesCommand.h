@@ -18,7 +18,8 @@ public:
         std::shared_ptr<const TileDef> tiledef);
     PlaceTilesCommand(Layer&);
 
-    const char* name() override;
+    const char* undo_string() override;
+    const char* redo_string() override;
 
     void add_placement(int x, int y);
 

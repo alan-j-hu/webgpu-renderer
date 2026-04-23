@@ -5,6 +5,16 @@ DeleteTiledefCommand::DeleteTiledefCommand(Tileset& tileset, int index)
 {
 }
 
+const char* DeleteTiledefCommand::undo_string()
+{
+    return "Undo delete tile definition";
+}
+
+const char* DeleteTiledefCommand::redo_string()
+{
+    return "Redo delete tile definition";
+}
+
 auto DeleteTiledefCommand::up(
     Project& project
 ) -> std::expected<Command::Outcome, std::string>
@@ -23,9 +33,4 @@ void DeleteTiledefCommand::down(Project& project)
 {
     m_tileset->add(std::move(*m_tiledef), m_index);
     m_tiledef.reset();
-}
-
-const char* DeleteTiledefCommand::name()
-{
-    return "delete tile definition";
 }

@@ -136,6 +136,10 @@ public:
 
     void run_pending_commands();
 
+    const char* has_undo();
+
+    const char* has_redo();
+
     void undo();
 
     void redo();

@@ -23,7 +23,8 @@ public:
     Command();
     virtual ~Command() = default;
 
-    virtual const char* name() = 0;
+    virtual const char* undo_string() = 0;
+    virtual const char* redo_string() = 0;
 
     /// Perform the command for the first time. This function may be called
     /// multiple times in a row.

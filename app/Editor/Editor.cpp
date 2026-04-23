@@ -414,12 +414,29 @@ void Editor::draw_toolbar()
         m_current_camera = &m_ortho_camera;
     }
     ImGui::SameLine();
-    if (ImGui::Button("Undo")) {
-        m_app_state->undo();
+
+    if (const char* desc = m_app_state->has_undo()) {
+        if (ImGui::Button("Undo")) {
+            m_app_state->undo();
+        }
+        ImGui::SetItemTooltip("%s", desc);
+    } else {
+        ImGui::BeginDisabled();
+        ImGui::Button("Undo");
+        ImGui::EndDisabled();
     }
+
     ImGui::SameLine();
-    if (ImGui::Button("Redo")) {
-        m_app_state->redo();
+
+    if (const char* desc = m_app_state->has_redo()) {
+        if (ImGui::Button("Redo")) {
+            m_app_state->redo();
+        }
+        ImGui::SetItemTooltip("%s", desc);
+    } else {
+        ImGui::BeginDisabled();
+        ImGui::Button("Redo");
+        ImGui::EndDisabled();
     }
 }
 

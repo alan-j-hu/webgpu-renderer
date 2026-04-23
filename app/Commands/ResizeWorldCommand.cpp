@@ -14,6 +14,16 @@ ResizeWorldCommand::ResizeWorldCommand(
 {
 }
 
+const char* ResizeWorldCommand::undo_string()
+{
+    return "Undo resize world";
+}
+
+const char* ResizeWorldCommand::redo_string()
+{
+    return "Redo resize world";
+}
+
 auto ResizeWorldCommand::up(
     Project& project
 ) -> std::expected<Command::Outcome, std::string>
@@ -25,9 +35,4 @@ auto ResizeWorldCommand::up(
 void ResizeWorldCommand::down(Project& project)
 {
     m_world->expand(-m_top, -m_bottom, -m_left, -m_right);
-}
-
-const char* ResizeWorldCommand::name()
-{
-    return "Resize World";
 }

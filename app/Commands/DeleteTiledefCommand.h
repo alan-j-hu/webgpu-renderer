@@ -9,7 +9,8 @@ class DeleteTiledefCommand : public Command
 public:
     DeleteTiledefCommand(Tileset&, int index);
 
-    virtual const char* name() override;
+    const char* undo_string() override;
+    const char* redo_string() override;
 
 protected:
     virtual std::expected<Outcome, std::string> up(Project&) override;
