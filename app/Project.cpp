@@ -45,6 +45,21 @@ glm::mat4 transform(
     }
 }
 
+Rotation rotate_cw(Rotation rotation)
+{
+    switch (rotation) {
+    case Rotation::Rotate0:
+        return Rotation::Rotate270;
+    case Rotation::Rotate90:
+        return Rotation::Rotate0;
+    case Rotation::Rotate180:
+        return Rotation::Rotate90;
+    case Rotation::Rotate270:
+        return Rotation::Rotate180;
+    }
+    return Rotation::Rotate0;
+}
+
 TileDef::TileDef()
 {
     m_width = 1;

@@ -2,7 +2,7 @@
 #include "../Editor.h"
 
 #include <numbers>
-#include <imgui.h>
+#include "imgui.h"
 
 TileMode::TileMode(AppState& app_state, Editor& editor)
     : View2DMode(app_state, editor),
@@ -74,25 +74,17 @@ void TileMode::draw_overlay(
     }
 }
 
+bool TileMode::has_controls()
+{
+    return true;
+}
+
 void TileMode::draw_controls()
 {
-    if (ImGui::RadioButton("0°", m_rotation == Rotation::Rotate0)) {
-        m_rotation = Rotation::Rotate0;
+    if (ImGui::Button((const char*)(u8"\u21BB"))) {
+        ImGui::SetItemTooltip("Rotate");
+        m_rotation = rotate_cw(m_rotation);
     }
-    ImGui::SameLine();
-    if (ImGui::RadioButton("90°", m_rotation == Rotation::Rotate90)) {
-        m_rotation = Rotation::Rotate90;
-    }
-    ImGui::SameLine();
-    if (ImGui::RadioButton("180°", m_rotation == Rotation::Rotate180)) {
-        m_rotation = Rotation::Rotate180;
-    }
-    ImGui::SameLine();
-    if (ImGui::RadioButton("270°", m_rotation == Rotation::Rotate270)) {
-        m_rotation = Rotation::Rotate270;
-    }
-
-    m_tile_list.draw();
 }
 
 void TileMode::handle_left_mouse_down(int x, int y)

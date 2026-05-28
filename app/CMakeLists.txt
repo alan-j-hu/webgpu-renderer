@@ -8,6 +8,14 @@ set(IMGUI_SRC
   ${imgui_SOURCE_DIR}/backends/imgui_impl_wgpu.cpp
   ${imgui_SOURCE_DIR}/misc/cpp/imgui_stdlib.cpp)
 
+add_executable(binary_to_compressed_c
+  ${imgui_SOURCE_DIR}/misc/fonts/binary_to_compressed_c.cpp)
+add_custom_command(
+  OUTPUT icon_font.h
+  COMMAND binary_to_compressed_c Resources/fa-solid-900.ttf IconFont
+    > icon_font.h
+  VERBATIM)
+
 add_executable(demo
   AppState.cpp
   Deserialize.cpp
@@ -45,12 +53,14 @@ add_executable(demo
   Editor/Tileset/TileList.cpp
   Editor/Tileset/TileThumbnail.cpp
   Editor/Tileset/TilesetThumbnails.cpp
-  ${IMGUI_SRC})
+  ${IMGUI_SRC}
+  icon_font.h)
 set_property(TARGET demo PROPERTY CXX_STANDARD 23)
 set_property(TARGET demo PROPERTY C_STANDARD 23)
 target_compile_definitions(demo PUBLIC "IMGUI_IMPL_WEBGPU_BACKEND_DAWN")
 target_include_directories(demo PRIVATE
   ../include
+  ${CMAKE_CURRENT_BINARY_DIR}
   ${imgui_SOURCE_DIR}
   ${imgui_SOURCE_DIR}/backends)
 

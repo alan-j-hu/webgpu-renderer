@@ -17,6 +17,8 @@ public:
 
     virtual void draw_overlay(RenderTarget&, SpriteRenderer&) override;
 
+    virtual bool has_controls() override;
+
     virtual void draw_controls() override;
 
 protected:

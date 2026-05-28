@@ -15,6 +15,8 @@
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_wgpu.h"
 
+#include "icon_font.h"
+
 class Main : public Application
 {
 public:
@@ -101,7 +103,21 @@ private:
         init_info.RenderTargetFormat = WGPUTextureFormat_BGRA8Unorm;
         init_info.DepthStencilFormat = WGPUTextureFormat_Undefined;
         ImGui_ImplWGPU_Init(&init_info);
-        ImGui::GetIO().ConfigFlags |= ImGuiConfigFlags_DockingEnable;
+
+        ImGuiIO& io = ImGui::GetIO();
+        io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
+        io.Fonts->Clear();
+        io.Fonts->AddFontDefaultVector();
+
+        ImFontConfig icons_config = {};
+        icons_config.MergeMode = true;
+        icons_config.FontDataOwnedByAtlas = false;
+        icons_config.PixelSnapH = true;
+        io.Fonts->AddFontFromMemoryCompressedTTF(
+            IconFont_compressed_data,
+            IconFont_compressed_size,
+            0,
+            &icons_config);
     }
 
     void shutdown_imgui()

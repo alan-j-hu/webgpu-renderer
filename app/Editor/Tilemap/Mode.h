@@ -11,6 +11,8 @@ public:
 
     virtual void draw_overlay(RenderTarget&, SpriteRenderer&) = 0;
 
+    virtual bool has_controls() { return false; }
+
     virtual void draw_controls() = 0;
 };
 

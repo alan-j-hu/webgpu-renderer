@@ -30,6 +30,7 @@ Third-party dependencies:
 - glm
 - nlohmann::json
 - stb_image
+- Font Awesome 6
 
 All dependencies should be automatically downloaded by CMake.
 

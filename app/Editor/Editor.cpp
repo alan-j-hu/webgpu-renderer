@@ -231,6 +231,26 @@ void Editor::draw_menubar()
             ImGui::EndMenu();
         }
         if (ImGui::BeginMenu("Edit")) {
+            if (const char* desc = m_app_state->has_undo()) {
+                if (ImGui::MenuItem(desc)) {
+                    m_app_state->undo();
+                }
+            } else {
+                ImGui::BeginDisabled();
+                ImGui::MenuItem("Undo");
+                ImGui::EndDisabled();
+            }
+
+            if (const char* desc = m_app_state->has_redo()) {
+                if (ImGui::MenuItem(desc)) {
+                    m_app_state->redo();
+                }
+            } else {
+                ImGui::BeginDisabled();
+                ImGui::MenuItem("Redo");
+                ImGui::EndDisabled();
+            }
+
             ImGui::EndMenu();
         }
 
@@ -399,44 +419,35 @@ void Editor::render_preview()
 
 void Editor::draw_toolbar()
 {
-    if (ImGui::Button("View 3D")) {
-        m_current_mode = &m_view_3d_mode;
-        m_current_camera = &m_persp_camera;
-    }
-    ImGui::SameLine();
-    if (ImGui::Button("Edit Tiles")) {
-        m_current_mode = &m_tile_mode;
-        m_current_camera = &m_ortho_camera;
-    }
-    ImGui::SameLine();
-    if (ImGui::Button("Edit Z")) {
-        m_current_mode = &m_height_mode;
-        m_current_camera = &m_ortho_camera;
-    }
-    ImGui::SameLine();
-
-    if (const char* desc = m_app_state->has_undo()) {
-        if (ImGui::Button("Undo")) {
-            m_app_state->undo();
+    ImGuiChildFlags flags =
+        ImGuiChildFlags_Borders
+      | ImGuiChildFlags_AutoResizeX
+      | ImGuiChildFlags_AutoResizeY;
+    if (ImGui::BeginChild("#ModeControls", ImVec2(0, 0), flags)) {
+        if (ImGui::Button("View 3D")) {
+            m_current_mode = &m_view_3d_mode;
+            m_current_camera = &m_persp_camera;
         }
-        ImGui::SetItemTooltip("%s", desc);
-    } else {
-        ImGui::BeginDisabled();
-        ImGui::Button("Undo");
-        ImGui::EndDisabled();
-    }
-
-    ImGui::SameLine();
-
-    if (const char* desc = m_app_state->has_redo()) {
-        if (ImGui::Button("Redo")) {
-            m_app_state->redo();
+        ImGui::SameLine();
+        if (ImGui::Button("Edit Tiles")) {
+            m_current_mode = &m_tile_mode;
+            m_current_camera = &m_ortho_camera;
         }
-        ImGui::SetItemTooltip("%s", desc);
-    } else {
-        ImGui::BeginDisabled();
-        ImGui::Button("Redo");
-        ImGui::EndDisabled();
+        ImGui::SameLine();
+        if (ImGui::Button("Edit Z")) {
+            m_current_mode = &m_height_mode;
+            m_current_camera = &m_ortho_camera;
+        }
+    }
+    ImGui::EndChild();
+
+    if (m_current_mode->has_controls()) {
+        ImGui::SameLine();
+
+        if (ImGui::BeginChild("#Controls", ImVec2(0, 0), flags)) {
+            m_current_mode->draw_controls();
+        }
+        ImGui::EndChild();
     }
 }
 

@@ -34,6 +34,8 @@ enum class Rotation
     Rotate270
 };
 
+Rotation rotate_cw(Rotation);
+
 class TileDef
 {
 public:
